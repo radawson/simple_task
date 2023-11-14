@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Tasks
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <h1>Tasks</h1>
+    <ul class="list-group my-5">
+        {% for task in tasks %}
+        <li class="list-group-item">{{ task.content }}</li>
+        {% endfor %}
+    </ul>
+    <button class="btn btn-primary" onclick="window.location.href='/add_task'">Add Task</button>
+</div>
+{% endblock %}

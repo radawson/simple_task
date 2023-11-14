@@ -5,3 +5,16 @@
 # Pycache
 # --------
 __pycache__
+
+# Python egg metadata
+# -------------------
+*.egg-info
+
+# Logs
+# ----
+logs
+*.log
+
+# Instance folder
+# ---------------
+instance/
