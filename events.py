@@ -22,4 +22,5 @@ def add_event():
         new_event = Event(name=name, description=description, date=date, time=time, location=location)
         db.session.add(new_event)
         db.session.commit()
-        return "Event added successfully"
+        message = "Event added successfully"
+    return render_template("add_event.html", message=message)

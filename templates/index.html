@@ -7,22 +7,22 @@ Today
 {% block content %}
 <div class="container py-5">
     <div class="card">
-    <h1>Tasks</h1>
-    <ul class="list-group my-5">
-        {% for task in tasks %}
-        <li class="list-group-item">{{ task.name }}</li>
-        {% endfor %}
-    </ul>
-    <button class="btn btn-primary" onclick="window.location.href='/tasks'">Add Task</button>
+        <h1>Tasks</h1>
+        <ul class="list-group my-5">
+            {% for task in tasks %}
+            <li class="list-group-item">{{ task.name }}</li>
+            {% endfor %}
+        </ul>
+        <button class="btn btn-primary" onclick="window.location.href='/tasks'">Add Task</button>
     </div>
     <div class="card">
-    <h1>Events</h1>
-    <ul class="list-group my-5">
-        {% for event in events %}
-        <li class="list-group-item">{{ event.name }}</li>
-        {% endfor %}
-    </ul>
-    <button class="btn btn-primary" onclick="window.location.href='/events'">Add Event</button>
-    
-</div>
-{% endblock %}
+        <h1>Events</h1>
+        <ul class="list-group my-5">
+            {% for event in events %}
+            <li class="list-group-item">{{ event.time }} {{ event.name }}</li>
+            {% endfor %}
+        </ul>
+        <button class="btn btn-primary" onclick="window.location.href='/events'">Add Event</button>
+
+    </div>
+    {% endblock %}

@@ -29,4 +29,12 @@ Add Event
         <button type="submit" class="btn btn-primary">Add Event</button>
     </form>
 </div>
+<script>
+    window.onload = function () {
+        var message = "{{ message }}";
+        if (message) {
+            alert(message);
+        }
+    };
+</script>
 {% endblock %}

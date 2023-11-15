@@ -31,4 +31,12 @@ Add Task
     <button class="btn btn-primary"
         onclick="window.location.href='/date/' + document.getElementById('view_date').value">View Tasks</button>
 </div>
+<script>
+    window.onload = function() {
+        var message = "{{ message }}";
+        if (message) {
+            alert(message);
+        }
+    };
+</script>
 {% endblock %}
