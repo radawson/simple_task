@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request
-from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
-from models import db, Task, Event
+from models import db, Task, Event, Note
+from notes import notes
 from tasks import tasks
 from events import events
 
@@ -16,9 +16,17 @@ with app.app_context():
 @app.route("/")
 def index():
     date = datetime.now().date()
+    notes = Note.query.filter_by(date=date).all()
     tasks = Task.query.filter_by(date=date).all()
     events = Event.query.filter_by(date=date).all()
-    return render_template("index.html", tasks=tasks, events=events)
+    if events == None:
+        events = ["Nothing scheduled yet"]
+    if notes == None:
+        notes = ["Nothing to show"]
+    if tasks == None:
+        tasks = ["Nothing to show"]
+
+    return render_template("index.html", notes=notes, tasks=tasks, events=events)
 
 @app.route("/date/<date>")
 def get_date(date):
@@ -27,7 +35,7 @@ def get_date(date):
     events = Event.query.filter_by(date=date).all()
     return render_template("index.html", tasks=tasks, events=events)
 
-
+app.register_blueprint(notes)
 app.register_blueprint(tasks)
 app.register_blueprint(events)
 

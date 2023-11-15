@@ -7,7 +7,7 @@
     <meta http-equiv="x-ua-compatible" content="ie=edge" />
     <title>{% block title %}{% endblock %}</title>
     <!-- MDB icon -->
-    <link rel="icon" href="{{url_for('static', filename='img/mdb-favicon.ico')}}" type="image/x-icon" />
+    <link rel="icon" href="{{url_for('static', filename='img/favicon.ico')}}" type="image/x-icon" />
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
     <!-- Google Fonts Roboto -->
@@ -36,19 +36,23 @@
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <!-- Navbar brand -->
                 <a class="navbar-brand mt-2 mt-lg-0" href="#">
-                    <img src="https://mdbcdn.b-cdn.net/img/logo/mdb-transaprent-noshadows.webp" height="15"
-                        alt="MDB Logo" loading="lazy" />
+                    <img src="{{url_for('static', filename='img/ptx_logo2.png') }}" height="25"
+                        alt="PTX Logo" loading="lazy" />
                 </a>
                 <!-- Left links -->
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item">
                         <a class="nav-link" href="/">Home</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/tasks">Tasks</a>
-                    </li>
+
                     <li class="nav-item">
                         <a class="nav-link" href="/events">Events</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/notes">Notes</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/tasks">Tasks</a>
                     </li>
                 </ul>
                 <!-- Left links -->

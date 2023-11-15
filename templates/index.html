@@ -10,19 +10,52 @@ Today
         <h1>Tasks</h1>
         <ul class="list-group my-5">
             {% for task in tasks %}
-            <li class="list-group-item">{{ task.name }}</li>
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                {{ task.name }}
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="" id="taskCheck{{ loop.index }}">
+                    <label class="form-check-label" for="taskCheck{{ loop.index }}">
+                        Completed
+                    </label>
+                </div>
+            </li>
             {% endfor %}
         </ul>
-        <button class="btn btn-primary" onclick="window.location.href='/tasks'">Add Task</button>
+        <div class="d-grid gap-2 col-6 mx-auto">
+            <button class="btn btn-primary" onclick="window.location.href='/tasks'">Add Task</button>
+        </div>
     </div>
     <div class="card">
         <h1>Events</h1>
         <ul class="list-group my-5">
             {% for event in events %}
-            <li class="list-group-item">{{ event.time }} {{ event.name }}</li>
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                {{ event.time }} {{ event.name }}
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="" id="eventCheck{{ loop.index }}">
+                    <label class="form-check-label" for="eventCheck{{ loop.index }}">
+                        Completed
+                    </label>
+                </div>
+            </li>
             {% endfor %}
         </ul>
-        <button class="btn btn-primary" onclick="window.location.href='/events'">Add Event</button>
-
+        <div class="d-grid gap-2 col-6 mx-auto">
+            <button class="btn btn-primary" onclick="window.location.href='/events'">Add Event</button>
+        </div>
+    </div>
+    <div class="card">
+        <h1>Notes</h1>
+        <ul class="list-group my-5">
+            {% for note in notes %}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                {{ note.title }}
+                {{ note.content }}
+            </li>
+            {% endfor %}
+        </ul>
+        <div class="d-grid gap-2 col-6 mx-auto">
+            <button class="btn btn-primary" onclick="window.location.href='/notes'">Add Note</button>
+        </div>
     </div>
     {% endblock %}

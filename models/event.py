@@ -8,3 +8,4 @@ class Event(db.Model):
     date = db.Column(db.Date, nullable=False)
     time = db.Column(db.Time, nullable=False)
     location = db.Column(db.String(200), nullable=False)
+    completed = db.Column(db.Boolean, nullable=False, default=False)
