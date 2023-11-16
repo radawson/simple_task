@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, request
-from models import Event, db
+from stasks.models import Event, db
 from datetime import datetime
 
 events = Blueprint('events', __name__)

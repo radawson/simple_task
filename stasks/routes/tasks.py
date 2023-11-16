@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, request
-from models import Task, db
+from stasks.models import Task, db
 from datetime import datetime
 
 tasks = Blueprint('tasks', __name__)
