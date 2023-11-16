@@ -36,8 +36,8 @@
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <!-- Navbar brand -->
                 <a class="navbar-brand mt-2 mt-lg-0" href="#">
-                    <img src="{{url_for('static', filename='img/ptx_logo2.png') }}" height="30"
-                        alt="PTX Logo" loading="lazy" />
+                    <img src="{{url_for('static', filename='img/ptx_logo2.png') }}" height="30" alt="PTX Logo"
+                        loading="lazy" />
                 </a>
                 <!-- Left links -->
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
@@ -63,7 +63,7 @@
             <div class="d-flex align-items-center">
 
                 <!-- Notifications -->
-                <div class="dropdown">
+                <!-- <div class="dropdown">
                     <a class="text-reset me-3 dropdown-toggle hidden-arrow" href="#" id="navbarDropdownMenuLink"
                         role="button" data-mdb-toggle="dropdown" aria-expanded="false">
                         <i class="fas fa-bell"></i>
@@ -80,8 +80,10 @@
                             <a class="dropdown-item" href="#">Something else here</a>
                         </li>
                     </ul>
-                </div>
-                
+                </div> -->
+                <!-- Live time and date -->
+                <div id="liveDateTime" class="navbar-text"></div>
+
             </div>
             <!-- Right elements -->
         </div>
@@ -90,5 +92,15 @@
     <!-- Navbar -->
     {% block content %}{% endblock %}
 </body>
+<script>
+    function updateDateTime() {
+        var now = new Date();
+        var date = now.toLocaleDateString();
+        var time = now.toLocaleTimeString();
+        document.getElementById('liveDateTime').textContent = date + ' ' + time;
+    }
+    setInterval(updateDateTime, 1000);
+    updateDateTime();
+</script>
 
 </html>
