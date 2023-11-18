@@ -27,13 +27,33 @@ def add_task():
         message = "Task added successfully"
     return render_template("add_task.html", message=message)
 
-@tasks.route("/task/<int:id>", methods=["DELETE", "GET"])
+@tasks.route("/task/<int:id>", methods=["DELETE", "GET", "PATCH"])
 def task_api(id):
     task = Task.query.get(id)
+    if task is None:
+        print(f"No task found with id {id}")
+        return "No task found", 404
+
     if request.method == "DELETE":
+        print(f"Deleting task {id}")
         db.session.delete(task)
         db.session.commit()
-        message = f"Task {id} deleted successfully"
-        return render_template("add_task.html", message=message) 
-    elif request.method == "GET":   
+        print(f"Task {id} deleted successfully")
+        return "Task deleted", 200 
+    elif request.method == "GET": 
+        # troubleshooting
+        print(f"received GET request for task {id}")  
         return render_template("detail_task.html", task=task)
+    elif request.method == "PATCH":
+        # troubleshooting
+        print(f"received PATCH request for task {id}, {request.form.items()}")
+        description = request.form["taskDescription"]
+        date = datetime.strptime(request.form["taskDate"], "%Y-%m-%d").date()
+        task.description = description
+        task.date = date
+        db.session.commit()
+        message = "Task updated successfully"
+        return render_template("detail_task.html", task=task, message=message)
+    else:
+        message = "Method not allowed"
+        return render_template("detail_task.html", task=task, message=message)

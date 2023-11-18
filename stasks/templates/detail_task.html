@@ -10,13 +10,18 @@ Task Detail
     <div class="card">
         <div class="card-body">
             <h5 class="card-title" id="taskName">{{ task.name }}</h5>
-            <div class="form-outline">
-                <input type="text" id="taskDescription" readonly class="form-control" value={{ task.description }}/>
-                <label class="form-label" for="form12">Description</label>
-            </div>
-            <p class="card-text" id="taskDate" readonly>{{ task.date }}</p>
+            <form id="taskForm" action="{{task.id}}" method="post">
+                <div class="form-outline">
+                    <input type="text" id="taskDescription" readonly class="form-control" value={{ task.description
+                        }} />
+                    <label class="form-label" for="taskDescription">Description</label>
+                </div>
+                <input type="date" class="form-control" id="taskDate" readonly
+                    value="{{ task.date.strftime('%Y-%m-%d') }}" />
+                <label class="form-label" for="taskDate">Date</label>
+            </form>
             <button id="editButton" class="btn btn-primary" onclick="toggleEdit()">Edit</button>
-            <a href="{{ url_for('tasks.task_api', id=task.id) }}" class="btn btn-danger">Delete</a>
+            <button id="deleteButton" class="btn btn-danger" onclick="deleteTask()">Delete</button>
         </div>
     </div>
 </div>
@@ -24,22 +29,57 @@ Task Detail
 
 {% block extra_js %}
 <script>
+    function deleteTask() {
+        let taskId = "{{task.id}}"; // Replace this with the actual task id
+
+        fetch(`/task/${taskId}`, {
+            method: 'DELETE',
+        })
+            .then(response => response.json())
+            .then(data => console.log(data))
+            .catch((error) => {
+                console.error('Error:', error);
+            })
+            .then(() => {
+                window.location.href = '/tasks';
+            });
+    }
+
     function toggleEdit() {
         let button = document.getElementById('editButton');
-        let fields = [document.getElementById('taskDescription'), document.getElementById('taskDate'), document.getElementById('taskName')]; // Add all other fields here
+    let fields = [document.getElementById('taskDescription'), document.getElementById('taskDate'), document.getElementById('taskName')]; // Add all other fields here
+    let form = document.getElementById('taskForm');
 
-        fields.forEach(function (field) {
-            if (field.hasAttribute('readonly')) {
-                field.removeAttribute('readonly');
-            } else {
-                field.setAttribute('readonly', true);
-            }
-        });
-        if (button.textContent === 'Edit') {
-            button.textContent = 'Save';
+    fields.forEach(function (field) {
+        if (field.hasAttribute('readonly')) {
+            field.removeAttribute('readonly');
         } else {
-            button.textContent = 'Edit';
+            field.setAttribute('readonly', true);
         }
+    });
+
+    if (button.textContent === 'Edit') {
+        button.textContent = 'Save';
+    } else {
+        let formData = new FormData(form);
+        fetch(form.action, {
+            method: 'PATCH',
+            body: formData,
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            }
+        }).then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        }).then(json => {
+            console.log(json);
+            button.textContent = 'Edit';
+        }).catch(e => {
+            console.log('There was a problem with the fetch operation: ' + e.message);
+        });
     }
+}
 </script>
 {% endblock %}

@@ -17,3 +17,25 @@ Note Detail
     </div>
 </div>
 {% endblock %}
+
+{% block extra_js %}
+<script>
+    function toggleEdit() {
+        let button = document.getElementById('editButton');
+        let fields = [document.getElementById('taskDescription'), document.getElementById('taskDate'), document.getElementById('taskName')]; // Add all other fields here
+
+        fields.forEach(function (field) {
+            if (field.hasAttribute('readonly')) {
+                field.removeAttribute('readonly');
+            } else {
+                field.setAttribute('readonly', true);
+            }
+        });
+        if (button.textContent === 'Edit') {
+            button.textContent = 'Save';
+        } else {
+            button.textContent = 'Edit';
+        }
+    }
+</script>
+{% endblock %}

@@ -9,7 +9,7 @@ Add Task
     <div class="card-group">
 
         {% for task in tasks %}
-        <a href="{{ url_for('task_api', id=task.id)}}">
+        <a href="{{ url_for('tasks.task_api', id=task.id)}}">
             <div class="card h-100">
                 <div class="card-body">
                     <h5 class="card-title">{{task.name}}</h5>
