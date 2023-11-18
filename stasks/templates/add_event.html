@@ -5,6 +5,20 @@ Add Event
 {% block content %}
 <div class="container py-5">
     <h1>Add Event</h1>
+    <div class="card-group">
+
+        {% for event in events %}
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="card-title">{{event.name}}</h5>
+                <p class="card-text">
+                    {{ event.date}}
+                </p>
+            </div>
+        </div>
+        {% endfor %}
+
+    </div>
     <form method="POST">
         <div class="form-group">
             <label for="name">Name:</label>
@@ -28,13 +42,14 @@ Add Event
         </div>
         <button type="submit" class="btn btn-primary">Add Event</button>
     </form>
+
+    <h1>View Events</h1>
+    <div class="form-group">
+        <label for="view_date">Date:</label>
+        <input type="date" id="view_date" name="view_date" class="form-control">
+    </div>
+    <button class="btn btn-primary"
+        onclick="window.location.href='/date/' + document.getElementById('view_date').value">View Events</button>
 </div>
-<script>
-    window.onload = function () {
-        var message = "{{ message }}";
-        if (message) {
-            alert(message);
-        }
-    };
-</script>
+
 {% endblock %}

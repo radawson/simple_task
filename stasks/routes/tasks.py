@@ -14,7 +14,10 @@ def get_tasks_date(date):
 @tasks.route("/tasks", methods=["GET", "POST"])
 def add_task():
     message = ""
-    if request.method == "POST":
+    if request.method == "GET":
+        tasks = Task.query.all()
+        return render_template("add_task.html", tasks=tasks)
+    elif request.method == "POST":
         name = request.form["name"]
         description = request.form["description"]
         date = datetime.strptime(request.form["date"], "%Y-%m-%d").date()
@@ -23,3 +26,14 @@ def add_task():
         db.session.commit()
         message = "Task added successfully"
     return render_template("add_task.html", message=message)
+
+@tasks.route("/task/<int:id>", methods=["DELETE", "GET"])
+def task_api(id):
+    task = Task.query.get(id)
+    if request.method == "DELETE":
+        db.session.delete(task)
+        db.session.commit()
+        message = f"Task {id} deleted successfully"
+        return render_template("add_task.html", message=message) 
+    elif request.method == "GET":   
+        return render_template("detail_task.html", task=task)

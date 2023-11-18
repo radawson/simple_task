@@ -12,7 +12,8 @@ def event_detail(id):
 @events.route("/events", methods=["GET", "POST"])
 def add_event():
     if request.method == "GET":
-        return render_template("add_event.html")
+        events = Event.query.all()
+        return render_template("add_event.html", events=events)
     elif request.method == "POST":
         name = request.form["name"]
         description = request.form["description"]

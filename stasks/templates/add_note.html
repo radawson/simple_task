@@ -5,20 +5,21 @@ Add Note
 {% block content %}
 <div class="container py-5">
     <h1>Add Note</h1>
-    <div class="row row-cols-1 row-cols-md-3 g-4">
+    <div class="card-group">
+
         {% for note in notes %}
-        <div class="col">
-            <div class="card h-100">
-                <div class="card-body">
-                    <h5 class="card-title">{{note.title}}</h5>
-                    <p class="card-text">
-                        {{ note.content}}
-                    </p>
-                </div>
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="card-title">{{note.title}}</h5>
+                <p class="card-text">
+                    {{ note.date}}
+                </p>
             </div>
         </div>
         {% endfor %}
+
     </div>
+
     <form action="/notes" method="post" class="my-5">
         <div class="form-group">
             <label for="date">Date:</label>
@@ -35,6 +36,14 @@ Add Note
         </div>
         <input class="btn btn-primary" type="submit" value="Add Note">
     </form>
+
+    <h1>View Notes</h1>
+    <div class="form-group">
+        <label for="view_date">Date:</label>
+        <input type="date" id="view_date" name="view_date" class="form-control">
+    </div>
+    <button class="btn btn-primary"
+        onclick="window.location.href='/date/' + document.getElementById('view_date').value">View Notes</button>
 </div>
 <script>
     document.addEventListener('DOMContentLoaded', (event) => {

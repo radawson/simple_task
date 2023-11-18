@@ -90,17 +90,25 @@
     <!-- MDB -->
     <script type="text/javascript" src="{{url_for('static', filename='js/mdb.min.js')}}"></script>
     <!-- Custom scripts -->
-
     <script>
         function updateDateTime() {
             let now = new Date();
             let date = now.toLocaleDateString();
             let time = now.toLocaleTimeString();
-            document.getElementById('liveDateTime').textContent = date;
+            document.getElementById('liveDateTime').textContent = date + ' ' + time;
         }
         setInterval(updateDateTime, 1000);
         updateDateTime();
     </script>
+    <script>
+        window.onload = function () {
+            var message = "{{ message }}";
+            if (message) {
+                alert(message);
+            }
+        };
+    </script>
+    {% block extra_js %}{% endblock %}
 </body>
 
 </html>
