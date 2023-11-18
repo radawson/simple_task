@@ -19,3 +19,7 @@ logs
 # Instance folder
 # ---------------
 instance/
+
+# Database migrations
+# -------------------
+migrations/
