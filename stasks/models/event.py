@@ -12,5 +12,4 @@ class Event(db.Model):
     location = db.Column(db.String(200), nullable=False)
     completed = db.Column(db.Boolean, nullable=False, default=False)
 
-    def get_people():
-        return ["George", "Kathy", "Ric", "Pat"]
+     

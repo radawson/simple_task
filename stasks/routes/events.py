@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, request
-from stasks.models import Event, db
+from stasks.models import Event, db, Person
 from datetime import datetime
 
 events = Blueprint('events', __name__)
@@ -13,7 +13,7 @@ def event_detail(id):
 def add_event():
     if request.method == "GET":
         events = Event.query.all()
-        return render_template("add_event.html", events=events, people=Event.get_people())
+        return render_template("add_event.html", events=events, people=Person.get_names())
     elif request.method == "POST":
         name = request.form.get("name")
         description = request.form.get("description")

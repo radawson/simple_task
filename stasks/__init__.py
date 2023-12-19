@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request
 from flask_migrate import Migrate
 from datetime import datetime
-from .models import db, Task, Event, Note
+from .models import db, Task, Event, Note, Person
 from .routes import notes, tasks, events
 
 def create_app():
