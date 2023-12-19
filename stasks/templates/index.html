@@ -30,7 +30,7 @@ Today
         <ul class="list-group my-5">
             {% for event in events %}
             <li class="list-group-item d-flex justify-content-between align-items-center">
-                {{ event.time }} {{ event.name }}
+                {{ event.time }}: {{ event.name }} for {{event.person}}
                 <div class="form-check">
                     <input class="form-check-input" type="checkbox" value="" id="eventCheck{{ loop.index }}">
                     <label class="form-check-label" for="eventCheck{{ loop.index }}">

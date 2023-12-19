@@ -31,14 +31,15 @@
                 aria-label="Toggle navigation">
                 <i class="fas fa-bars"></i>
             </button>
+            <!-- Navbar brand -->
+            <a class="navbar-brand mt-2 mt-lg-0" href="/">
+                <img src="{{url_for('static', filename='img/ptx_logo2.png') }}" height="15" alt="PTX Logo"
+                    loading="lazy" />
+            </a>
 
             <!-- Collapsible wrapper -->
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <!-- Navbar brand -->
-                <a class="navbar-brand mt-2 mt-lg-0" href="/">
-                    <img src="{{url_for('static', filename='img/ptx_logo2.png') }}" height="15" alt="PTX Logo"
-                        loading="lazy" />
-                </a>
+
                 <!-- Left links -->
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item">
@@ -117,7 +118,7 @@
     </script>
     <!-- Template scripts -->
     {% block extra_js %}{% endblock %}
-    
+
 </body>
 
 </html>

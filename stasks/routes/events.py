@@ -13,14 +13,15 @@ def event_detail(id):
 def add_event():
     if request.method == "GET":
         events = Event.query.all()
-        return render_template("add_event.html", events=events)
+        return render_template("add_event.html", events=events, people=Event.get_people())
     elif request.method == "POST":
-        name = request.form["name"]
-        description = request.form["description"]
+        name = request.form.get("name")
+        description = request.form.get("description")
         date = datetime.strptime(request.form["date"], "%Y-%m-%d").date()
         time = datetime.strptime(request.form["time"], "%H:%M").time()
-        location = request.form["location"]
-        new_event = Event(name=name, description=description, date=date, time=time, location=location)
+        location = request.form.get("location")
+        person = request.form.get("person")
+        new_event = Event(name=name, description=description, date=date, time=time, location=location, person= person)
         db.session.add(new_event)
         db.session.commit()
         message = "Event added successfully"
