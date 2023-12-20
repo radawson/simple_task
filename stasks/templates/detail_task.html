@@ -12,8 +12,8 @@ Task Detail
             <h5 class="card-title" id="taskName">{{ task.name }}</h5>
             <form id="taskForm" action="{{task.id}}" method="post">
                 <div class="form-outline">
-                    <input type="text" id="taskDescription" readonly class="form-control" value={{ task.description
-                        }} />
+                    <input type="text" id="taskDescription" readonly class="form-control" value="{{ task.description
+                        }}"" />
                     <label class="form-label" for="taskDescription">Description</label>
                 </div>
                 <input type="date" class="form-control" id="taskDate" readonly

@@ -5,57 +5,44 @@ Add Event
 {% block content %}
 <div class="container py-5">
     <h1>Add Event</h1>
-    <div class="card-group">
 
-        {% for event in events %}
-        <div class="card h-100">
-            <div class="card-body">
-                <h5 class="card-title">{{event.name}}</h5>
-                <h6 class="card-subtitle mb-2 text-muted">{{event.person}}</h6>
-                <p class="card-text">
-                    {{ event.date}} {{event.time}}
-                </p>
-            </div>
-        </div>
-        {% endfor %}
-
-    </div>
     <form method="POST">
-        <div class="form-group">
-            <label for="name">Name:</label>
-            <input type="text" id="name" name="name" class="form-control">
+        <div class="form-outline mb-2" data-mdb-input-init>
+            <input type="text" id="name" name="name" class="form-control" />
+            <label class="form-label" for="name">Name</label>
         </div>
-        <div class="form-group">
-            <label for="description">Description:</label>
+        <div class="form-outline mb-2" data-mdb-input-init>
             <textarea id="description" name="description" class="form-control"></textarea>
+            <label class="form-label" for="description">Event Description</label>
         </div>
-        <div class="form-group">
-            <label for="date">Date:</label>
-            <input type="date" id="date" name="date" class="form-control">
+        <div class="form-outline mb-2" data-mdb-input-init>
+            <input type="date" id="date" name="date" class="form-control" />
+            <label class="form-label" for="date">Date</label>
         </div>
-        <div class="form-group">
-            <label for="time">Time:</label>
-            <input type="time" id="time" name="time" class="form-control">
+        <div class="form-outline mb-2" data-mdb-input-init>
+            <input type="time" id="time" name="time" class="form-control" />
+            <label class="form-label" for="time">Time</label>
         </div>
-        <div class="form-group">
-            <label for="person">Person:</label>
-            <select id="person" name="person" class="form-control mdb-select">
-                {% for person in people %}
-                <option value="{{person}}">{{person}}</option>
-                {% endfor %}
+        <div class="form-outline mb-2" data-mdb-input-init>
+            <input type="text" id="location" name="location" class="form-control" />
+            <label class="form-label" for="location">Location</label>
+        </div>
+        <div class="form-outline mb-2">
+            <select id="person" name="person" class="form-control mdb-select" data-mdb-select-init >
+            <option></option>
+            {% for person in people %}
+            <option value="{{person}}">{{person}}</option>
+            {% endfor %}
             </select>
-        </div>
-        <div class="form-group">
-            <label for="location">Location:</label>
-            <input type="text" id="location" name="location" class="form-control">
+            <label class="form-label select-label" for="person">Person</label>
         </div>
         <button type="submit" class="btn btn-primary">Add Event</button>
     </form>
 
-    <h1>View Events</h1>
-    <div class="form-group">
-        <label for="view_date">Date:</label>
-        <input type="date" id="view_date" name="view_date" class="form-control">
+    <h1>View Events by Date</h1>
+    <div class="form-outline">
+        <input type="date" id="view_date" name="view_date" class="form-control"/>
+        <label class="form-label" for="view_date">Date</label>
     </div>
     <button class="btn btn-primary"
         onclick="window.location.href='/date/' + document.getElementById('view_date').value">View Events</button>

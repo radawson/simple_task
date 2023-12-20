@@ -12,8 +12,8 @@ Event Detail
             <h5 class="card-title">{{ event.name }}</h5>
             <h6 class="card-subtitle">for {{event.person}}</h6>
             <p class="card-text">{{ event.description }}</p>
-            <a href="{{ url_for('edit_event', id=task.id) }}" class="btn btn-primary">Edit</a>
-            <a href="{{ url_for('delete_event', id=task.id) }}" class="btn btn-danger">Delete</a>
+            <a href="{{ url_for('events.event_detail', id=event.id) }}" class="btn btn-primary">Edit</a>
+            <button id="deleteButton" class="btn btn-danger" onclick="deleteEvent()">Delete</button>
         </div>
     </div>
 </div>
@@ -21,6 +21,22 @@ Event Detail
 
 {% block extra_js %}
 <script>
+    function deleteEvent() {
+        let eventId = "{{event.id}}"; 
+
+        fetch(`/event/${eventId}`, {
+            method: 'DELETE',
+        })
+            .then(response => response.json())
+            .then(data => console.log(data))
+            .catch((error) => {
+                console.error('Error:', error);
+            })
+            .then(() => {
+                window.location.href = '/events';
+            });
+    }
+
     function toggleEdit() {
         let button = document.getElementById('editButton');
         let fields = [document.getElementById('taskDescription'), document.getElementById('taskDate'), document.getElementById('taskName')]; // Add all other fields here
