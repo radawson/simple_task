@@ -5,7 +5,7 @@ from datetime import datetime
 tasks = Blueprint('tasks', __name__)
 
 @tasks.route("/tasks")
-def get_tasks():
+def task_list():
     tasks = Task.query.all()
     return render_template("tasks.html", tasks=tasks)
 
@@ -15,6 +15,10 @@ def get_tasks_date(date):
     tasks = Task.query.filter_by(date=date).all()
     return render_template("tasks.html", tasks=tasks)
 
+@tasks.route("/tasks/<int:id>")
+def task_detail(id):
+    task = Task.query.get(id)
+    return render_template("detail_task.html", task=task)
 
 @tasks.route("/tasks/add", methods=["GET", "POST"])
 def add_task():

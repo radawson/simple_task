@@ -35,8 +35,6 @@ Events
         url = url.replace('0', eventId);
         window.location.href = url;
     }
-</script>
-<script>
 
     document.getElementById("btn_add_event").addEventListener("click", function () {
         window.location.href = "{{ url_for('events.add_event') }}";

@@ -44,8 +44,18 @@ Add Event
         <input type="date" id="view_date" name="view_date" class="form-control"/>
         <label class="form-label" for="view_date">Date</label>
     </div>
-    <button class="btn btn-primary"
-        onclick="window.location.href='/date/' + document.getElementById('view_date').value">View Events</button>
+    <button class="btn btn-primary" id="btn_view_date">View Events</button>
 </div>
 
 {% endblock %}
+
+{% block extra_js %}
+
+<script>
+    document.getElementById("btn_view_date").addEventListener("click", function () {
+        window.location.href = "/date/" + document.getElementById('view_date').value;
+    });
+</script>
+    
+{% endblock %}
+

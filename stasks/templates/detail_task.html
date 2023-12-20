@@ -14,7 +14,7 @@ Task Detail
                 <div class="form-outline">
                     <input type="text" id="taskDescription" readonly class="form-control" value="{{ task.description
                         }}"" />
-                    <label class="form-label" for="taskDescription">Description</label>
+                    <label class=" form-label" for="taskDescription">Description</label>
                 </div>
                 <input type="date" class="form-control" id="taskDate" readonly
                     value="{{ task.date.strftime('%Y-%m-%d') }}" />
@@ -47,39 +47,39 @@ Task Detail
 
     function toggleEdit() {
         let button = document.getElementById('editButton');
-    let fields = [document.getElementById('taskDescription'), document.getElementById('taskDate'), document.getElementById('taskName')]; // Add all other fields here
-    let form = document.getElementById('taskForm');
+        let fields = [document.getElementById('taskDescription'), document.getElementById('taskDate'), document.getElementById('taskName')]; // Add all other fields here
+        let form = document.getElementById('taskForm');
 
-    fields.forEach(function (field) {
-        if (field.hasAttribute('readonly')) {
-            field.removeAttribute('readonly');
-        } else {
-            field.setAttribute('readonly', true);
-        }
-    });
-
-    if (button.textContent === 'Edit') {
-        button.textContent = 'Save';
-    } else {
-        let formData = new FormData(form);
-        fetch(form.action, {
-            method: 'PATCH',
-            body: formData,
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
+        fields.forEach(function (field) {
+            if (field.hasAttribute('readonly')) {
+                field.removeAttribute('readonly');
+            } else {
+                field.setAttribute('readonly', true);
             }
-        }).then(response => {
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            return response.json();
-        }).then(json => {
-            console.log(json);
-            button.textContent = 'Edit';
-        }).catch(e => {
-            console.log('There was a problem with the fetch operation: ' + e.message);
         });
+
+        if (button.textContent === 'Edit') {
+            button.textContent = 'Save';
+        } else {
+            let formData = new FormData(form);
+            fetch(form.action, {
+                method: 'PATCH',
+                body: formData,
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                }
+            }).then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            }).then(json => {
+                console.log(json);
+                button.textContent = 'Edit';
+            }).catch(e => {
+                console.log('There was a problem with the fetch operation: ' + e.message);
+            });
+        }
     }
-}
 </script>
 {% endblock %}

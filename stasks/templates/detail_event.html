@@ -11,8 +11,28 @@ Event Detail
         <div class="card-body">
             <h5 class="card-title">{{ event.name }}</h5>
             <h6 class="card-subtitle">for {{event.person}}</h6>
-            <p class="card-text">{{ event.description }}</p>
-            <a href="{{ url_for('events.event_detail', id=event.id) }}" class="btn btn-primary">Edit</a>
+            <hr>
+            <form id="detailForm" action="{{url_for('events.event_api',id=event.id)}}">
+                <div class="form-outline mb-2" data-mdb-input-init>
+                    <textarea id="description" name="description" class="form-control"
+                        readonly>{{event.description}}</textarea>
+                    <label class="form-label" for="description">Event Description</label>
+                </div>
+                <div class="form-outline mb-2" data-mdb-input-init>
+                    <input type="date" id="date" name="date" class="form-control" readonly value="{{event.date}}" />
+                    <label class="form-label" for="date">Date</label>
+                </div>
+                <div class="form-outline mb-2" data-mdb-input-init>
+                    <input type="time" id="time" name="time" class="form-control" readonly value="{{event.time}}" />
+                    <label class="form-label" for="time">Time</label>
+                </div>
+                <div class="form-outline mb-2" data-mdb-input-init>
+                    <input type="text" id="location" name="location" class="form-control" readonly
+                        value="{{event.location}}" />
+                    <label class="form-label" for="location">Location</label>
+                </div>
+            </form>
+            <button id="editButton" class="btn btn-primary" onclick="toggleEdit()">Edit</button>
             <button id="deleteButton" class="btn btn-danger" onclick="deleteEvent()">Delete</button>
         </div>
     </div>
@@ -21,8 +41,52 @@ Event Detail
 
 {% block extra_js %}
 <script>
+    function toggleEdit() {
+        let eventId = "{{event.id}}";
+        let button = document.getElementById('editButton');
+        let fields = [document.getElementById('description'), document.getElementById('date'), document.getElementById('time'), document.getElementById('location')];
+        let form = document.getElementById('detailForm');
+
+        fields.forEach(function (field) {
+            console.log(field);
+
+            if (field === null) {
+                console.log('field is null' + field.id)
+            } else if (field.hasAttribute('readonly')) {
+                field.removeAttribute('readonly');
+            } else {
+                field.setAttribute('readonly', true);
+            }
+        });
+
+        if (button.textContent === 'Edit') {
+            button.textContent = 'Save';
+        } else {
+            let formData = new FormData(form);
+            fetch(form.action, {
+                method: 'PATCH',
+                body: new URLSearchParams(formData).toString(),
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                }
+            }).then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            }).then(json => {
+                console.log(json);
+                button.textContent = 'Edit';
+            }).catch(e => {
+                console.log('There was a problem with the fetch operation: ' + e.message);
+            }).then(() => {
+                window.location.href = `/event/${eventId}`;
+            });
+        }
+    }
+
     function deleteEvent() {
-        let eventId = "{{event.id}}"; 
+        let eventId = "{{event.id}}";
 
         fetch(`/event/${eventId}`, {
             method: 'DELETE',
@@ -37,22 +101,5 @@ Event Detail
             });
     }
 
-    function toggleEdit() {
-        let button = document.getElementById('editButton');
-        let fields = [document.getElementById('taskDescription'), document.getElementById('taskDate'), document.getElementById('taskName')]; // Add all other fields here
-
-        fields.forEach(function (field) {
-            if (field.hasAttribute('readonly')) {
-                field.removeAttribute('readonly');
-            } else {
-                field.setAttribute('readonly', true);
-            }
-        });
-        if (button.textContent === 'Edit') {
-            button.textContent = 'Save';
-        } else {
-            button.textContent = 'Edit';
-        }
-    }
 </script>
 {% endblock %}

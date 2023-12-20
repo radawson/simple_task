@@ -16,7 +16,7 @@ Tasks
                         <h5 class="card-title">{{ task.name }}</h5>
                         <p class="card-title">{{ task.date }}</p>
                         <p class="card-text">{{ task.description }}</p>
-                        <button class="btn btn-primary" id="btn_task_detail">View Details</button>
+                        <button class="btn btn-primary" id="btn_task_detail" onclick="redirectToTaskDetail( '{{task.id}}' )">View Details</button>
                     </div>
                 </div>
             </div>
@@ -29,9 +29,11 @@ Tasks
 
 {% block extra_js %}
 <script>
-    document.getElementById("btn_task_detail").addEventListener("click", function () {
-        window.location.href = "{{ url_for('tasks.task_detail') }}";
-    });
+    function redirectToTaskDetail(eventId) {
+        url = "{{ url_for('tasks.task_detail', id=0) }}"
+        url = url.replace('0', eventId);
+        window.location.href = url;
+    }
 
     document.getElementById("btn_add_task").addEventListener("click", function () {
         window.location.href = "{{ url_for('tasks.add_task') }}";
