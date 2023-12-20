@@ -16,13 +16,26 @@ Tasks
                         <h5 class="card-title">{{ task.name }}</h5>
                         <p class="card-title">{{ task.date }}</p>
                         <p class="card-text">{{ task.description }}</p>
-                        <a href="{{ url_for('tasks.add_task', id=task.id) }}" class="btn btn-primary">View Details</a>
+                        <button class="btn btn-primary" id="btn_task_detail">View Details</button>
                     </div>
                 </div>
             </div>
             {% endfor %}
         </div>
     </div>
-    <button class="btn btn-primary" onclick="window.location.href='/add_task'">Add Task</button>
+    <button class="btn btn-primary" id="btn_add_task">Add Task</button>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.getElementById("btn_task_detail").addEventListener("click", function () {
+        window.location.href = "{{ url_for('tasks.task_detail') }}";
+    });
+
+    document.getElementById("btn_add_task").addEventListener("click", function () {
+        window.location.href = "{{ url_for('tasks.add_task') }}";
+    });
+
+</script>
 {% endblock %}

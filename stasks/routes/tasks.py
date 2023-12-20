@@ -32,13 +32,31 @@ def add_task():
         message = "Task added successfully"
     return render_template("add_task.html", message=message)
 
-@tasks.route("/task/<int:id>", methods=[ "GET"])
-def task_detail(id):
-    task = Task.query.get(id)
-    if task is None:
-        print(f"No task found with id {id}")
-        return "No task found", 404
-    else:
-        # troubleshooting
-        print(f"received GET request for task {id}")  
-        return render_template("detail_task.html", task=task)
+@tasks.route("/task/<int:id>", methods=["GET", "POST","DELETE", "PATCH"])
+def task_api(id):
+    if request.method == "GET":
+        task = Task.query.get(id)
+        message=None
+    elif request.method == "POST":
+        name = request.form.get("name")
+        description = request.form.get("description")
+        date = datetime.strptime(request.form["date"], "%Y-%m-%d").date()
+        new_task = Task(name=name, description=description, date=date)
+        db.session.add(new_task)
+        db.session.commit()
+        message = "Task added successfully"
+        task=new_task
+    elif request.method == "DELETE":
+        task = Task.query.get(id)
+        db.session.delete(task)
+        db.session.commit()
+        message = "Task deleted successfully"
+        return render_template("tasks.html", message=message)
+    elif request.method == "PATCH":
+        task = Task.query.get(id)
+        task.name = request.form.get("name")
+        task.description = request.form.get("description")
+        task.date = datetime.strptime(request.form["date"], "%Y-%m-%d").date()
+        db.session.commit()
+        message = "Task updated successfully"
+    return render_template("detail_task.html", task=task, message=message)

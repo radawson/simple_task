@@ -24,3 +24,31 @@ def add_note():
         message = "Note added successfully"
     notes = Note.query.all()
     return render_template("add_note.html", message=message, notes=notes)
+
+@notes.route("/note/<int:id>", methods=["GET", "POST","DELETE", "PATCH"])
+def note_api(id):
+    if request.method == "GET":
+        note = Note.query.get(id)
+        message=None
+    elif request.method == "POST":
+        title = request.form.get("title")
+        content = request.form.get("content")
+        date = datetime.strptime(request.form["date"], "%Y-%m-%d").date()
+        new_note = Note(title=title, content=content, date=date)
+        db.session.add(new_note)
+        db.session.commit()
+        message = "Note added successfully"
+        note=new_note
+    elif request.method == "DELETE":
+        note = Note.query.get(id)
+        db.session.delete(note)
+        db.session.commit()
+        message = "Note deleted successfully"
+        return render_template("notes.html", message=message)
+    elif request.method == "PATCH":
+        note = Note.query.get(id)
+        note.title = request.form.get("title")
+        note.content = request.form.get("content")
+        note.date = datetime.strptime(request.form["date"], "%Y-%m-%d").date()
+        db.session.commit()
+    return render_template("notes.html", message=message)
