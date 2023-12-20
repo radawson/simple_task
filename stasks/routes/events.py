@@ -34,14 +34,15 @@ def add_event():
 
 @events.route("/event/<int:id>", methods=["GET", "POST","DELETE", "PATCH"])
 def event_api(id):
+    message = ""
     if request.method == "GET":
         event = Event.query.get(id)
         message=None
     elif request.method == "POST":
         name = request.form.get("name")
         description = request.form.get("description")
-        date = datetime.strptime(request.form["date"], "%Y-%m-%d").date()
-        time = datetime.strptime(request.form["time"], "%H:%M").time()
+        date = datetime.strptime(request.form.get("date"), "%Y-%m-%d").date()
+        time = datetime.strptime(request.form.get("time"), "%H:%M").time()
         location = request.form.get("location")
         person = request.form.get("person")
         new_event = Event(name=name, description=description, date=date, time=time, location=location, person= person)
@@ -57,19 +58,21 @@ def event_api(id):
         return render_template("events.html", message=message)
     elif request.method == "PATCH":
         event = Event.query.get(id)
-        print(f"Got Event {event} with id {id}")
         form_data = request.form.to_dict()
-        print(f"Got form data {form_data.get('location')}")
         if form_data.get("name"):
             event.name = form_data.get("name")
         if form_data.get("description"):
             event.description = form_data.get("description")
         raw_date = form_data.get("date")
         raw_time = form_data.get("time")
+        print(f"Raw time: {raw_time} and length: {len(raw_time)}")
         if raw_date:
             event.date = datetime.strptime(raw_date, "%Y-%m-%d").date()
         if raw_time:
-            event.time = datetime.strptime(raw_time, "%H:%M:%S").time()
+            try:
+                event.time = datetime.strptime(raw_time, "%H:%M").time()
+            except ValueError:
+                event.time = datetime.strptime(raw_time, "%H:%M:%S").time()
         if form_data.get("location"):
             event.location = form_data.get("location")
         if form_data.get("person"):
