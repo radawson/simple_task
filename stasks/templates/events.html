@@ -17,19 +17,63 @@ Events
                         <p class="card-title">{{ event.date }} {{event.time}}</p>
                         <p class="card-title">{{ event.person }}</p>
                         <p class="card-text">{{ event.description }}</p>
-                        <button class="btn btn-primary" id="btn_event_detail_{{event.id}}" onclick="redirectToEventDetail('{{event.id}}')">View Details</a>
+                    </div>
+                    <div class="container">
+                        <div class="form-check col-md-4 float-end">
+                            <input type="checkbox" class="form-check-input" id="event_completed_{{event.id}}" {% if
+                                event.completed %} checked {% endif %} />
+                            <label class="form-check-label" for="event_completed_{{event.id}}">Completed</label>
+                        </div>
+
+                    </div>
+                    <div class="card-footer">
+                        <div class="col-md-6">
+                            <button class="btn btn-primary" id="btn_event_detail_{{event.id}}"
+                                onclick="redirectToEventDetail('{{event.id}}')">View Details</button>
+                        </div>
                     </div>
                 </div>
             </div>
-            {% endfor %}
         </div>
+        {% endfor %}
     </div>
-    <button class="btn btn-primary m-2" id="btn_add_event">Add Event</button>
+</div>
+<button class="btn btn-primary m-2" id="btn_add_event">Add Event</button>
 </div>
 {% endblock %}
 
 {% block extra_js %}
 <script>
+
+    // Get all the checkboxes with the class "form-check-input"
+    var checkboxes = document.getElementsByClassName("form-check-input");
+
+    // Loop through each checkbox and add the event listener
+    for (var i = 0; i < checkboxes.length; i++) {
+        checkboxes[i].addEventListener("change", function () {
+            var completed = this.checked;
+            var eventId = this.id.split("_")[2]; // Extract the event ID from the checkbox ID
+            var url = "{{ url_for('events.event_api',id=0) }}";
+            url = url.replace('0', eventId);
+            var data = { completed: completed };
+
+            fetch(url, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data),
+            })
+                .then(response => response.text())
+                .then(data => {
+                    document.body.innerHTML = data;
+                })
+                .catch(error => {
+                    console.error('Error updating event:', error);
+                });
+        });
+    }
+
     function redirectToEventDetail(eventId) {
         url = "{{ url_for('events.event_detail', id=0) }}"
         url = url.replace('0', eventId);

@@ -65,7 +65,6 @@ def event_api(id):
             event.description = form_data.get("description")
         raw_date = form_data.get("date")
         raw_time = form_data.get("time")
-        print(f"Raw time: {raw_time} and length: {len(raw_time)}")
         if raw_date:
             event.date = datetime.strptime(raw_date, "%Y-%m-%d").date()
         if raw_time:
@@ -77,6 +76,8 @@ def event_api(id):
             event.location = form_data.get("location")
         if form_data.get("person"):
             event.person = form_data.get("person")
+        if form_data.get("completed"):
+            event.completed = form_data.get("completed")
         db.session.commit()
         message = "Event updated successfully"
     return render_template("detail_event.html", event=event, message=message)
