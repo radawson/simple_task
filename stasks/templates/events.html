@@ -8,81 +8,131 @@ Events
 <div class="container py-5">
     <h1>Events</h1>
     <div class="container">
-        <div class="row">
-            {% for event in events %}
-            <div class="col-md-4 col-sm-12">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">{{ event.name }}</h5>
-                        <p class="card-title">{{ event.date }} {{event.time}}</p>
-                        <p class="card-title">{{ event.person }}</p>
-                        <p class="card-text">{{ event.description }}</p>
-                    </div>
-                    <div class="container">
-                        <div class="form-check col-md-4 float-end">
-                            <input type="checkbox" class="form-check-input" id="event_completed_{{event.id}}" {% if
-                                event.completed %} checked {% endif %} />
-                            <label class="form-check-label" for="event_completed_{{event.id}}">Completed</label>
-                        </div>
-
-                    </div>
-                    <div class="card-footer">
-                        <div class="col-md-6">
-                            <button class="btn btn-primary" id="btn_event_detail_{{event.id}}"
-                                onclick="redirectToEventDetail('{{event.id}}')">View Details</button>
-                        </div>
+        
+        <div class="container py-5">
+            <h1>Events</h1>
+            <div class="container">
+                <div class="row my-2">
+                    <div class="col-md-3 ">
+                        <label class="form-label select-label" for="filter">Filter</label>
+                        <select id="filter" class="form-select" data-mdb-select-init>
+                            <option value="today" selected>Today</option>
+                            <option value="all">All</option>
+                            <option value="future">Future</option>
+                        </select>
+                        
                     </div>
                 </div>
+                <div class="row">
+                    {% for event in events %}
+                    <div class="col-md-4 col-sm-12 python_event">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title" id="name_{{event.id}}">{{ event.name }}</h5>
+                                <p class="card-title" id="date_{{event.id}}">{{ event.date }} {{event.time}}</p>
+                                <p class="card-title" id="person_{{event.id}}">{{ event.person }}</p>
+                                <p class="card-text" id="description_{{event.id}}">{{ event.description }}</p>
+                            </div>
+                            <div class="container">
+                                <div class="form-check col-md-4 float-end">
+                                    <input type="checkbox" class="form-check-input" id="event_completed_{{event.id}}" {% if
+                                        event.completed %} checked {% endif %} />
+                                    <label class="form-check-label" for="event_completed_{{event.id}}">Completed</label>
+                                </div>
+
+                            </div>
+                            <div class="card-footer">
+                                <div class="col-md-6">
+                                    <button class="btn btn-primary" id="btn_event_detail_{{event.id}}"
+                                        onclick="redirectToEventDetail('{{event.id}}')">View Details</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
             </div>
-            {% endfor %}
         </div>
-    </div>
-</div>
-<button class="btn btn-primary m-2" id="btn_add_event">Add Event</button>
-</div>
-{% endblock %}
+        <button class="btn btn-primary m-2" id="btn_add_event">Add Event</button>
+        </div>
+        {% endblock %}
 
-{% block extra_js %}
-<script>
+        {% block extra_js %}
+        <script>
 
-    // Get all the checkboxes with the class "form-check-input"
-    var checkboxes = document.getElementsByClassName("form-check-input");
+            // Get all the checkboxes with the class "form-check-input"
+            var checkboxes = document.getElementsByClassName("form-check-input");
 
-    // Loop through each checkbox and add the event listener
-    for (var i = 0; i < checkboxes.length; i++) {
-        checkboxes[i].addEventListener("change", function () {
-            var completed = this.checked;
-            var eventId = this.id.split("_")[2]; // Extract the event ID from the checkbox ID
-            var url = "{{ url_for('events.event_api',id=0) }}";
-            url = url.replace('0', eventId);
-            var data = { completed: completed };
+            // Loop through each checkbox and add the event listener
+            for (var i = 0; i < checkboxes.length; i++) {
+                checkboxes[i].addEventListener("change", function () {
+                    var completed = this.checked;
+                    var eventId = this.id.split("_")[2]; // Extract the event ID from the checkbox ID
+                    var url = "{{ url_for('events.event_api',id=0) }}";
+                    url = url.replace('0', eventId);
+                    var data = { completed: completed };
 
-            fetch(url, {
-                method: 'PATCH',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(data),
-            })
-                .then(response => response.text())
-                .then(data => {
-                    document.body.innerHTML = data;
-                })
-                .catch(error => {
-                    console.error('Error updating event:', error);
+                    fetch(url, {
+                        method: 'PATCH',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(data),
+                    })
+                        .then(response => response.text())
+                        .then(data => {
+                            document.body.innerHTML = data;
+                        })
+                        .catch(error => {
+                            console.error('Error updating event:', error);
+                        });
                 });
-        });
-    }
+            }
 
-    function redirectToEventDetail(eventId) {
-        url = "{{ url_for('events.event_detail', id=0) }}"
-        url = url.replace('0', eventId);
-        window.location.href = url;
-    }
+            function redirectToEventDetail(eventId) {
+                url = "{{ url_for('events.event_detail', id=0) }}"
+                url = url.replace('0', eventId);
+                window.location.href = url;
+            }
 
-    document.getElementById("btn_add_event").addEventListener("click", function () {
-        window.location.href = "{{ url_for('events.add_event') }}";
-    });
-</script>
-{% endblock %}
-```
+            document.getElementById("btn_add_event").addEventListener("click", function () {
+                window.location.href = "{{ url_for('events.add_event') }}";
+            });
+
+            document.addEventListener("DOMContentLoaded", function() {
+                filterEvents("today");
+            });
+
+            document.getElementById("filter").addEventListener("change", function () {
+                var filterValue = this.value;
+                filterEvents(filterValue);
+            });
+
+            function filterEvents(filterValue) {
+                var events = document.getElementsByClassName("python_event");
+
+                for (var i = 0; i < events.length; i++) {
+                    var event = events[i];
+                    var eventDate = new Date(event.querySelector("[id^='date']").textContent);
+
+                    if (filterValue === "today" && !isToday(eventDate)) {
+                        event.style.display = "none";
+                    } else if (filterValue === "future" && !isFuture(eventDate)) {
+                        event.style.display = "none";
+                    } else {
+                        event.style.display = "block";
+                    }
+                }
+            }
+
+            function isToday(date) {
+                var today = new Date();
+                return date.toDateString() === today.toDateString();
+            }
+
+            function isFuture(date) {
+                var today = new Date();
+                return date > today;
+            }
+        </script>
+        {% endblock %}
