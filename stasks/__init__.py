@@ -31,11 +31,19 @@ def create_app():
 
         # If there are no events, set events to a default message
         if events == []:
-            events = [{"name": "No events scheduled for today"}]
+            events = [{"name": "No events scheduled",
+                       "person": "today",
+                       "time": "Relax"}]
+        else:
+            events = sorted(events, key=lambda x: x.time)
+
         if notes == []:
             notes = [{"title": "Nothing to show"}]
+
         if tasks == []:
             tasks = [{"name": "No tasks found for today"}]
+        else:
+            tasks = sorted(tasks, key=lambda x: x.time)
 
         return render_template(
             "index.html", date=date, events=events, notes=notes, tasks=tasks
@@ -48,7 +56,8 @@ def create_app():
         date = datetime.strptime(date, "%Y-%m-%d").date()
         tasks = Task.query.filter_by(date=date).all()
         events = Event.query.filter_by(date=date).all()
-        return render_template("index.html", tasks=tasks, events=events)
+        notes = Note.query.filter_by(date=date).all()
+        return render_template("index.html", tasks=tasks, events=events, notes=notes, date=date)
 
 
     # Register the blueprints

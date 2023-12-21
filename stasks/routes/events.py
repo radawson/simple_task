@@ -1,13 +1,15 @@
 from flask import Blueprint, render_template, request
 from stasks.models import Event, db, Person
 from datetime import datetime
+from operator import attrgetter
 
 events = Blueprint('events', __name__)
 
 @events.route('/events')
 def event_list():
     events = Event.query.all()
-    return render_template('events.html', events=events)
+    sorted_events = sorted(events, key=attrgetter('date', 'time'))
+    return render_template('events.html', events=sorted_events)
 
 @events.route('/events/<int:id>')
 def event_detail(id):
@@ -30,7 +32,8 @@ def add_event():
         db.session.commit()
         message = "Event added successfully"
         events = Event.query.all()
-    return render_template("events.html", events=events, message=message)
+        sorted_events = sorted(events, key=attrgetter('date', 'time'))
+    return render_template("events.html", events=sorted_events, message=message)
 
 @events.route("/event/<int:id>", methods=["GET", "POST","DELETE", "PATCH"])
 def event_api(id):
