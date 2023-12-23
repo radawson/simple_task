@@ -4,6 +4,11 @@ from datetime import datetime
 
 notes = Blueprint('notes', __name__)
 
+@notes.route("/notes")
+def note_list():
+    notes = Note.query.all()
+    return render_template("notes.html", notes=notes)
+
 @notes.route("/notes/<date>")
 def get_notess_date(date):
     date = datetime.strptime(date, "%Y-%m-%d").date()
@@ -11,7 +16,7 @@ def get_notess_date(date):
     return render_template("notes.html", notes=notes)
 
 
-@notes.route("/notes", methods=["GET", "POST"])
+@notes.route("/notes/add", methods=["GET", "POST"])
 def add_note():
     message = ""
     if request.method == "POST":
@@ -24,6 +29,11 @@ def add_note():
         message = "Note added successfully"
     notes = Note.query.all()
     return render_template("add_note.html", message=message, notes=notes)
+
+@notes.route("/notes/<int:id>")
+def note_detail(id):
+    note = Note.query.get(id)
+    return render_template("detail_note.html", note=note)
 
 @notes.route("/note/<int:id>", methods=["GET", "POST","DELETE", "PATCH"])
 def note_api(id):

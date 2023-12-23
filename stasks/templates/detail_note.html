@@ -10,9 +10,20 @@ Note Detail
     <div class="card">
         <div class="card-body">
             <h5 class="card-title">{{ note.name }}</h5>
-            <p class="card-text">{{ note.description }}</p>
-            <a href="{{ url_for('edit_note', id=task.id) }}" class="btn btn-primary">Edit</a>
-            <a href="{{ url_for('delete_note', id=task.id) }}" class="btn btn-danger">Delete</a>
+            <hr>
+            <form id="detailForm" action="{{url_for('notes.note_api',id=note.id)}}">
+                <div class="form-outline mb-2" data-mdb-input-init>
+                    <textarea id="description" name="description" class="form-control"
+                        readonly>{{note.description}}</textarea>
+                    <label class="form-label" for="description">Note Contents</label>
+                </div>
+                <div class="form-outline mb-2" data-mdb-input-init>
+                    <input type="date" id="date" name="date" class="form-control" readonly value="{{note.date}}" />
+                    <label class="form-label" for="date">Date</label>
+                </div>
+            </form>
+            <button id="editButton" class="btn btn-primary" onclick="toggleEdit()">Edit</button>
+            <button id="deleteButton" class="btn btn-danger" onclick="deleteEvent()">Delete</button>
         </div>
     </div>
 </div>
@@ -21,21 +32,65 @@ Note Detail
 {% block extra_js %}
 <script>
     function toggleEdit() {
+        let noteId = "{{note.id}}";
         let button = document.getElementById('editButton');
-        let fields = [document.getElementById('taskDescription'), document.getElementById('taskDate'), document.getElementById('taskName')]; // Add all other fields here
+        let fields = [document.getElementById('description'), document.getElementById('date')];
+        let form = document.getElementById('detailForm');
 
         fields.forEach(function (field) {
-            if (field.hasAttribute('readonly')) {
+            console.log(field);
+
+            if (field === null) {
+                console.log('field is null' + field.id)
+            } else if (field.hasAttribute('readonly')) {
                 field.removeAttribute('readonly');
             } else {
                 field.setAttribute('readonly', true);
             }
         });
+
         if (button.textContent === 'Edit') {
             button.textContent = 'Save';
         } else {
-            button.textContent = 'Edit';
+            let formData = new FormData(form);
+            fetch(form.action, {
+                method: 'PATCH',
+                body: new URLSearchParams(formData).toString(),
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                }
+            }).then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            }).then(json => {
+                console.log(json);
+                button.textContent = 'Edit';
+            }).catch(e => {
+                console.log('There was a problem with the fetch operation: ' + e.message);
+            }).then(() => {
+                window.location.href = `/note/${noteId}`;
+            });
         }
     }
+
+    function deleteNote() {
+        let noteId = "{{note.id}}";
+
+        fetch(`/note/${noteId}`, {
+            method: 'DELETE',
+        })
+            .then(response => response.json())
+            .then(data => console.log(data))
+            .catch((error) => {
+                console.error('Error:', error);
+            })
+            .then(() => {
+                window.location.href = '/notes';
+            });
+    }
+
+</script>
 </script>
 {% endblock %}
