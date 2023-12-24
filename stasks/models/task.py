@@ -7,3 +7,4 @@ class Task(db.Model):
     description = db.Column(db.Text, nullable=True)
     date = db.Column(db.Date, nullable=False)
     completed = db.Column(db.Boolean, nullable=False, default=False)
+    priority = db.Column(db.Integer, default=0)

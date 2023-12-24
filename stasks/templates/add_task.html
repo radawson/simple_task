@@ -6,23 +6,7 @@ Add Task
 {% block content %}
 <div class="container py-5">
     <h1>Add Task</h1>
-    <div class="card-group">
-
-        {% for task in tasks %}
-        <a href="{{ url_for('tasks.task_api', id=task.id)}}">
-            <div class="card h-100">
-                <div class="card-body">
-                    <h5 class="card-title">{{task.name}}</h5>
-                    <p class="card-text">
-                        {{ task.date}}
-                    </p>
-                </div>
-            </div>
-        </a>
-        {% endfor %}
-
-    </div>
-    <form action="/tasks" method="post" class="my-5">
+    <form method="post" class="my-5">
         <div class="form-group">
             <label for="name">Task:</label>
             <input type="text" id="name" name="name" class="form-control">

@@ -33,7 +33,8 @@ def create_app():
         if events == []:
             events = [{"name": "No events scheduled",
                        "person": "today",
-                       "time": "Relax"}]
+                       "time": "Relax",
+                       "no_check":True}]
         else:
             events = sorted(events, key=lambda x: x.time)
 
@@ -41,9 +42,10 @@ def create_app():
             notes = [{"title": "Nothing to show"}]
 
         if tasks == []:
-            tasks = [{"name": "No tasks found for today"}]
+            tasks = [{"name": "No tasks found for today",
+                      "no_check":True}]
         else:
-            tasks = sorted(tasks, key=lambda x: x.time)
+            tasks = sorted(tasks, key=lambda x: x.priority)
 
         return render_template(
             "index.html", date=date, events=events, notes=notes, tasks=tasks

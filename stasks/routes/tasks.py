@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request
+from flask import Blueprint, jsonify, render_template, request
 from stasks.models import Task, db
 from datetime import datetime
 
@@ -58,9 +58,25 @@ def task_api(id):
         return render_template("tasks.html", message=message)
     elif request.method == "PATCH":
         task = Task.query.get(id)
-        task.name = request.form.get("name")
-        task.description = request.form.get("description")
-        task.date = datetime.strptime(request.form["date"], "%Y-%m-%d").date()
+        form_data = request.form.to_dict()
+        print(form_data)
+        if form_data.get("name"):
+            task.name = form_data.get("name")
+        if form_data.get("description"):
+            task.description = form_data.get("description")
+        raw_date = form_data.get("date")
+        if raw_date:
+            task.date = datetime.strptime(raw_date, "%Y-%m-%d").date()
+        if form_data.get("completed") == "True":
+            task.completed = True
+        elif form_data.get("completed") == "False":
+            task.completed = False
+        elif form_data.get("completed"):
+            task.completed = form_data.get("completed")
+        if form_data.get("priority"):
+            task.priority = form_data.get("priority")
+
         db.session.commit()
         message = "Task updated successfully"
+        return jsonify(message)
     return render_template("detail_task.html", task=task, message=message)
