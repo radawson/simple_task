@@ -8,7 +8,7 @@ Events
 <div class="container py-5">
     <h1>Events</h1>
     <div class="container">
-        
+
         <div class="container py-5">
             <h1>Events</h1>
             <div class="container">
@@ -20,7 +20,7 @@ Events
                             <option value="all">All</option>
                             <option value="future">Future</option>
                         </select>
-                        
+
                     </div>
                 </div>
                 <div class="row">
@@ -35,8 +35,8 @@ Events
                             </div>
                             <div class="container">
                                 <div class="form-check col-md-4 float-end">
-                                    <input type="checkbox" class="form-check-input" id="event_completed_{{event.id}}" {% if
-                                        event.completed %} checked {% endif %} />
+                                    <input type="checkbox" class="form-check-input" id="event_completed_{{event.id}}" {%
+                                        if event.completed %} checked {% endif %} />
                                     <label class="form-check-label" for="event_completed_{{event.id}}">Completed</label>
                                 </div>
 
@@ -54,85 +54,82 @@ Events
             </div>
         </div>
         <button class="btn btn-primary m-2" id="btn_add_event">Add Event</button>
-        </div>
-        {% endblock %}
+    </div>
+    {% endblock %}
 
-        {% block extra_js %}
-        <script>
-
-            // Get all the checkboxes with the class "form-check-input"
-            var checkboxes = document.getElementsByClassName("form-check-input");
-
-            // Loop through each checkbox and add the event listener
-            for (var i = 0; i < checkboxes.length; i++) {
-                checkboxes[i].addEventListener("change", function () {
-                    var completed = this.checked;
-                    var eventId = this.id.split("_")[2]; // Extract the event ID from the checkbox ID
-                    var url = "{{ url_for('events.event_api',id=0) }}";
-                    url = url.replace('0', eventId);
-                    var data = { completed: completed };
-
-                    fetch(url, {
-                        method: 'PATCH',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify(data),
-                    })
-                        .then(response => response.text())
-                        .then(data => {
-                            document.body.innerHTML = data;
-                        })
-                        .catch(error => {
-                            console.error('Error updating event:', error);
-                        });
-                });
-            }
-
-            function redirectToEventDetail(eventId) {
-                url = "{{ url_for('events.event_detail', id=0) }}"
+    {% block extra_js %}
+    <script>
+        // Loop through each checkbox and add the event listener
+        document.querySelectorAll("[id^='event_completed']").forEach(function (checkbox) {
+            checkbox.addEventListener("change", function () {
+                var completed = this.checked;
+                var eventId = this.id.split("_")[2]; // Extract the event ID from the checkbox ID
+                var url = "{{ url_for('events.event_api',id=0) }}";
                 url = url.replace('0', eventId);
-                window.location.href = url;
-            }
-
-            document.getElementById("btn_add_event").addEventListener("click", function () {
-                window.location.href = "{{ url_for('events.add_event') }}";
+                let formData = new FormData();
+                if (checkbox.checked) {
+                    formData.append("completed", "True");
+                } else {
+                    formData.append("completed", "False");
+                }
+                fetch(url, {
+                    body: formData,
+                    method: "PATCH"
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log(data);
+                    })
+                    .catch(error => {
+                        console.error(error);
+                    });
             });
+        });
 
-            document.addEventListener("DOMContentLoaded", function() {
-                filterEvents("today");
-            });
+        function redirectToEventDetail(eventId) {
+            url = "{{ url_for('events.event_detail', id=0) }}"
+            url = url.replace('0', eventId);
+            window.location.href = url;
+        }
 
-            document.getElementById("filter").addEventListener("change", function () {
-                var filterValue = this.value;
-                filterEvents(filterValue);
-            });
+        document.getElementById("btn_add_event").addEventListener("click", function () {
+            window.location.href = "{{ url_for('events.add_event') }}";
+        });
 
-            function filterEvents(filterValue) {
-                var events = document.getElementsByClassName("python_event");
+        document.addEventListener("DOMContentLoaded", function () {
+            filterEvents("today");
+        });
 
-                for (var i = 0; i < events.length; i++) {
-                    var event = events[i];
-                    var eventDate = new Date(event.querySelector("[id^='date']").textContent);
+        document.getElementById("filter").addEventListener("change", function () {
+            var filterValue = this.value;
+            filterEvents(filterValue);
+        });
 
-                    if (filterValue === "today" && !isToday(eventDate)) {
-                        event.style.display = "none";
-                    } else if (filterValue === "future" && !isFuture(eventDate)) {
-                        event.style.display = "none";
-                    } else {
-                        event.style.display = "block";
-                    }
+        function filterEvents(filterValue) {
+            var events = document.getElementsByClassName("python_event");
+
+            for (var i = 0; i < events.length; i++) {
+                var event = events[i];
+                var eventDate = new Date(event.querySelector("[id^='date']").textContent);
+
+                if (filterValue === "today" && !isToday(eventDate)) {
+                    event.style.display = "none";
+                } else if (filterValue === "future" && !isFuture(eventDate)) {
+                    event.style.display = "none";
+                } else {
+                    event.style.display = "block";
                 }
             }
+        }
 
-            function isToday(date) {
-                var today = new Date();
-                return date.toDateString() === today.toDateString();
-            }
+        function isToday(date) {
+            var today = new Date();
+            return date.toDateString() === today.toDateString();
+        }
 
-            function isFuture(date) {
-                var today = new Date();
-                return date > today;
-            }
-        </script>
-        {% endblock %}
+        function isFuture(date) {
+            var today = new Date();
+            return date > today;
+        }
+    </script>
+    {% endblock %}
