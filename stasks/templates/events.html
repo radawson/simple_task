@@ -33,13 +33,12 @@ Events
                                 <p class="card-title" id="person_{{event.id}}">{{ event.person }}</p>
                                 <p class="card-text" id="description_{{event.id}}">{{ event.description }}</p>
                             </div>
-                            <div class="container">
+                            <div class="container clearfix">
                                 <div class="form-check col-md-4 float-end">
                                     <input type="checkbox" class="form-check-input" id="event_completed_{{event.id}}" {%
                                         if event.completed %} checked {% endif %} />
                                     <label class="form-check-label" for="event_completed_{{event.id}}">Completed</label>
                                 </div>
-
                             </div>
                             <div class="card-footer">
                                 <div class="col-md-6">
