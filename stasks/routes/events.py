@@ -62,7 +62,6 @@ def event_api(id):
     elif request.method == "PATCH":
         event = Event.query.get(id)
         form_data = request.form.to_dict()
-        print(form_data)
         if form_data.get("name"):
             event.name = form_data.get("name")
         if form_data.get("description"):
@@ -86,7 +85,7 @@ def event_api(id):
             event.completed = False
         elif form_data.get("completed"):
             event.completed = form_data.get("completed")
-            
+
         db.session.commit()
         message = "Event updated successfully"
         return jsonify(message)

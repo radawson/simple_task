@@ -59,7 +59,6 @@ def task_api(id):
     elif request.method == "PATCH":
         task = Task.query.get(id)
         form_data = request.form.to_dict()
-        print(form_data)
         if form_data.get("name"):
             task.name = form_data.get("name")
         if form_data.get("description"):
