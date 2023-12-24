@@ -83,4 +83,5 @@ def event_api(id):
             event.completed = form_data.get("completed")
         db.session.commit()
         message = "Event updated successfully"
+        return event
     return render_template("detail_event.html", event=event, message=message)

@@ -9,7 +9,7 @@ Note Detail
     <h1>Note Detail</h1>
     <div class="card">
         <div class="card-body">
-            <h5 class="card-title">{{ note.name }}</h5>
+            <h5 class="card-title">{{ note.title }}</h5>
             <hr>
             <form id="detailForm" action="{{url_for('notes.note_api',id=note.id)}}">
                 <div class="form-outline mb-2" data-mdb-input-init>

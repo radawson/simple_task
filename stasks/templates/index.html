@@ -13,7 +13,8 @@ Today - {{ date }}
             <li class="list-group-item d-flex justify-content-between align-items-center">
                 {{ task.name }}
                 <div class="form-check">
-                    <input class="form-check-input" type="checkbox" value="" id="taskCheck{{ task.id }}">
+                    <input class="form-check-input" type="checkbox" id="taskCheck{{ task.id }}" {% if task.completed
+                        %}checked{% endif %} />
                     <label class="form-check-label" for="taskCheck{{ task.id }}">
                         Completed
                     </label>
@@ -21,7 +22,7 @@ Today - {{ date }}
             </li>
             {% endfor %}
         </ul>
-        <div class="d-grid gap-2 col-6 mx-auto">
+        <div class="d-grid gap-2 col-4 mx-auto">
             <button class="btn btn-primary" id="btn_tasks">Add Task</button>
         </div>
     </div>
@@ -32,7 +33,8 @@ Today - {{ date }}
             <li class="list-group-item d-flex justify-content-between align-items-center">
                 {{ event.time }}: {{ event.name }} for {{event.person}}
                 <div class="form-check">
-                    <input class="form-check-input" type="checkbox" value="" id="eventCheck{{ event.id }}">
+                    <input class="form-check-input" type="checkbox" id="eventCheck{{ event.id }}" {% if event.completed
+                        %}checked{% endif %} />
                     <label class="form-check-label" for="eventCheck{{ event.id }}">
                         Completed
                     </label>
@@ -40,8 +42,8 @@ Today - {{ date }}
             </li>
             {% endfor %}
         </ul>
-        <div class="d-grid gap-2 col-6 mx-auto">
-            <button class="btn btn-primary" id="btn_events" >Add Event</button>
+        <div class="d-grid gap-2 col-4 mx-auto">
+            <button class="btn btn-primary" id="btn_events">Add Event</button>
         </div>
     </div>
     <div class="card">
@@ -54,7 +56,7 @@ Today - {{ date }}
             </li>
             {% endfor %}
         </ul>
-        <div class="d-grid gap-2 col-6 mx-auto">
+        <div class="d-grid gap-2 col-4 mx-auto">
             <button class="btn btn-primary" id="btn_notes">Add Note</button>
         </div>
     </div>
@@ -72,8 +74,22 @@ Today - {{ date }}
     document.getElementById("btn_notes").addEventListener("click", function () {
         window.location.href = "{{ url_for('notes.add_note') }}";
     });
-    
 
+    document.querySelectorAll("[id^='eventCheck']").forEach(function(checkbox) {
+        checkbox.addEventListener("change", function () {
+            fetch("{{ url_for('event_api', id=event.id) }}", {
+                method: "PATCH"
+            })
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                })
+                .catch(error => {
+                    console.error(error);
+                });
+        });
+    });
 </script>
+
 {% endblock %}
 ```
