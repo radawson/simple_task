@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request
+from flask import Blueprint, jsonify, render_template, request
 from stasks.models import Event, db, Person
 from datetime import datetime
 from operator import attrgetter
@@ -62,6 +62,7 @@ def event_api(id):
     elif request.method == "PATCH":
         event = Event.query.get(id)
         form_data = request.form.to_dict()
+        print(form_data)
         if form_data.get("name"):
             event.name = form_data.get("name")
         if form_data.get("description"):
@@ -79,9 +80,14 @@ def event_api(id):
             event.location = form_data.get("location")
         if form_data.get("person"):
             event.person = form_data.get("person")
-        if form_data.get("completed"):
+        if form_data.get("completed") == "True":
+            event.completed = True
+        elif form_data.get("completed") == "False":
+            event.completed = False
+        elif form_data.get("completed"):
             event.completed = form_data.get("completed")
+            
         db.session.commit()
         message = "Event updated successfully"
-        return event
+        return jsonify(message)
     return render_template("detail_event.html", event=event, message=message)
