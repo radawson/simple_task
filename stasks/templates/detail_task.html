@@ -11,14 +11,20 @@ Task Detail
         <div class="card-body">
             <h5 class="card-title" id="taskName">{{ task.name }}</h5>
             <form id="taskForm" action="{{task.id}}" method="post">
-                <div class="form-outline">
-                    <input type="text" id="taskDescription" readonly class="form-control" value="{{ task.description
+                <div class="form-outline mb-2">
+                    <input type="text" id="taskDescription" name="description" readonly class="form-control" value="{{ task.description
                         }}"" />
                     <label class=" form-label" for="taskDescription">Description</label>
                 </div>
-                <input type="date" class="form-control" id="taskDate" readonly
+                <div class="form-outline mb-2">
+                <input type="date" class="form-control" id="taskDate" name="date" readonly
                     value="{{ task.date.strftime('%Y-%m-%d') }}" />
                 <label class="form-label" for="taskDate">Date</label>
+                </div>
+                <div class="form-outline mb-2">
+                    <input type="number" class="form-control" id="taskPriority" name="priority" readonly value="{{ task.priority }}" />
+                    <label class="form-label" for="taskPriority">Priority</label>
+                </div>
             </form>
             <button id="editButton" class="btn btn-primary" onclick="toggleEdit()">Edit</button>
             <button id="deleteButton" class="btn btn-danger" onclick="deleteTask()">Delete</button>
@@ -30,7 +36,7 @@ Task Detail
 {% block extra_js %}
 <script>
     function deleteTask() {
-        let taskId = "{{task.id}}"; // Replace this with the actual task id
+        let taskId = "{{task.id}}"; 
 
         fetch(`/task/${taskId}`, {
             method: 'DELETE',
