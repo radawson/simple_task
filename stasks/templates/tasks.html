@@ -106,11 +106,11 @@ Tasks
             var taskDate = new Date(task.querySelector("[id^='date']").textContent);
 
             if (filterValue === "today" && !isToday(taskDate)) {
-                event.style.display = "none";
-            } else if (filterValue === "future" && !isFuture(eventDate)) {
-                event.style.display = "none";
+                task.style.display = "none";
+            } else if (filterValue === "future" && !isFuture(taskDate)) {
+                task.style.display = "none";
             } else {
-                event.style.display = "block";
+                task.style.display = "block";
             }
         }
     }
