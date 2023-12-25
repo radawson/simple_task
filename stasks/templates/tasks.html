@@ -103,7 +103,7 @@ Tasks
 
         for (var i = 0; i < tasks.length; i++) {
             var task = tasks[i];
-            var taskDate = new Date(event.querySelector("[id^='date']").textContent);
+            var taskDate = new Date(task.querySelector("[id^='date']").textContent);
 
             if (filterValue === "today" && !isToday(taskDate)) {
                 event.style.display = "none";
