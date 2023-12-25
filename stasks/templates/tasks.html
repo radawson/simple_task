@@ -8,15 +8,38 @@ Tasks
 <div class="container py-5">
     <h1>Tasks</h1>
     <div class="container">
+        <div class="row my-2">
+            <div class="col-md-3 ">
+                <label class="form-label select-label" for="filter">Filter</label>
+                <select id="filter" class="form-select" data-mdb-select-init>
+                    <option value="today" selected>Today</option>
+                    <option value="all">All</option>
+                    <option value="future">Future</option>
+                </select>
+
+            </div>
+        </div>
         <div class="row">
             {% for task in tasks %}
-            <div class="col-md-4 col-sm-12">
+            <div class="col-md-4 col-sm-12 python_task">
                 <div class="card">
                     <div class="card-body">
                         <h5 class="card-title">{{ task.name }}</h5>
                         <p class="card-title">{{ task.date }}</p>
                         <p class="card-text">{{ task.description }}</p>
-                        <button class="btn btn-primary" id="btn_task_detail" onclick="redirectToTaskDetail( '{{task.id}}' )">View Details</button>
+                    </div>
+                    <div class="container">
+                        <div class="form-check float-end">
+                            <input type="checkbox" class="form-check-input" id="task_completed_{{task.id}}" {% if
+                                task.completed %} checked {% endif %} />
+                            <label class="form-check-label" for="task_completed_{{task.id}}">Completed</label>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <div class="col-md-6">
+                            <button class="btn btn-primary" id="btn_task_detail_{{task.id}}"
+                                onclick="redirectToTaskDetail('{{task.id}}')">View Details</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -29,6 +52,33 @@ Tasks
 
 {% block extra_js %}
 <script>
+    // Loop through each checkbox and add the event listener
+    document.querySelectorAll("[id^='task_completed']").forEach(function (checkbox) {
+        checkbox.addEventListener("change", function () {
+            var completed = this.checked;
+            var taskId = this.id.split("_")[2]; // Extract the event ID from the checkbox ID
+            var url = "{{ url_for('tasks.task_api',id=0) }}";
+            url = url.replace('0', taskId);
+            let formData = new FormData();
+            if (checkbox.checked) {
+                formData.append("completed", "True");
+            } else {
+                formData.append("completed", "False");
+            }
+            fetch(url, {
+                body: formData,
+                method: "PATCH"
+            })
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                })
+                .catch(error => {
+                    console.error(error);
+                });
+        });
+    });
+
     function redirectToTaskDetail(eventId) {
         url = "{{ url_for('tasks.task_detail', id=0) }}"
         url = url.replace('0', eventId);
@@ -38,6 +88,42 @@ Tasks
     document.getElementById("btn_add_task").addEventListener("click", function () {
         window.location.href = "{{ url_for('tasks.add_task') }}";
     });
+
+    document.addEventListener("DOMContentLoaded", function () {
+        filterEvents("today");
+    });
+
+    document.getElementById("filter").addEventListener("change", function () {
+        var filterValue = this.value;
+        filterEvents(filterValue);
+    });
+
+    function filterEvents(filterValue) {
+        var events = document.getElementsByClassName("python_task");
+
+        for (var i = 0; i < tasks.length; i++) {
+            var task = tasks[i];
+            var taskDate = new Date(event.querySelector("[id^='date']").textContent);
+
+            if (filterValue === "today" && !isToday(taskDate)) {
+                event.style.display = "none";
+            } else if (filterValue === "future" && !isFuture(eventDate)) {
+                event.style.display = "none";
+            } else {
+                event.style.display = "block";
+            }
+        }
+    }
+
+    function isToday(date) {
+        var today = new Date();
+        return date.toDateString() === today.toDateString();
+    }
+
+    function isFuture(date) {
+        var today = new Date();
+        return date > today;
+    }
 
 </script>
 {% endblock %}
