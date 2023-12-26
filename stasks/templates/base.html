@@ -22,7 +22,7 @@
 
 <body>
     <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
         <!-- Container wrapper -->
         <div class="container-fluid">
             <!-- Toggle button -->
@@ -43,7 +43,7 @@
                 <!-- Left links -->
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item">
-                        <a class="nav-link" href="/">Today</a>
+                        <a class="nav-link" href="{{url_for('main.index')}}">Today</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="/events">Events</a>
@@ -53,6 +53,9 @@
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="/tasks">Tasks</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Admin</a>
                     </li>
                 </ul>
                 <!-- Left links -->
@@ -81,6 +84,16 @@
                         </li>
                     </ul>
                 </div> -->
+                <!-- Login Elements -->
+                <a href="{{ url_for('auth.login') }}" class="navbar-item">
+                    Login
+                </a>
+                <a href="{{ url_for('auth.register') }}" class="navbar-item">
+                    Sign Up
+                </a>
+                <a href="{{ url_for('auth.logout') }}" class="navbar-item">
+                    Logout
+                </a>
                 <!-- Live time and date -->
                 <div id="liveDateTime" class="navbar-text"></div>
 
@@ -90,6 +103,8 @@
         <!-- Container wrapper -->
     </nav>
     <!-- Navbar -->
+    <!-- Messages -->
+   
 
     <!--Main layout-->
     {% block content %}{% endblock %}
