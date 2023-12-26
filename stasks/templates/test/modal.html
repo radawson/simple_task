@@ -2,26 +2,18 @@
 
 {% block content %}
 {% with messages = get_flashed_messages(with_categories=true) %}
-<!-- Modal -->
+<!-- Alert -->
 {% if messages %}
 {% for category, message in messages %}
-<div class="alert alert-{{ category }}" id="div_flash">
+
     {{ message }}
-    <input type="button" value=&#10006 onclick="removeFlash()" style="float: right">
-</div>
+
 {% endfor %}
 {% endif %}
-{{messages[0]}}
 {% endwith %}
 
 {% endblock %}
 
 {% block extra_js %}
-<script>
-    function removeFlash() {
-        const element = document.getElementById('div_flash');
-        element.remove();
-    }
-</script>
 
 {% endblock %}
