@@ -2,7 +2,7 @@ from flask import Flask
 from flask_migrate import Migrate
 from flask_login import LoginManager
 from .models import db, seed_db
-from .routes import auth,  main, notes, tasks, events
+from .routes import auth, main, notes, tasks, events, test
 
 def create_app():
     # Initialize Flask app
@@ -37,10 +37,12 @@ def create_app():
 
     # Register the blueprints
     app.register_blueprint(auth)
+    app.register_blueprint(events)
     app.register_blueprint(main)
     app.register_blueprint(notes)
     app.register_blueprint(tasks)
-    app.register_blueprint(events)
+    app.register_blueprint(test)
+ 
 
     @app.cli.command("seed-db")
     def seed_db_command():
