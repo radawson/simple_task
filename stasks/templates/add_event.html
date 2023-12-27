@@ -30,6 +30,7 @@ Add Event
         <div class="form-outline mb-2">
             <select id="person" name="person" class="form-control mdb-select" data-mdb-select-init >
             <option></option>
+            <option value="everyone">Everyone</option>
             {% for person in people %}
             <option value="{{person}}">{{person}}</option>
             {% endfor %}

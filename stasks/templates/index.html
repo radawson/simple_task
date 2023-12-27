@@ -19,7 +19,7 @@ Today - {{ date }}
                         {{ task.name }}
                     </button>
                     {% if not task.no_check %}
-                    <div class="form-check">
+                    <div class="form-check me-2">
                         <input class="form-check-input" type="checkbox" id="taskCheck_{{ task.id }}" name="completed" {%
                             if task.completed %}checked{% endif %} />
                         <label class="form-check-label" for="taskCheck_{{ task.id }}">
@@ -53,7 +53,7 @@ Today - {{ date }}
                             {{ event.time }}: {{ event.name }} for {{event.person}}
                         </button>
                         {% if not event.no_check %}
-                        <div class="form-check">
+                        <div class="form-check me-2">
                             <input class="form-check-input" type="checkbox" id="eventCheck_{{ event.id }}"
                                 name="completed" {% if event.completed %}checked{% endif %} />
                             <label class="form-check-label" for="eventCheck_{{ event.id }}">

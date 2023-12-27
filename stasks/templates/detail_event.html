@@ -31,6 +31,16 @@ Event Detail
                         value="{{event.location}}" />
                     <label class="form-label" for="location">Location</label>
                 </div>
+                <div class="form-outline mb-2">
+                    <select id="person" name="person" class="form-control mdb-select" data-mdb-select-init >
+                    <option></option>
+                    <option value="everyone" {% if event.person == 'everyone' %}selected{% endif %}>Everyone</option>
+                    {% for person in people %}
+                    <option value="{{person}}" {% if event.person == person %}selected{% endif %}>{{person}}</option>
+                    {% endfor %}
+                    </select>
+                    <label class="form-label select-label" for="person">Event Participant</label>
+                </div>
             </form>
             <button id="editButton" class="btn btn-primary" onclick="toggleEdit()">Edit</button>
             <button id="deleteButton" class="btn btn-danger" onclick="deleteEvent()">Delete</button>
