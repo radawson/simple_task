@@ -8,139 +8,164 @@ Today - {{ date }}
 <div class="container py-5">
     <div class="card">
         <h3 class="m-2">Tasks</h3>
-        <ul class="list-group my-5">
+        <div class="accordion accordion-flush" id="task_accordion">
             {% for task in tasks %}
-            <li class="list-group-item d-flex justify-content-between align-items-center">
-                {{ task.name }}
-                {% if not task.no_check %}
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" id="taskCheck_{{ task.id }}" {% if task.completed
-                        %}checked{% endif %} />
-                    <label class="form-check-label" for="taskCheck_{{ task.id }}">
-                        Completed
-                    </label>
-                </div>
-                {% endif %}
-            </li>
-            {% endfor %}
-        </ul>
-        <div class="d-grid gap-2 col-4 mx-auto">
-            <button class="btn btn-primary" id="btn_tasks">Add Task</button>
-        </div>
-    </div>
-    <div class="card">
-        <h3 class="m-2">Events</h3>
-        <div class="accordion " id="event_accordion">
-            {% for event in events %}
-            <div class="accordion-item ">
+            <div class="accordion-item">
                 <div class="accordion-header d-flex justify-content-between align-items-center"
-                    id="heading-{{event.id}}">
+                    id="heading-task-{{task.id}}">
                     <button data-mdb-collapse-init class="accordion-button" type="button" data-mdb-toggle="collapse"
-                        data-mdb-target="#collapse-{{event.id}}" aria-expanded="false" aria-controls="collapse-{{event.id}}">
-                        {{ event.time }}: {{ event.name }} for {{event.person}}
+                        data-mdb-target="#collapse-task-{{task.id}}" aria-expanded="false"
+                        aria-controls="collapse-task-{{task.id}}">
+                        {{ task.name }}
                     </button>
-                    {% if not event.no_check %}
+                    {% if not task.no_check %}
                     <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="eventCheck_{{ event.id }}" name="completed"
-                            {% if event.completed %}checked{% endif %} />
-                        <label class="form-check-label" for="eventCheck_{{ event.id }}">
+                        <input class="form-check-input" type="checkbox" id="taskCheck_{{ task.id }}" name="completed" {%
+                            if task.completed %}checked{% endif %} />
+                        <label class="form-check-label" for="taskCheck_{{ task.id }}">
                             Completed
                         </label>
                     </div>
                     {% endif %}
                 </div>
-                <div id="collapse-{{event.id}}" class="accordion-collapse collapse" aria-labelledby="heading-{{event.id}}"
-                    data-mdb-parent="#event_accordion">
+                <div id="collapse-task-{{task.id}}" class="accordion-collapse collapse"
+                    aria-labelledby="heading-task-{{task.id}}" data-mdb-parent="#task_accordion">
                     <div class="accordion-body">
-                        {{ event.description }}
+                        {{ task.description }}
                     </div>
                 </div>
             </div>
             {% endfor %}
+            <div class="d-grid gap-2 col-4 mx-auto">
+                <button class="btn btn-primary" id="btn_tasks">Add Task</button>
+            </div>
         </div>
-        <div class="d-grid gap-2 col-4 mx-auto">
-            <button class="btn btn-primary" id="btn_events">Add Event</button>
+        <div class="card">
+            <h3 class="m-2">Events</h3>
+            <div class="accordion accordion-flush" id="event_accordion">
+                {% for event in events %}
+                <div class="accordion-item ">
+                    <div class="accordion-header d-flex justify-content-between align-items-center"
+                        id="heading-event-{{event.id}}">
+                        <button data-mdb-collapse-init class="accordion-button" type="button" data-mdb-toggle="collapse"
+                            data-mdb-target="#collapse-event-{{event.id}}" aria-expanded="false"
+                            aria-controls="collapse-event-{{event.id}}">
+                            {{ event.time }}: {{ event.name }} for {{event.person}}
+                        </button>
+                        {% if not event.no_check %}
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="eventCheck_{{ event.id }}"
+                                name="completed" {% if event.completed %}checked{% endif %} />
+                            <label class="form-check-label" for="eventCheck_{{ event.id }}">
+                                Completed
+                            </label>
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div id="collapse-event-{{event.id}}" class="accordion-collapse collapse"
+                        aria-labelledby="heading-event-{{event.id}}" data-mdb-parent="#event_accordion">
+                        <div class="accordion-body">
+                            {{ event.description }}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            <div class="d-grid gap-2 col-4 mx-auto">
+                <button class="btn btn-primary" id="btn_events">Add Event</button>
+            </div>
+        </div>
+        <div class="card">
+            <h3 class="m-2">Notes</h3>
+            <div class="accordion accordion-flush" id="note_accordion">
+                {% for note in notes %}
+                <div class="accordion-item ">
+                    <div class="accordion-header d-flex justify-content-between align-items-center"
+                        id="heading-note-{{note.id}}">
+                        <button data-mdb-collapse-init class="accordion-button" type="button" data-mdb-toggle="collapse"
+                            data-mdb-target="#collapse-note-{{note.id}}" aria-expanded="false"
+                            aria-controls="collapse-note-{{note.id}}">
+                            {{ note.title }}
+                        </button>
+                    </div>
+                    <div id="collapse-note-{{note.id}}" class="accordion-collapse collapse"
+                        aria-labelledby="heading-note-{{note.id}}" data-mdb-parent="#note_accordion">
+                        <div class="accordion-body">
+                            {{ note.content }}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            <div class="d-grid gap-2 col-4 mx-auto">
+                <button class="btn btn-primary" id="btn_notes">Add Note</button>
+            </div>
         </div>
     </div>
-    <div class="card">
-        <h3 class="m-2">Notes</h3>
-        <ul class="list-group my-5">
-            {% for note in notes %}
-            <li class="list-group-item d-flex justify-content-between align-items-center">
-                {{ note.title }}
-                {{ note.content }}
-            </li>
-            {% endfor %}
-        </ul>
-        <div class="d-grid gap-2 col-4 mx-auto">
-            <button class="btn btn-primary" id="btn_notes">Add Note</button>
-        </div>
-    </div>
-</div>
-{% endblock %}
+    {% endblock %}
 
-{% block extra_js %}
-<script>
-    document.getElementById("btn_tasks").addEventListener("click", function () {
-        window.location.href = "{{ url_for('tasks.add_task') }}";
-    });
-    document.getElementById("btn_events").addEventListener("click", function () {
-        window.location.href = "{{ url_for('events.add_event') }}";
-    });
-    document.getElementById("btn_notes").addEventListener("click", function () {
-        window.location.href = "{{ url_for('notes.add_note') }}";
-    });
-
-    document.querySelectorAll("[id^='eventCheck']").forEach(function (checkbox) {
-        checkbox.addEventListener("change", function () {
-            let eventId = checkbox.id.split("_")[1];
-            let url = "{{ url_for('events.event_api', id=0) }}";
-            url = url.replace("0", eventId);
-            let formData = new FormData();
-            if (checkbox.checked) {
-                formData.append("completed", "True");
-            } else {
-                formData.append("completed", "False");
-            }
-            fetch(url, {
-                body: formData,
-                method: "PATCH"
-            })
-                .then(response => response.json())
-                .then(data => {
-                    console.log(data);
-                })
-                .catch(error => {
-                    console.error(error);
-                });
+    {% block extra_js %}
+    <script>
+        document.getElementById("btn_tasks").addEventListener("click", function () {
+            window.location.href = "{{ url_for('tasks.add_task') }}";
         });
-    });
-
-    document.querySelectorAll("[id^='taskCheck']").forEach(function (checkbox) {
-        checkbox.addEventListener("change", function () {
-            let taskId = checkbox.id.split("_")[1];
-            let url = "{{ url_for('tasks.task_api', id=0) }}";
-            url = url.replace("0", taskId);
-            let formData = new FormData();
-            if (checkbox.checked) {
-                formData.append("completed", "True");
-            } else {
-                formData.append("completed", "False");
-            }
-            fetch(url, {
-                body: formData,
-                method: "PATCH"
-            })
-                .then(response => response.json())
-                .then(data => {
-                    console.log(data);
-                })
-                .catch(error => {
-                    console.error(error);
-                });
+        document.getElementById("btn_events").addEventListener("click", function () {
+            window.location.href = "{{ url_for('events.add_event') }}";
         });
-    });
-</script>
+        document.getElementById("btn_notes").addEventListener("click", function () {
+            window.location.href = "{{ url_for('notes.add_note') }}";
+        });
 
-{% endblock %}
-```
+        document.querySelectorAll("[id^='eventCheck']").forEach(function (checkbox) {
+            checkbox.addEventListener("change", function () {
+                let eventId = checkbox.id.split("_")[1];
+                let url = "{{ url_for('events.event_api', id=0) }}";
+                url = url.replace("0", eventId);
+                let formData = new FormData();
+                if (checkbox.checked) {
+                    formData.append("completed", "True");
+                } else {
+                    formData.append("completed", "False");
+                }
+                fetch(url, {
+                    body: formData,
+                    method: "PATCH"
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log(data);
+                    })
+                    .catch(error => {
+                        console.error(error);
+                    });
+            });
+        });
+
+        document.querySelectorAll("[id^='taskCheck']").forEach(function (checkbox) {
+            checkbox.addEventListener("change", function () {
+                let taskId = checkbox.id.split("_")[1];
+                let url = "{{ url_for('tasks.task_api', id=0) }}";
+                url = url.replace("0", taskId);
+                let formData = new FormData();
+                if (checkbox.checked) {
+                    formData.append("completed", "True");
+                } else {
+                    formData.append("completed", "False");
+                }
+                fetch(url, {
+                    body: formData,
+                    method: "PATCH"
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log(data);
+                    })
+                    .catch(error => {
+                        console.error(error);
+                    });
+            });
+        });
+    </script>
+
+    {% endblock %}
+    ```
