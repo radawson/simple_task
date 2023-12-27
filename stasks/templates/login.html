@@ -1,54 +1,46 @@
 {% extends "base.html" %}
 
 {% block content %}
-{% with messages = get_flashed_messages() %}
-{% if messages %}
-<div class="modal" tabindex="-1" show>
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Modal title</h5>
-                <button type="button" class="btn-close" data-mdb-ripple-init data-mdb-dismiss="modal"
-                    aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <p>{{ messages[0] }}. Go to <a href="{{ url_for('auth.login') }}">login page</a>.</p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-mdb-ripple-init
-                    data-mdb-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary" data-mdb-ripple-init>Save changes</button>
-            </div>
-        </div>
-    </div>
-</div>
-{% endif %}
-{% endwith %}
 <div class="col-md-4">
     <h3 class="title">Login</h3>
-    <div class="box">
-        <form method="POST" action="/login">
-            <div class="field">
-                <div class="form-control">
-                    <input class="input is-large" type="text" name="username"  autofocus=""/>
-                    <label class="form-label" for="username">Username</label>
+    <div>
+        <form method="POST" action="{{url_for('auth.login')}}">
+
+            <div class="form-outline mb-4">
+                <input type="text" id="username" name="username" class="form-control" />
+                <label class="form-label" for="username">Username</label>
+            </div>
+
+            <!-- Password input -->
+            <div class="form-outline mb-4">
+                <input type="password" id="loginPassword" name="password" class="form-control" />
+                <label class="form-label" for="loginPassword">Password</label>
+            </div>
+
+            <!-- 2 column grid layout -->
+            <div class="row mb-4">
+                <div class="col-md-6 d-flex justify-content-center">
+                    <!-- Checkbox -->
+                    <div class="form-check mb-3 mb-md-0">
+                        <input class="form-check-input" type="checkbox" value="" id="remember" checked />
+                        <label class="form-check-label" for="remember">
+                            Remember me
+                        </label>
+                    </div>
+                </div>
+
+                <div class="col-md-6 d-flex justify-content-center">
+                    <!-- Simple link -->
+                    <a href="#!">Forgot password?</a>
                 </div>
             </div>
 
-            <div class="field">
-                <div class="form-control">
-                    <input class="input is-large" type="password" name="password" />
-                    <label class="form-label" for="password">Password</label>
-                </div>
-            </div>
-            <div class="field">
-                <label class="checkbox">
-                    <input type="checkbox" name="remember">
-                    Remember me
-                </label>
-            </div>
-            <button class="button is-block is-info is-large is-fullwidth">Login</button>
+            <!-- Submit button -->
+            <button type="submit" class="btn btn-primary btn-block mb-4">
+                Sign in
+            </button>
         </form>
     </div>
 </div>
+
 {% endblock %}
