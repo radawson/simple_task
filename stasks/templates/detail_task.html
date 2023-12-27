@@ -10,7 +10,7 @@ Task Detail
     <div class="card">
         <div class="card-body">
             <h5 class="card-title" id="taskName">{{ task.name }}</h5>
-            <form id="taskForm" action="{{task.id}}" method="post">
+            <form id="taskForm" action="{{url_for('tasks.task_api',id=task.id)}}" method="post">
                 <div class="form-outline mb-2">
                     <input type="text" id="taskDescription" name="description" readonly class="form-control" value="{{ task.description
                         }}"" />
