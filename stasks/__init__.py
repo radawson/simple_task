@@ -46,8 +46,7 @@ def create_app():
 
     @app.cli.command("seed-db")
     def seed_db_command():
-        seed_db()
-        print("Database seeded.")
+        print(seed_db())
 
     # Run the app
     if __name__ == "__main__":

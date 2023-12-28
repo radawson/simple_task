@@ -12,4 +12,6 @@ def seed_db():
     db.session.add(Person(first_name="Kathy", last_name="Dirschel"))
     db.session.add(Person(first_name="Ric", last_name="Dawson"))
     db.session.add(Person(first_name="Pat", last_name="Dawson"))
+    db.session.add(User(first_name="Rick", last_name="Dawson", username="admin", password="P@$$word"))
     db.session.commit()
+    return f"5 users added to database."
