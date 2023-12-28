@@ -24,9 +24,9 @@ Tasks
             <div class="col-md-4 col-sm-12 python_task">
                 <div class="card">
                     <div class="card-body">
-                        <h5 class="card-title">{{ task.name }}</h5>
-                        <p class="card-title">{{ task.date }}</p>
-                        <p class="card-text">{{ task.description }}</p>
+                        <h5 class="card-title" id="name_{{task.id}}">{{ task.name }}</h5>
+                        <p class="card-title" id="date_{{task.id}}">{{ task.date }}</p>
+                        <p class="card-text" id="description_{{task.id}}">{{ task.description }}</p>
                     </div>
                     <div class="container">
                         <div class="form-check float-end">
@@ -103,14 +103,14 @@ Tasks
 
         for (var i = 0; i < tasks.length; i++) {
             var task = tasks[i];
-            var taskDate = new Date(event.querySelector("[id^='date']").textContent);
+            var taskDate = new Date(task.querySelector("[id^='date']").textContent);
 
             if (filterValue === "today" && !isToday(taskDate)) {
-                event.style.display = "none";
-            } else if (filterValue === "future" && !isFuture(eventDate)) {
-                event.style.display = "none";
+                task.style.display = "none";
+            } else if (filterValue === "future" && !isFuture(taskDate)) {
+                task.style.display = "none";
             } else {
-                event.style.display = "block";
+                task.style.display = "block";
             }
         }
     }

@@ -31,6 +31,16 @@ Event Detail
                         value="{{event.location}}" />
                     <label class="form-label" for="location">Location</label>
                 </div>
+                <div class="form-outline mb-2">
+                    <select id="person" name="person" class="form-control mdb-select" data-mdb-select-init >
+                    <option></option>
+                    <option value="everyone" {% if event.person == 'everyone' %}selected{% endif %}>Everyone</option>
+                    {% for person in people %}
+                    <option value="{{person}}" {% if event.person == person %}selected{% endif %}>{{person}}</option>
+                    {% endfor %}
+                    </select>
+                    <label class="form-label select-label" for="person">Event Participant</label>
+                </div>
                 {% if current_user.admin %}
                 <div class="form-outline mb-2" data-mdb-input-init>
                     <input type="text" id="added_by" name="added_by" class="form-control" readonly
