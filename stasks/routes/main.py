@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template
+from flask import Blueprint, flash, render_template
 from flask_login import current_user, login_required
 from stasks.models import db, Event, Note, Task
 from datetime import datetime
@@ -58,7 +58,8 @@ def get_date(date):
 @login_required
 def admin():
     if current_user.is_admin():
-        return "Admin page"
+        return render_template("admin.html")
+    flash("You do not have administrator permissions")
     return render_template("settings.html")  # temp until admin page is created
 
 

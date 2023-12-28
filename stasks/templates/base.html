@@ -91,10 +91,10 @@
                     <a data-mdb-dropdown-init class="dropdown-toggle d-flex align-items-center hidden-arrow" href="#"
                         id="navbarDropdownMenuAvatar" role="button" aria-expanded="false" data-mdb-toggle="dropdown">
                         {% if current_user.is_authenticated %}
-                        <i class="fas fa-user me-2" style="color:#fbfbfb"></i>
+                        <i class="fas fa-user me-2" ></i>
                         {% else %}
                         <a href="{{ url_for('auth.login') }}" class="navbar-item">
-                            <i class="fas fa-arrow-right-to-bracket me-2" style="color:#fbfbfb"></i>
+                            <i class="fas fa-arrow-right-to-bracket me-2" ></i>
                         </a>
                         {% endif %}
                     </a>
