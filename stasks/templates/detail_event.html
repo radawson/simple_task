@@ -31,6 +31,13 @@ Event Detail
                         value="{{event.location}}" />
                     <label class="form-label" for="location">Location</label>
                 </div>
+                {% if current_user.admin %}
+                <div class="form-outline mb-2" data-mdb-input-init>
+                    <input type="text" id="added_by" name="added_by" class="form-control" readonly
+                        value="{{event.added_by}}" />
+                    <label class="form-label" for="added_by">Created By</label>
+                </div>
+                {% endif %}
             </form>
             <button id="editButton" class="btn btn-primary" onclick="toggleEdit()">Edit</button>
             <button id="deleteButton" class="btn btn-danger" onclick="deleteEvent()">Delete</button>

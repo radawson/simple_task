@@ -29,10 +29,11 @@ def add_task():
         tasks = Task.query.all()
         return render_template("add_task.html", tasks=tasks)
     elif request.method == "POST":
-        name = request.form["name"]
-        description = request.form["description"]
-        date = datetime.strptime(request.form["date"], "%Y-%m-%d").date()
-        new_task = Task(name=name, description=description, date=date)
+        name = request.form.get("name")
+        description = request.form.get("description")
+        date = datetime.strptime(request.form.get("date"), "%Y-%m-%d").date()
+        added_by = request.form.get("added_by")
+        new_task = Task(name=name, description=description, date=date, added_by=added_by)
         db.session.add(new_task)
         db.session.commit()
         message = "Task added successfully"

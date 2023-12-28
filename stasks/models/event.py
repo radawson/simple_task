@@ -11,5 +11,4 @@ class Event(db.Model):
     person = db.Column(db.String(20))
     location = db.Column(db.String(200), nullable=False)
     completed = db.Column(db.Boolean, nullable=False, default=False)
-
-     
+    added_by = db.Column(db.String(30), nullable=True)     

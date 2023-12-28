@@ -24,9 +24,11 @@ Today - {{ date }}
             </li>
             {% endfor %}
         </ul>
+        {% if current_user.admin %}
         <div class="d-grid gap-2 col-4 mx-auto">
             <button class="btn btn-primary" id="btn_tasks">Add Task</button>
         </div>
+        {% endif %}
     </div>
     <div class="card">
         <h2 class="m-2">Events</h2>
@@ -46,9 +48,11 @@ Today - {{ date }}
             </li>
             {% endfor %}
         </ul>
+        {% if current_user.admin %}
         <div class="d-grid gap-2 col-4 mx-auto">
             <button class="btn btn-primary" id="btn_events">Add Event</button>
         </div>
+        {% endif %}
     </div>
     <div class="card">
         <h2 class="m-2">Notes</h2>

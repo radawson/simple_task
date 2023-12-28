@@ -29,7 +29,8 @@ def add_event():
         time = datetime.strptime(request.form["time"], "%H:%M").time()
         location = request.form.get("location")
         person = request.form.get("person")
-        new_event = Event(name=name, description=description, date=date, time=time, location=location, person= person)
+        added_by = request.form.get("added_by")
+        new_event = Event(name=name, description=description, date=date, time=time, location=location, person= person, added_by=added_by)
         db.session.add(new_event)
         db.session.commit()
         message = "Event added successfully"

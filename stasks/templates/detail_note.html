@@ -21,6 +21,13 @@ Note Detail
                     <input type="date" id="date" name="date" class="form-control" readonly value="{{note.date}}" />
                     <label class="form-label" for="date">Date</label>
                 </div>
+                {% if current_user.admin %}
+                <div class="form-outline mb-2" data-mdb-input-init>
+                    <input type="text" id="added_by" name="added_by" class="form-control" readonly
+                        value="{{note.added_by}}" />
+                    <label class="form-label" for="added_by">Created By</label>
+                </div>
+                {% endif %}
             </form>
             <button id="editButton" class="btn btn-primary" onclick="toggleEdit()">Edit</button>
             <button id="deleteButton" class="btn btn-danger" onclick="deleteEvent()">Delete</button>
