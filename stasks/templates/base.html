@@ -54,9 +54,11 @@
                     <li class="nav-item">
                         <a class="nav-link" href="/tasks">Tasks</a>
                     </li>
+                    {% if current_user.admin %}
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Admin</a>
+                        <a class="nav-link" href="{{url_for('main.admin')}}">Admin</a>
                     </li>
+                    {% endif %}
                 </ul>
                 <!-- Left links -->
             </div>
@@ -89,10 +91,11 @@
                     <a data-mdb-dropdown-init class="dropdown-toggle d-flex align-items-center hidden-arrow" href="#"
                         id="navbarDropdownMenuAvatar" role="button" aria-expanded="false" data-mdb-toggle="dropdown">
                         {% if current_user.is_authenticated %}
-                        <img src="https://mdbcdn.b-cdn.net/img/new/avatars/2.webp" class="rounded-circle" height="25"
-                            alt="Black and White Portrait of a Man" loading="lazy" />
+                        <i class="fas fa-user me-2" style="color:#fbfbfb"></i>
                         {% else %}
-                        <i class="fas fa-arrow-right-to-bracket me-2" style="color:#fafafa" ></i>
+                        <a href="{{ url_for('auth.login') }}" class="navbar-item">
+                        <i class="fas fa-arrow-right-to-bracket me-2" style="color:#fbfbfb" ></i>
+                        </a>
                         {% endif %}
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownMenuAvatar">
@@ -103,17 +106,12 @@
                         <li>
                             <a class="dropdown-item" href="#">Settings</a>
                         </li>
-                        <li>
-                        
+                        <li>      
                             <a class="dropdown-item" href="{{ url_for('auth.logout') }}" class="navbar-item">
                             Logout
                             </a>
-                        {% else %}
-                            <a class="dropdown-item" href="{{ url_for('auth.login') }}" class="navbar-item">
-                            Login
-                            </a>
                         {% endif %}
-                        {% if current_user.is_authenticated and current_user.is_admin() %}
+                        {% if current_user.is_authenticated and current_user.admin %}
                             <a class="dropdown-item" href="{{ url_for('auth.register') }}" class="navbar-item">
                                 Add User
                             </a>
@@ -167,17 +165,8 @@
             element.remove();
         }
     </script>
-    <!-- <script>
-        window.onload = function () {
-            var message = "{{ message }}";
-            if (message) {
-                alert(message);
-            }
-        };
-    </script> -->
-    <!-- Template scripts -->
+
     {% block extra_js %}{% endblock %}
 
 </body>
-
 </html>

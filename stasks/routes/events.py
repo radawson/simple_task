@@ -1,4 +1,5 @@
 from flask import Blueprint, jsonify, render_template, request
+from flask_login import login_required
 from stasks.models import Event, db, Person
 from datetime import datetime
 from operator import attrgetter
@@ -17,6 +18,7 @@ def event_detail(id):
     return render_template('detail_event.html', event=event)
 
 @events.route("/events/add", methods=["GET", "POST"])
+@login_required
 def add_event():
     if request.method == "GET":
         return render_template("add_event.html",  people=Person.get_names())

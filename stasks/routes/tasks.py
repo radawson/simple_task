@@ -1,4 +1,5 @@
 from flask import Blueprint, jsonify, render_template, request
+from flask_login import login_required
 from stasks.models import Task, db
 from datetime import datetime
 
@@ -21,6 +22,7 @@ def task_detail(id):
     return render_template("detail_task.html", task=task)
 
 @tasks.route("/tasks/add", methods=["GET", "POST"])
+@login_required
 def add_task():
     message = ""
     if request.method == "GET":
