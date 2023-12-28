@@ -20,6 +20,7 @@ Add Task
             <label for="date">Date:</label>
             <input type="date" id="date" name="date" class="form-control">
         </div>
+        <input type="hidden" id="added_by" name="added_by" value="{{current_user.username}}" />
         <input class="btn btn-primary" type="submit" value="Add Task">
     </form>
 

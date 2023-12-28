@@ -8,3 +8,4 @@ class Task(db.Model):
     date = db.Column(db.Date, nullable=False)
     completed = db.Column(db.Boolean, nullable=False, default=False)
     priority = db.Column(db.Integer, default=0)
+    added_by = db.Column(db.String(30), nullable=True)

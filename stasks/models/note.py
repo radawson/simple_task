@@ -6,3 +6,4 @@ class Note(db.Model):
     title = db.Column(db.String(200), nullable=False)
     content = db.Column(db.Text)
     date = db.Column(db.Date)
+    added_by = db.Column(db.String(30), nullable=True)

@@ -22,7 +22,7 @@
 
 <body>
     <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
         <!-- Container wrapper -->
         <div class="container-fluid">
             <!-- Toggle button -->
@@ -43,7 +43,7 @@
                 <!-- Left links -->
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item">
-                        <a class="nav-link" href="/">Today</a>
+                        <a class="nav-link" href="{{url_for('main.index')}}">Today</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="/events">Events</a>
@@ -54,6 +54,11 @@
                     <li class="nav-item">
                         <a class="nav-link" href="/tasks">Tasks</a>
                     </li>
+                    {% if current_user.admin %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{url_for('main.admin')}}">Admin</a>
+                    </li>
+                    {% endif %}
                 </ul>
                 <!-- Left links -->
             </div>
@@ -81,8 +86,40 @@
                         </li>
                     </ul>
                 </div> -->
+                <!-- Avatar -->
+                <div class="dropdown">
+                    <a data-mdb-dropdown-init class="dropdown-toggle d-flex align-items-center hidden-arrow" href="#"
+                        id="navbarDropdownMenuAvatar" role="button" aria-expanded="false" data-mdb-toggle="dropdown">
+                        {% if current_user.is_authenticated %}
+                        <i class="fas fa-user me-2" style="color:#fbfbfb"></i>
+                        {% else %}
+                        <a href="{{ url_for('auth.login') }}" class="navbar-item">
+                            <i class="fas fa-arrow-right-to-bracket me-2" style="color:#fbfbfb"></i>
+                        </a>
+                        {% endif %}
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownMenuAvatar">
+                        <li>
+                            {% if current_user.is_authenticated %}
+                            <a class="dropdown-item" href="{{url_for('main.profile')}}">My profile</a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="{{url_for('main.settings')}}">Settings</a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="{{ url_for('auth.logout') }}">Logout</a>
+                            {% endif %}
+                            {% if current_user.is_authenticated and current_user.admin %}
+                            <a class="dropdown-item" href="{{ url_for('auth.register') }}" class="navbar-item">
+                                Add User
+                            </a>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </div>
+
                 <!-- Live time and date -->
-                <div id="liveDateTime" class="navbar-text"></div>
+                <div id="liveDateTime" class="navbar-text mx-2"></div>
 
             </div>
             <!-- Right elements -->
@@ -90,6 +127,18 @@
         <!-- Container wrapper -->
     </nav>
     <!-- Navbar -->
+    <!-- Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    <!-- Alert -->
+    {% if messages %}
+    {% for category, message in messages %}
+    <div class="alert alert-{{ category }}" id="flash_message">
+        {{ message }}
+        <input type="button" value=&#10006 onclick="removeFlash()" style="float: right">
+    </div>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
 
     <!--Main layout-->
     {% block content %}{% endblock %}
@@ -109,14 +158,12 @@
         updateDateTime();
     </script>
     <script>
-        window.onload = function () {
-            var message = "{{ message }}";
-            if (message) {
-                alert(message);
-            }
-        };
+        function removeFlash() {
+            const element = document.getElementById('flash_message');
+            element.remove();
+        }
     </script>
-    <!-- Template scripts -->
+
     {% block extra_js %}{% endblock %}
 
 </body>

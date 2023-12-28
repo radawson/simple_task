@@ -1,4 +1,5 @@
 from flask import Blueprint, render_template, request
+from flask_login import login_required
 from stasks.models import Note, db
 from datetime import datetime
 
@@ -17,13 +18,15 @@ def get_notess_date(date):
 
 
 @notes.route("/notes/add", methods=["GET", "POST"])
+@login_required
 def add_note():
     message = ""
     if request.method == "POST":
         title = request.form["title"]
         content = request.form["content"]
         date = datetime.strptime(request.form["date"], "%Y-%m-%d").date()
-        new_note = Note(title=title, content=content, date=date)
+        added_by = request.form.get("added_by")
+        new_note = Note(title=title, content=content, date=date, added_by=added_by)
         db.session.add(new_note)
         db.session.commit()
         message = "Note added successfully"

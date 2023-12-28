@@ -36,9 +36,12 @@ Today - {{ date }}
                 </div>
             </div>
             {% endfor %}
-            <div class="d-grid gap-2 col-4 mx-auto">
-                <button class="btn btn-primary" id="btn_tasks">Add Task</button>
-            </div>
+
+             {% if current_user.admin %}
+        <div class="d-grid gap-2 col-4 mx-auto">
+            <button class="btn btn-primary" id="btn_tasks">Add Task</button>
+        </div>
+        {% endif %}
         </div>
         <div class="card">
             <h3 class="m-2">Events</h3>
