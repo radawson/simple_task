@@ -4,6 +4,7 @@ from flask_login import LoginManager
 from .models import db, seed_db
 from .routes import auth, main, notes, tasks, events, test
 
+
 def create_app():
     # Initialize Flask app
     app = Flask(__name__)
@@ -12,7 +13,7 @@ def create_app():
     # Set up the SQLAlchemy track modifications
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
     # Add secret key for CSRF protection
-    app.config['SECRET_KEY'] = '1234abcd-changeme'
+    app.config["SECRET_KEY"] = "1234abcd-changeme"
 
     # Initialize the database with the app
     db.init_app(app)
@@ -21,7 +22,7 @@ def create_app():
 
     # Initialize the login manager
     login_manager = LoginManager()
-    login_manager.login_view = 'auth.login'
+    login_manager.login_view = "auth.login"
     login_manager.init_app(app)
 
     from .models import User
@@ -42,7 +43,6 @@ def create_app():
     app.register_blueprint(notes)
     app.register_blueprint(tasks)
     app.register_blueprint(test)
- 
 
     @app.cli.command("seed-db")
     def seed_db_command():
