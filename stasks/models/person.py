@@ -14,6 +14,7 @@ class Person(db.Model):
     zip_code = db.Column(db.String(10))
     country = db.Column(db.String(20))
     birthday = db.Column(db.Date)
+    info = db.Column(db.Text)
 
     def get_all():
         return Person.query.order_by(Person.first_name).all()
