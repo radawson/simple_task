@@ -17,12 +17,31 @@ def login():
         user = User.query.filter_by(username=username).first()
 
         if not user or not check_password_hash(user.password, password):
-            flash("Please check your login details and try again.")
+            flash("Please check your login details and try again.", "danger")
             return redirect(url_for("auth.login"))
 
         login_user(user, remember=remember)
         return redirect(url_for("main.index"))
     return render_template("login.html")
+
+@auth.route('/password', methods=['POST'])
+def password():
+    if request.method == "POST":
+        username = request.form.get("username")
+        password = request.form.get("password")
+        new_password = request.form.get("new_password")
+        confirm_password = request.form.get("confirm_password")
+        if new_password != confirm_password:
+            flash("New password and confirm password do not match.","danger")
+            return redirect(url_for("main.profile"))
+        user = User.query.filter_by(username=username).first()
+        if not user or not check_password_hash(user.password, password):
+            flash("Please check your current password and try again.", "danger")
+            return redirect(url_for("main.profile"))
+        user.password = generate_password_hash(new_password)
+        db.session.commit()
+        flash("Password changed successfully.", "success")
+        return redirect(url_for("main.profile"))
 
 
 @auth.route("/register", methods=["GET", "POST"])
@@ -45,7 +64,7 @@ def register():
         ).first()  # if this returns a user, then the email already exists in database
 
         if user:
-            flash("Username already exists")
+            flash("Username already exists", "warning")
             return redirect(url_for("auth.register"))
 
         new_user = User(

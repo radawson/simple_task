@@ -5,48 +5,43 @@ Profile
 {% endblock %}
 
 {% block content %}
-<main class="my-5" >
-  <!-- Container for demo purpose -->
+<main class="my-5">
   <div class="container px-4">
-
     <!--Section: Profile-->
     <section>
       <div class="row gx-xl-5">
         <div class="mb-4 mb-md-0">
           <div class="card shadow-0 mb-5">
             <div class="card-header py-3">
-              <strong>Edit profile</strong>
+              <h4 class="mb-0">Edit profile</h4>
             </div>
             <div class="card-body text-center">
-              <div class="mt-1 mb-4">
-                <strong>Profile photo</strong>
-              </div>
 
               <form action="">
-                <div class="d-flex justify-content-center mb-4">
+                <!-- <div class="d-flex justify-content-center mb-4">
                   <div id="dnd-default-value" class="file-upload-wrapper shadow-5" style="max-width: 300px">
                     <input type="file" class="file-upload-input"
                       data-mdb-default-file="https://mdbootstrap.com/img/new/avatars/1.jpg" data-mdb-file-upload-init />
                   </div>
-                </div>
+                </div> -->
                 <div class="mb-4 input-group">
                   <div class="form-outline mb-0 " data-mdb-input-init>
                     <input type="text" id="first_name" class="form-control" value="{{current_user.first_name}}" />
-                    <label class="form-label" for="formName">First Name</label>
+                    <label class="form-label" for="first_name">First Name</label>
                   </div>
                   <div class="form-outline mb-0 " data-mdb-input-init>
                     <input type="text" id="last_name" class="form-control" value="{{current_user.last_name}}" />
-                    <label class="form-label" for="formName">Last Name</label>
+                    <label class="form-label" for="last_name">Last Name</label>
                   </div>
                 </div>
                 <div class="form-outline mb-4" data-mdb-input-init>
-                  <input type="email" id="formEmail" class="form-control" value="johndoe@gmail.com" />
+                  <input type="email" id="formEmail" class="form-control" value="{{current_user.email}}" />
                   <label class="form-label" for="formEmail">Email</label>
                 </div>
 
                 <div class="form-outline mb-4" data-mdb-input-init>
-                  <input type="text" id="formPosition" class="form-control" value="Founder" />
-                  <label class="form-label" for="formName">Position</label>
+                  <input type="date" id="formPosition" class="form-control" value="{{current_user.birthday}}" />
+                  <label class="form-label" for="formName">Birthdate</label>
                 </div>
 
                 <div class="form-outline mb-4" data-mdb-input-init>
@@ -66,18 +61,23 @@ Profile
             <div class="card-header py-3"><strong>Change password</strong></div>
             <div class="card-body text-center pt-4">
 
-              <form action="">
+              <form action="{{url_for('auth.password')}}" method="post">
                 <div class="form-outline mb-4" data-mdb-input-init>
-                  <input type="password" id="newPassword" class="form-control" />
+                  <input type="password" id="password" name="password" class="form-control" />
+                  <label class="form-label" for="password">Current password</label>
+                </div>
+
+                <div class="form-outline mb-4" data-mdb-input-init>
+                  <input type="password" id="newPassword" name="new_password" class="form-control" />
                   <label class="form-label" for="newPassword">New password</label>
                 </div>
 
                 <div class="form-outline mb-4" data-mdb-input-init>
-                  <input type="password" id="confirmPassword" class="form-control" />
+                  <input type="password" id="confirmPassword" name="confirm_password" class="form-control" />
                   <label class="form-label" for="confirmPassword">Confirm password</label>
                 </div>
-
-                <button type="button" class="btn btn-primary mb-2" data-mdb-ripple-init>Apply</button>
+                <input type="hidden" name="username" value="{{ current_user.username }}" />
+                <button type="submit" class="btn btn-primary mb-2" data-mdb-ripple-init>Apply</button>
               </form>
 
             </div>
@@ -102,6 +102,9 @@ Profile
 
   input.addEventListener('change', updateImageDisplay);
 
+</script>
+<script>
+  // 
 </script>
 
 {% endblock %}

@@ -1,34 +1,57 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="column is-4 is-offset-4">
-    <h3 class="title">Sign Up</h3>
-    <div class="box">
+<main class="my-5">
+    <div class="container px-4">
+        <!--Section: Profile-->
+        <section>
+            <div class="row gx-xl-5">
+                <div class="mb-4 mb-md-0">
+                    <div class="card shadow-0 mb-5">
+                        <div class="card-header py-3">
+                            <h4 class="mb-0">Add User</h4>
+                        </div>
+                        <div class="card-body text-center">
 
-        <form method="POST" action="{{url_for('auth.register')}}">
+                            <form method="POST" action="{{url_for('auth.register')}}">
+                                <div class="mb-4 input-group">
+                                    <div class="form-outline mb-0 " data-mdb-input-init>
+                                        <input type="text" id="first_name" class="form-control" />
+                                        <label class="form-label" for="first_name">First Name</label>
+                                    </div>
+                                    <div class="form-outline mb-0 " data-mdb-input-init>
+                                        <input type="text" id="last_name" class="form-control" />
+                                        <label class="form-label" for="last_name">Last Name</label>
+                                    </div>
+                                </div>
+                                <div class="form-outline mb-4">
+                                    <input type="text" id="username" name="username" class="form-control" />
+                                    <label class="form-label" for="username">Username</label>
+                                </div>
+                                <div class="form-outline mb-4">
+                                    <input type="password" id="password" name="password" class="form-control" />
+                                    <label class="form-label" for="password">Password</label>
+                                </div>
+                                <div class="form-outline mb-4">
+                                    <input class="form-control" type="email" name="email" placeholder="Email"
+                                        autofocus />
+                                    <label class="form-label" for="email">Email address</label>
+                                </div>
+                                <div class="form-check float-start">
+                                    <input class="form-check-input" type="checkbox" value="false" id="admin"
+                                        name="admin" />
+                                    <label class="form-check-label" for="admin">Administrator</label>
+                                </div>
 
-
-            <div class="form-outline mb-4">
-                <input type="text" id="username" name="username" class="form-control" />
-                <label class="form-label" for="username">Username</label>
+                                <button class="btn btn-primary">Sign Up</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="form-outline mb-4">
-                <input type="password" id="password" name="password" class="form-control" />
-                <label class="form-label" for="password">Password</label>
-            </div>
-            <div class="form-outline mb-4">
-                <input class="form-control" type="email" name="email" placeholder="Email" autofocus />
-                <label class="form-label" for="email">Email address</label>
-            </div>
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" value="false" id="admin" name="admin" />
-                <label class="form-check-label" for="admin">Administrator</label>
-            </div>
-
-            <button class="btn btn-primary">Sign Up</button>
-        </form>
+        </section>
     </div>
-</div>
+</main>
 {% endblock %}
 
 {% block extra_js %}

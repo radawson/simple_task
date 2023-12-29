@@ -13,7 +13,7 @@ class Person(db.Model):
     state = db.Column(db.String(2))
     zip_code = db.Column(db.String(10))
     country = db.Column(db.String(20))
-    birthday = db.Column(db.Date)
+    birthdate = db.Column(db.Date)
     info = db.Column(db.Text)
 
     def get_all():

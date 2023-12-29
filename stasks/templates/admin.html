@@ -1,12 +1,36 @@
 {% extends 'base.html' %}
 
-{% block title %}    
+{% block title %}
 Admin
 {% endblock %}
 
 {% block content %}
 
-Admin page goes here
+<main class="my-5">
+    <div class="container px-4">
+        <section>
+            <div class="card shadow-0">
+                <div class="card-header py-4 mb-3">
+                    <h4 class="mb-0">User management</h4>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-end mb-4">
+                        <div class="form-outline" data-mdb-input-init>
+                            <input data-mdb-search data-mdb-target="#table_modal" type="text" id="search_modal"
+                                class="form-control" />
+                            <label class="form-label" for="search_modal">Search</label>
+                        </div>
+                        <button class="btn btn-primary btn-sm ms-3" data-mdb-ripple-init data-mdb-add-entry
+                            data-mdb-target="#table_modal">
+                            <i class="fa fa-plus"></i>
+                        </button>
+                    </div>
+                    <div id="table_modal"></div>
+                </div>
+            </div>
+        </section>
+    </div>
+</main>
 
 {% endblock %}
 
