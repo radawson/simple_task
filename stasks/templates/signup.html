@@ -7,7 +7,7 @@
 
         <form method="POST" action="{{url_for('auth.register')}}">
 
-            
+
             <div class="form-outline mb-4">
                 <input type="text" id="username" name="username" class="form-control" />
                 <label class="form-label" for="username">Username</label>
@@ -17,16 +17,28 @@
                 <label class="form-label" for="password">Password</label>
             </div>
             <div class="form-outline mb-4">
-                    <input class="form-control" type="email" name="email" placeholder="Email" autofocus/>
-                    <label class="form-label" for="email">Password</label>
+                <input class="form-control" type="email" name="email" placeholder="Email" autofocus />
+                <label class="form-label" for="email">Email address</label>
             </div>
             <div class="form-check">
-                <input class="form-check-input" type="checkbox" value="" id="admin" name="admin" />
+                <input class="form-check-input" type="checkbox" value="false" id="admin" name="admin" />
                 <label class="form-check-label" for="admin">Administrator</label>
-              </div>
-            
-            <button class="button is-block is-info is-large is-fullwidth">Sign Up</button>
+            </div>
+
+            <button class="btn btn-primary">Sign Up</button>
         </form>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.getElementById("admin").onchange = function () {
+        if (this.checked) {
+            this.value = "true";
+        } else {
+            this.value = "false";
+        }
+    };
+</script>
 {% endblock %}

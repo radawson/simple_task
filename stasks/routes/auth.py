@@ -35,7 +35,11 @@ def register():
         last_name = request.form.get("last_name")
         if not first_name:
             first_name = username.split()[0]
-        admin = request.form.get("admin")
+        print(request.form.get('admin'))
+        if request.form.get("admin"):
+            admin = True
+        else:
+            admin = False
         user = User.query.filter_by(
             username=username
         ).first()  # if this returns a user, then the email already exists in database
