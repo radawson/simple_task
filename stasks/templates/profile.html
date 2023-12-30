@@ -17,7 +17,7 @@ Profile
             </div>
             <div class="card-body text-center">
 
-              <form action="">
+              <form action="{{url_for('main.profile')}}" method="post">
                 <!-- <div class="d-flex justify-content-center mb-4">
                   <div id="dnd-default-value" class="file-upload-wrapper shadow-5" style="max-width: 300px">
                     <input type="file" class="file-upload-input"
@@ -26,31 +26,31 @@ Profile
                 </div> -->
                 <div class="mb-4 input-group">
                   <div class="form-outline mb-0 " data-mdb-input-init>
-                    <input type="text" id="first_name" class="form-control" value="{{current_user.first_name}}" />
+                    <input type="text" id="first_name" name="first_name" class="form-control" value="{{current_user.first_name}}" />
                     <label class="form-label" for="first_name">First Name</label>
                   </div>
                   <div class="form-outline mb-0 " data-mdb-input-init>
-                    <input type="text" id="last_name" class="form-control" value="{{current_user.last_name}}" />
+                    <input type="text" id="last_name" name="last_name" class="form-control" value="{{current_user.last_name}}" />
                     <label class="form-label" for="last_name">Last Name</label>
                   </div>
                 </div>
                 <div class="form-outline mb-4" data-mdb-input-init>
-                  <input type="email" id="formEmail" class="form-control" value="{{current_user.email}}" />
-                  <label class="form-label" for="formEmail">Email</label>
+                  <input type="email" id="email" name="email" class="form-control" value="{{ current_user.email if current_user.email else ''}}" />
+                  <label class="form-label" for="email">Email</label>
                 </div>
 
                 <div class="form-outline mb-4" data-mdb-input-init>
-                  <input type="date" id="formPosition" class="form-control" value="{{current_user.birthday}}" />
-                  <label class="form-label" for="formName">Birthdate</label>
+                  <input type="date" id="birthdate" name="birthdate" class="form-control" value="{{current_user.birthday}}" />
+                  <label class="form-label" for="birthdate">Birthdate</label>
                 </div>
 
                 <div class="form-outline mb-4" data-mdb-input-init>
-                  <textarea class="form-control" id="formDescription" rows="4">{{current_user.info}}
+                  <textarea class="form-control" id="info" name="info" rows="4">{{current_user.info if current_user.info else ''}}
                   </textarea>
-                  <label class="form-label" for="formDescription">Information</label>
+                  <label class="form-label" for="info">Information</label>
                 </div>
 
-                <button type="button" class="btn btn-primary mb-2" data-mdb-ripple-init>
+                <button type="submit" class="btn btn-primary mb-2" data-mdb-ripple-init>
                   Update profile
                 </button>
               </form>

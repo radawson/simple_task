@@ -1,6 +1,6 @@
-from flask import Blueprint, flash, render_template
+from flask import Blueprint, flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_required
-from stasks.models import db, Event, Note, Task
+from stasks.models import db, Event, Note, Task, User
 from datetime import datetime
 
 main = Blueprint("main", __name__)
@@ -63,9 +63,25 @@ def admin():
     return render_template("settings.html")  # temp until admin page is created
 
 
-@main.route("/profile")
+@main.route("/profile", methods=["GET", "POST"])
 @login_required
 def profile():
+    if request.method == "POST":
+        print(request.form)
+        user = User.query.get(current_user.id)
+        if request.form.get('first_name'):
+            user.first_name = request.form.get('first_name')
+        if request.form.get('last_name'):
+            user.last_name = request.form.get('last_name')
+        if request.form.get('birthdate'):
+            user.birthdate = request.form.get('birthdate')
+        if request.form.get('email'):
+            user.email = request.form.get('email')
+        if request.form.get('info'):
+            user.info = request.form.get('info')
+        db.session.commit()
+        flash("Profile updated", "success")
+        return redirect(url_for("main.profile"))
     user = current_user
     return render_template("profile.html", user=user)
 
