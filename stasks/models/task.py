@@ -29,4 +29,4 @@ class Template(db.Model):
     added_by = db.Column(db.String(30), nullable=True)
 
     def __repr__(self):
-        return f"<Template {self.id}: {self.name} - {len(self.tasks)} tasks.>"
+        return f"<Template {self.id}: {self.name} - {self.tasks} tasks.>"

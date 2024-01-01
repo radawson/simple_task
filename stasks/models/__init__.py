@@ -29,7 +29,6 @@ def seed_db():
         message += f"{len(people)} people added to db.\n"
     if Template.query.count() > 0:
         message += f"Templates exist in database: {Template.query.all()}"
-
     else:
         templates = []
         templates.append(Template(name="Daily Tasks"))
@@ -46,17 +45,17 @@ def seed_db():
         templates.append(Template(name="Afternoon Tasks"))
         db.session.add_all(templates)
         message += f"{len(templates)} templates added to db.\n"
-
+ 
     tasks = []
-    tasks.append(
-        Task(
+    task1 = Task(
             name="Clean Cat Litter",
             description="Clean the cat litter box and refil; with 1 inch of fresh litter.",
             completed=False,
             priority=0,
             added_by="Rick",
         )
-    )
+    task1.templates.append(Template.query.filter_by(name="Daily Tasks").first())
+    tasks.append(task1)
 
     db.session.add_all(tasks)
     message += f"{len(tasks)} tasks added to db.\n"
