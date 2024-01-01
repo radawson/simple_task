@@ -56,6 +56,9 @@
                     </li>
                     {% if current_user.admin %}
                     <li class="nav-item">
+                        <a class="nav-link" href="/templates">Templates</a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link" href="{{url_for('main.admin')}}">Admin</a>
                     </li>
                     {% endif %}

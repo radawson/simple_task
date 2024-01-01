@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, render_template, request
 from flask_login import login_required
-from stasks.models import Task, db
+from stasks.models import Task, Template, db
 from datetime import datetime
 
 tasks = Blueprint('tasks', __name__)
@@ -82,3 +82,11 @@ def task_api(id):
         message = "Task updated successfully"
         return jsonify(message)
     return render_template("detail_task.html", task=task, message=message)
+
+## Templates
+
+@tasks.route('/templates')
+def templates():
+    tasks = Task.query.filter(Task.templates != None).all()
+    templates = Template.query.all()
+    return render_template('templates.html', tasks=tasks, templates=templates)

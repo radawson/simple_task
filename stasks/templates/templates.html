@@ -1,0 +1,133 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Tasks
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <h1>Tasks</h1>
+    <div class="container">
+        <div class="row my-2">
+            <div class="col-md-3 ">
+                <label class="form-label select-label" for="filter">Filter</label>
+                <select id="filter" class="form-select" data-mdb-select-init>
+                    <!-- <option value="today" selected>Today</option>
+                    <option value="all">All</option>
+                    <option value="future">Future</option> -->
+                    {% for template in templates %}
+                    <option value="{{ template.id }}">{{ template.name }}</option>
+                    {% endfor %}
+                </select>
+
+            </div>
+        </div>
+        <div class="row">
+            {% for task in tasks %}
+            <div class="col-md-4 col-sm-12 python_task">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title" id="name_{{task.id}}">{{ task.name }}</h5>
+                        <p class="card-title" id="date_{{task.id}}">{{ task.date }}</p>
+                        <p class="card-text" id="description_{{task.id}}">{{ task.description }}</p>
+                        <p class="card-text" id="templates_{{task.id}}">{{ task.templates }}</p>
+                    </div>
+                    <div class="container">
+                        <div class="form-check float-end">
+                            <input type="checkbox" class="form-check-input" id="task_completed_{{task.id}}" {% if
+                                task.completed %} checked {% endif %} />
+                            <label class="form-check-label" for="task_completed_{{task.id}}">Completed</label>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <div class="col-md-6">
+                            <button class="btn btn-primary" id="btn_task_detail_{{task.id}}"
+                                onclick="redirectToTaskDetail('{{task.id}}')">View Details</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    <button class="btn btn-primary" id="btn_add_task">Add Task</button>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Loop through each checkbox and add the event listener
+    document.querySelectorAll("[id^='task_completed']").forEach(function (checkbox) {
+        checkbox.addEventListener("change", function () {
+            var completed = this.checked;
+            var taskId = this.id.split("_")[2]; // Extract the event ID from the checkbox ID
+            var url = "{{ url_for('tasks.task_api',id=0) }}";
+            url = url.replace('0', taskId);
+            let formData = new FormData();
+            if (checkbox.checked) {
+                formData.append("completed", "True");
+            } else {
+                formData.append("completed", "False");
+            }
+            fetch(url, {
+                body: formData,
+                method: "PATCH"
+            })
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                })
+                .catch(error => {
+                    console.error(error);
+                });
+        });
+    });
+
+    function redirectToTaskDetail(eventId) {
+        url = "{{ url_for('tasks.task_detail', id=0) }}"
+        url = url.replace('0', eventId);
+        window.location.href = url;
+    }
+
+    document.getElementById("btn_add_task").addEventListener("click", function () {
+        window.location.href = "{{ url_for('tasks.add_task') }}";
+    });
+
+    document.addEventListener("DOMContentLoaded", function () {
+        filterEvents("today");
+    });
+
+    document.getElementById("filter").addEventListener("change", function () {
+        var filterValue = this.value;
+        filterEvents(filterValue);
+    });
+
+    function filterEvents(filterValue) {
+        var tasks = document.getElementsByClassName("python_task");
+
+        for (var i = 0; i < tasks.length; i++) {
+            var task = tasks[i];
+            var taskDate = new Date(task.querySelector("[id^='date']").textContent);
+
+            if (filterValue === "today" && !isToday(taskDate)) {
+                task.style.display = "none";
+            } else if (filterValue === "future" && !isFuture(taskDate)) {
+                task.style.display = "none";
+            } else {
+                task.style.display = "block";
+            }
+        }
+    }
+
+    function isToday(date) {
+        var today = new Date();
+        return date.toDateString() === today.toDateString();
+    }
+
+    function isFuture(date) {
+        var today = new Date();
+        return date > today;
+    }
+
+</script>
+{% endblock %}
