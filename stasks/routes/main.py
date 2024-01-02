@@ -1,4 +1,4 @@
-from flask import Blueprint, flash, redirect, render_template, request, url_for
+from flask import Blueprint, current_app, flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_required
 from stasks.models import db, Event, Note, Task, User
 from datetime import datetime
@@ -53,6 +53,9 @@ def get_date(date):
         "index.html", tasks=tasks, events=events, notes=notes, date=date
     )
 
+@main.route('/about')
+def about():
+    return render_template('about.html', version=current_app.__version__)
 
 @main.route("/admin")
 @login_required
@@ -89,4 +92,4 @@ def profile():
 @main.route("/settings")
 @login_required
 def settings():
-    return render_template("settings.html")
+    return render_template("settings.html", config=current_app.config)

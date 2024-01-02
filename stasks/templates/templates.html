@@ -10,7 +10,6 @@ Templates
     <div class="container">
         <div class="row my-2">
             <div class="col-md-3 ">
-                
                 <select id="filter" class="form-select" data-mdb-select-init>
                     <!-- <option value="today" selected>Today</option>
                     <option value="all">All</option>
@@ -21,56 +20,26 @@ Templates
                 </select>
                 <label class="form-label select-label" for="filter">Filter</label>
             </div>
+            <div class="col-md-3">
+                <div class="form-outline" data-mdb-input-init>
+                    <input class="form-control" type="date" id="date" name="date" />
+                    <label class="form-label" for="date">Date</label>
+                </div>
+            </div>
         </div>
+        <button class="btn btn-primary" id="btn_add_task">Add Selected Items to Date</button>
         <section>
             <div class="card shadow-0">
                 <div class="card-header py-4 mb-3">
                     <h4 class="mb-0">Template Tasks</h4>
                 </div>
                 <div class="card-body">
-                    <div class="d-flex justify-content-end mb-4">
-                        <div data-mdb-input-init class="form-outline">
-                            <input data-mdb-search data-mdb-target="#table_inputs" type="text" id="search_table_inputs"
-                                class="form-control" />
-                            <label class="form-label" for="search_table_inputs">Search</label>
-                        </div>
-                        <button data-mdb-ripple-init class="btn btn-primary btn-sm ms-3" data-mdb-add-entry
-                            data-mdb-target="#table_inputs">
-                            <i class="fa fa-plus"></i>
-                        </button>
-                    </div>
-                    <hr />
-                    <div id="table_inputs">
-                        <table class="table">
-                            <thead>
-                                <tr>
-                                    <th scope="col">
-                                        Select
-                                    </th>
-                                    <th scope="col">Task</th>
-                                    <th scope="col">Description</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for task in tasks %}
-                                <tr>
-                                    <td>
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" value=""
-                                                id="flexCheckDefault" />
-                                        </div>
-                                    </td>
-                                    <td>{{ task.name }}</td>
-                                    <td>{{ task.description }}</td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                    </div>
+                    <div id="datatable" data-mdb-selectable="true" data-mdb-multi="true" data-mdb-loading="true"></div>
                 </div>
             </div>
         </section>
     </div>
-    <button class="btn btn-primary" id="btn_add_task">Add Template</button>
+
 </div>
 {% endblock %}
 
@@ -88,65 +57,43 @@ Templates
         window.location.href = "{{ url_for('tasks.add_task') }}";
     });
 
-    document.addEventListener("DOMContentLoaded", function () {
-        filterEvents("today");
-    });
-
-    document.getElementById("filter").addEventListener("change", function () {
-        var filterValue = this.value;
-        filterEvents(filterValue);
-    });
-
-    function filterEvents(filterValue) {
-        var tasks = document.getElementsByClassName("python_task");
-
-        for (var i = 0; i < tasks.length; i++) {
-            var task = tasks[i];
-            var templates = task.getAttribute('data-templates').split(',');
-
-            if (templates.includes(filterValue)) {
-                task.style.display = "block";
-            } else {
-                task.style.display = "none";
-            }
-        }
+    function fetchTasks(templateId) {
+        let url = "{{ url_for('tasks.template_tasks_api', id=0) }}"
+        url = url.replace('0', templateId);
+        fetch(url)
+            .then((response) => response.json())
+            .then((data) => {
+                asyncTable.update(
+                    {
+                        rows: data.map((user) => ({
+                            ...user,
+                        })),
+                    },
+                    { loading: false }
+                );
+            });
     }
 
-</script>
-<script>
-    const advancedColumns = [
-        {
-            width: 30,
-            defaultValue: false,
-            inputType: 'checkbox',
-            label: 'Select',
-            field: 'select',
-        },
-        {
-            width: 250,
-            label: 'Task',
-            field: 'task_name',
-            sort: true,
-        },
-        {
-            width: 250,
-            sort: false,
-            label: 'Description',
-            field: 'task_description',
-        },
-        {
-            width: 250,
-            inputType: 'number',
-            label: 'ID',
-            field: 'task_id',
-        },
+    document.getElementById('filter').addEventListener('change', function () {
+        fetchTasks(this.value);
+    });
 
+    const columns = [
+        { label: 'Name', field: 'name' },
+        { label: 'Description', field: 'description' },
+        { label: 'ID', field: 'id' },
     ];
 
-        const tableDisableEdit = new TableEditor(
-        document.getElementById('table_inputs'),
-        { columns: advancedColumns, rows: advancedRows },
-        { entries: 10, entriesOptions: [10, 25, 50] }
+    const asyncTable = new mdb.Datatable(
+        document.getElementById('datatable'),
+        { columns, },
+        { loading: true }
     );
+
+    fetchTasks(1);
+
+    datatable.addEventListener('rowSelected.mdb.datatable', (e) => {
+        console.log(e.selectedRows, e.selectedIndexes, e.allSelected);
+    })
 </script>
 {% endblock %}

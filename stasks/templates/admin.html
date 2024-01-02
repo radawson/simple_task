@@ -30,27 +30,6 @@ Admin
                 </div>
             </div>
         </section>
-        <section>
-            <div class="card shadow-0">
-                <div class="card-header py-4 mb-3">
-                    <h4 class="mb-0">Template management</h4>
-                </div>
-                <div class="card-body">
-                    <div class="d-flex justify-content-end mb-4">
-                        <div class="form-outline" data-mdb-input-init>
-                            <input data-mdb-search data-mdb-target="#table2_modal" type="text" id="search2_modal"
-                                class="form-control" />
-                            <label class="form-label" for="search2_modal">Search</label>
-                        </div>
-                        <button class="btn btn-primary btn-sm ms-3" data-mdb-ripple-init data-mdb-add-entry
-                            data-mdb-target="#table2_modal">
-                            <i class="fa fa-plus"></i>
-                        </button>
-                    </div>
-                    <div id="table2_modal"></div>
-                </div>
-            </div>
-        </section>
     </div>
 </main>
 
@@ -134,7 +113,7 @@ Admin
     const tableDisableEdit = new TableEditor(
         document.getElementById('table_inputs'),
         { columns: advancedColumns, rows: advancedRows },
-        { entries: 5, entriesOptions: [5, 10, 15] }
+        { entries: 5, entriesOptions: [5, 10, 15], confirm: true }
     );
 </script>
 {% endblock %}

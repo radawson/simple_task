@@ -112,3 +112,19 @@ def template_add_task(id):
             return task.jsonify()
     flash("Get not currently supported")
     return redirect(url_for('tasks.templates'))
+
+@tasks.route('/template/<int:id>/tasks', methods=['GET','POST'])
+def template_tasks_api(id):
+    if request.method == 'GET':
+        template = Template.query.get(id)
+        tasks = template.tasks
+        return jsonify([task.to_dict() for task in tasks])
+    elif request.method == 'POST':
+        task_id = request.form.get('task_id')
+        template_id = id
+
+        if task_id:
+            task = Task.query.get(id)
+            task.templates.append(Template.query.get(template_id))
+            db.session.commit()
+            return task.jsonify()

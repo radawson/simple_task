@@ -4,10 +4,12 @@ from flask_login import LoginManager
 from .models import db, seed_db
 from .routes import auth, main, notes, tasks, events, test
 
+version = "0.0.4"
 
 def create_app():
     # Initialize Flask app
     app = Flask(__name__)
+    app.__version__ = version
     # Set up the SQLAlchemy database URI
     app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///tasks.db"
     # Set up the SQLAlchemy track modifications

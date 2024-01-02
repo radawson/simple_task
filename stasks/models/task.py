@@ -20,6 +20,9 @@ class Task(db.Model):
 
     def __repr__(self):
         return f"<Task {self.id}: {self.name}>"
+    
+    def to_dict(self):
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
 
 
 class Template(db.Model):
