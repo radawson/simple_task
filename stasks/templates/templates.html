@@ -34,6 +34,10 @@ Templates
                     <h4 class="mb-0">Template Tasks</h4>
                 </div>
                 <div class="card-body">
+                    <div data-mdb-input-init class="form-outline mb-4">
+                        <input type="text" class="form-control" id="datatable-search-input" />
+                        <label class="form-label" for="datatable-search-input">Search</label>
+                    </div>
                     <div id="datatable" data-mdb-selectable="true" data-mdb-multi="true" data-mdb-loading="true"></div>
                 </div>
             </div>
@@ -52,10 +56,6 @@ Templates
         url = url.replace('0', eventId);
         window.location.href = url;
     }
-
-    document.getElementById("btn_add_task").addEventListener("click", function () {
-        window.location.href = "{{ url_for('tasks.add_task') }}";
-    });
 
     function fetchTasks(templateId) {
         let url = "{{ url_for('tasks.template_tasks_api', id=0) }}"
@@ -92,8 +92,37 @@ Templates
 
     fetchTasks(1);
 
-    datatable.addEventListener('rowSelected.mdb.datatable', (e) => {
+    document.getElementById('datatable-search-input').addEventListener('input', (e) => {
+        asyncTable.search(e.target.value);
+    });
+
+    document.getElementById('datatable').addEventListener('rowSelected.mdb.datatable', (e) => {
         console.log(e.selectedRows, e.selectedIndexes, e.allSelected);
     })
+
+    document.getElementById('btn_add_task').addEventListener('click', function () {
+        const selectedRowsData = asyncTable.getSelectedRowsData();
+        const date = document.getElementById('date').value;
+
+        selectedRowsData.forEach(function (data) {
+            const taskId = data.id; // assuming the task id is stored in a field named 'id'
+
+            fetch(`{{ url_for('tasks.template_task_api') }}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    taskId: taskId,
+                    date: date,
+                }),
+            })
+                .then(response => response.json())
+                .then(data => console.log(data))
+                .catch((error) => {
+                    console.error('Error:', error);
+                });
+        });
+    });
 </script>
 {% endblock %}

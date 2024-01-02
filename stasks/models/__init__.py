@@ -45,28 +45,38 @@ def seed_db():
         templates.append(Template(name="Afternoon Tasks"))
         db.session.add_all(templates)
         message += f"{len(templates)} templates added to db.\n"
- 
+
     tasks = []
     task1 = Task(
-            name="Clean Cat Litter",
-            description="Clean the cat litter box and refill with 1 inch of fresh litter.",
-            completed=False,
-            priority=0,
-            template=True,
-            added_by="admin",
-        )
+        name="Clean Cat Litter",
+        description="Clean the cat litter box and refill with 1 inch of fresh litter.",
+        completed=False,
+        priority=0,
+        template=True,
+        added_by="admin",
+    )
     task1.templates.append(Template.query.filter_by(name="Daily Tasks").first())
     tasks.append(task1)
     task2 = Task(
-            name="Pick Up Dishes",
-            description="Periodically check the house (especially bedrooms) for dirty dishes and bring them to the kitchen.",
-            completed=False,
-            priority=0,
-            template=True,
-            added_by="admin",
-        )
+        name="Pick Up Dishes",
+        description="Periodically check the house (especially bedrooms) for dirty dishes and bring them to the kitchen.",
+        completed=False,
+        priority=0,
+        template=True,
+        added_by="admin",
+    )
     task2.templates.append(Template.query.filter_by(name="Daily Tasks").first())
     tasks.append(task2)
+    task3 = Task(
+        name="Take Out Trash",
+        description="Remove trash from upstairs bathrooms and bedrooms, downstairs bathroom, kitchen, and powder room. replace trash bags in each garbage can.",
+        completed=False,
+        priority=0,
+        template=True,
+        added_by="admin",
+    )
+    task3.templates.append(Template.query.filter_by(name="Daily Tasks").first())
+    tasks.append(task3)
 
     db.session.add_all(tasks)
     message += f"{len(tasks)} tasks added to db.\n"

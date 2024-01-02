@@ -1,6 +1,6 @@
 from flask import flash
 from flask import Blueprint, redirect, render_template, request, url_for
-from flask_login import login_user, logout_user
+from flask_login import login_required, login_user, logout_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from stasks.models import db, User
 
@@ -25,6 +25,7 @@ def login():
     return render_template("login.html")
 
 @auth.route('/password', methods=['POST'])
+@login_required
 def password():
     if request.method == "POST":
         username = request.form.get("username")
@@ -83,6 +84,7 @@ def register():
 
 
 @auth.route("/logout")
+@login_required
 def logout():
     logout_user()
     return redirect(url_for("main.index"))

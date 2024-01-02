@@ -89,17 +89,20 @@ def task_api(id):
 ## Templates
 
 @tasks.route('/templates')
+@login_required
 def templates():
     tasks = Task.query.filter(Task.templates != None).all()
     templates = Template.query.all()
     return render_template('templates.html', tasks=tasks, templates=templates)
 
 @tasks.route('/templates/<int:id>')
+@login_required
 def template_detail(id):
     template = Template.query.get(id)
     return render_template('detail_template.html', template=template)
 
 @tasks.route('/template/<int:id>/add-task', methods=['GET','POST'])
+@login_required
 def template_add_task(id):
     if request.method == 'POST':
         task_id = request.form.get('task_id')
@@ -128,3 +131,17 @@ def template_tasks_api(id):
             task.templates.append(Template.query.get(template_id))
             db.session.commit()
             return task.jsonify()
+        
+@tasks.route('/template/task', methods=['POST'])
+def template_task_api():
+    if request.method == 'POST':
+        task_id = request.form.get('task_id')
+        template_id = request.form.get('template_id')
+
+        if task_id and template_id:
+            task = Task.query.get(task_id)
+            template = Template.query.get(template_id)
+            task.templates.append(template)
+            db.session.commit()
+            return task.jsonify()
+    return jsonify({"error": "Invalid data"}), 422

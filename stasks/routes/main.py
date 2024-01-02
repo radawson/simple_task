@@ -1,5 +1,5 @@
 from flask import Blueprint, current_app, flash, redirect, render_template, request, url_for
-from flask_login import current_user, login_required
+from flask_login import current_user, fresh_login_required, login_required
 from stasks.models import db, Event, Note, Task, User
 from datetime import datetime
 
@@ -67,7 +67,7 @@ def admin():
 
 
 @main.route("/profile", methods=["GET", "POST"])
-@login_required
+@fresh_login_required
 def profile():
     if request.method == "POST":
         print(request.form)
