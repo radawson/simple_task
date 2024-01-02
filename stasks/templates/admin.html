@@ -59,7 +59,7 @@ Admin
 {% block extra_js %}
 
 <!-- MDB PLUGINS -->
-<script type="text/javascript" src="plugins/js/all.min.js"></script>
+<script type="text/javascript" src="{{url_for('static', filename='plugins/js/all.min.js')}}"></script>
 <script>
     const advancedColumns = [
         {

@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Template Detail
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <h1>Template Detail</h1>
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title" id="templateName">{{ template.name }}</h5>
+            <form id="taskForm" action="{{url_for('tasks.task_api',id=task.id)}}" method="post">
+                <div class="form-outline mb-2">
+                    <input type="text" id="template_name" name="template_name" readonly class="form-control" value="{{ template.name
+                        }}"" />
+                    <label class=" form-label" for="template_name">Name</label>
+                </div>
+                <div class="form-outline mb-2">
+                    <input type="text" id="taskDescription" name="description" readonly class="form-control" value="{{ task.description
+                        }}"" />
+                    <label class=" form-label" for="taskDescription">Description</label>
+                </div>
+                {% if current_user.admin %}
+                <div class="form-outline mb-2" data-mdb-input-init>
+                    <input type="text" id="added_by" name="added_by" class="form-control" readonly
+                        value="{{task.added_by}}" />
+                    <label class="form-label" for="added_by">Created By</label>
+                </div>
+                {% endif %}
+            </form>
+            <button id="editButton" class="btn btn-primary" onclick="toggleEdit()">Edit</button>
+            <button id="deleteButton" class="btn btn-danger" onclick="deleteTask()">Delete</button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function deleteTask() {
+        let taskId = "{{task.id}}"; 
+
+        fetch(`/task/${taskId}`, {
+            method: 'DELETE',
+        })
+            .then(response => response.json())
+            .then(data => console.log(data))
+            .catch((error) => {
+                console.error('Error:', error);
+            })
+            .then(() => {
+                window.location.href = '/tasks';
+            });
+    }
+
+    function toggleEdit() {
+        let button = document.getElementById('editButton');
+        let fields = [document.getElementById('taskDescription'), document.getElementById('taskDate'), document.getElementById('taskName'), document.getElementById('taskPriority')]; 
+        let form = document.getElementById('taskForm');
+
+        fields.forEach(function (field) {
+            if (field.hasAttribute('readonly')) {
+                field.removeAttribute('readonly');
+            } else {
+                field.setAttribute('readonly', true);
+            }
+        });
+
+        if (button.textContent === 'Edit') {
+            button.textContent = 'Save';
+        } else {
+            let formData = new FormData(form);
+            console.log(formData.values());
+            fetch(form.action, {
+                method: 'PATCH',
+                body: formData
+            }).then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            }).then(json => {
+                console.log(json);
+                button.textContent = 'Edit';
+            }).catch(e => {
+                console.log('There was a problem with the fetch operation: ' + e.message);
+            });
+        }
+    }
+</script>
+{% endblock %}

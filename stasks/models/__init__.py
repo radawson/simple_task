@@ -49,13 +49,24 @@ def seed_db():
     tasks = []
     task1 = Task(
             name="Clean Cat Litter",
-            description="Clean the cat litter box and refil; with 1 inch of fresh litter.",
+            description="Clean the cat litter box and refill with 1 inch of fresh litter.",
             completed=False,
             priority=0,
-            added_by="Rick",
+            template=True,
+            added_by="admin",
         )
     task1.templates.append(Template.query.filter_by(name="Daily Tasks").first())
     tasks.append(task1)
+    task2 = Task(
+            name="Pick Up Dishes",
+            description="Periodically check the house (especially bedrooms) for dirty dishes and bring them to the kitchen.",
+            completed=False,
+            priority=0,
+            template=True,
+            added_by="admin",
+        )
+    task2.templates.append(Template.query.filter_by(name="Daily Tasks").first())
+    tasks.append(task2)
 
     db.session.add_all(tasks)
     message += f"{len(tasks)} tasks added to db.\n"

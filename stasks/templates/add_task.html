@@ -7,40 +7,41 @@ Add Task
 <div class="container py-5">
     <h1>Add Task</h1>
     <form method="post" class="my-5">
-        <div class="form-group">
-            <label for="name">Task:</label>
-            <input type="text" id="name" name="name" class="form-control">
+        <div class="form-outline mb-2" data-mdb-input-init>
+            <input type="text" id="name" name="name" class="form-control"/>
+            <label class="form-label" for="name">Task</label>
         </div>
-        <div class="form-group">
-            <label for="description">Description:</label>
+        <div class="form-outline mb-2" data-mdb-input-init>
             <textarea type="text" id="description" name="description" class="form-control">
             </textarea>
+            <label  class="form-label" for="description">Description</label>
         </div>
-        <div class="form-group">
-            <label for="date">Date:</label>
+        <div class="form-outline mb-2" data-mdb-input-init>
             <input type="date" id="date" name="date" class="form-control">
+            <label  class="form-label" for="date">Date</label>
+        </div>
+        <div class="form-check form-switch mb-2">
+            <input class="form-check-input" type="checkbox" id="template" name="template">
+            <label class="form-check-label" for="template">Template</label>
         </div>
         <input type="hidden" id="added_by" name="added_by" value="{{current_user.username}}" />
-        <input class="btn btn-primary" type="submit" value="Add Task">
+        <button class="btn btn-primary" type="submit">Add Task</button>
     </form>
 
     <h1>View Tasks</h1>
     <div class="form-group">
-        <label for="view_date">Date:</label>
-        <input type="date" id="view_date" name="view_date" class="form-control">
+        <input type="date" id="view_date" name="view_date" class="form-control"/>
+        <label for="view_date">Date</label>
     </div>
     <button class="btn btn-primary"
         onclick="window.location.href='/date/' + document.getElementById('view_date').value">View Tasks</button>
 </div>
-<script>
-    document.addEventListener('DOMContentLoaded', (event) => {
-        var today = new Date();
-        var dd = String(today.getDate()).padStart(2, '0');
-        var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
-        var yyyy = today.getFullYear();
+{% endblock %}
 
-        today = yyyy + '-' + mm + '-' + dd;
-        document.getElementById('date').value = today;
+{% block extra_js %}
+<script>
+    document.getElementById("btn_view_date").addEventListener("click", function () {
+        window.location.href = "/date/" + document.getElementById('view_date').value;
     });
 </script>
 {% endblock %}

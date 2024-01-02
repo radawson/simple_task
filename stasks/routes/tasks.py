@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, render_template, request
+from flask import Blueprint, flash, jsonify, redirect, render_template, request, url_for
 from flask_login import login_required
 from stasks.models import Task, Template, db
 from datetime import datetime
@@ -19,6 +19,9 @@ def get_tasks_date(date):
 @tasks.route("/tasks/<int:id>")
 def task_detail(id):
     task = Task.query.get(id)
+    if len(task.templates) > 0:
+        templates = Template.query.all()
+        return render_template("detail_task.html", task=task, templates=templates)
     return render_template("detail_task.html", task=task)
 
 @tasks.route("/tasks/add", methods=["GET", "POST"])
@@ -90,3 +93,22 @@ def templates():
     tasks = Task.query.filter(Task.templates != None).all()
     templates = Template.query.all()
     return render_template('templates.html', tasks=tasks, templates=templates)
+
+@tasks.route('/templates/<int:id>')
+def template_detail(id):
+    template = Template.query.get(id)
+    return render_template('detail_template.html', template=template)
+
+@tasks.route('/template/<int:id>/add-task', methods=['GET','POST'])
+def template_add_task(id):
+    if request.method == 'POST':
+        task_id = request.form.get('task_id')
+        template_id = id
+
+        if task_id:
+            task = Task.query.get(id)
+            task.templates.append(Template.query.get(template_id))
+            db.session.commit()
+            return task.jsonify()
+    flash("Get not currently supported")
+    return redirect(url_for('tasks.templates'))

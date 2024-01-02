@@ -17,15 +17,27 @@ Task Detail
                     <label class=" form-label" for="taskDescription">Description</label>
                 </div>
                 <div class="form-outline mb-2">
-                <input type="date" class="form-control" id="taskDate" name="date" readonly
-                    value="{{ task.date.strftime('%Y-%m-%d') }}" />
-                <label class="form-label" for="taskDate">Date</label>
+                    <input type="date" class="form-control" id="taskDate" name="date" readonly
+                        value="{{ task.date.strftime('%Y-%m-%d') if task.date else ''}}" />
+                    <label class="form-label" for="taskDate">Date</label>
                 </div>
                 <div class="form-outline mb-2">
-                    <input type="number" class="form-control" id="taskPriority" name="priority" readonly value="{{ task.priority }}" />
+                    <input type="number" class="form-control" id="taskPriority" name="priority" readonly
+                        value="{{ task.priority }}" />
                     <label class="form-label" for="taskPriority">Priority</label>
                 </div>
                 {% if current_user.admin %}
+                {% if templates %}
+                <div class="form-outline mb-2">
+                    <select class="form-select" id="templates" data-mdb-select-init multiple>
+                        <option></option>
+                        {% for template in templates %}
+                        <option value="{{ template.id }}">{{ template.name }}</option>
+                        {% endfor %}
+                    </select>
+                    <label class="form-label select-label" for="templates">Templates</label>
+                </div>
+                {% endif %}
                 <div class="form-outline mb-2" data-mdb-input-init>
                     <input type="text" id="added_by" name="added_by" class="form-control" readonly
                         value="{{task.added_by}}" />
@@ -43,7 +55,7 @@ Task Detail
 {% block extra_js %}
 <script>
     function deleteTask() {
-        let taskId = "{{task.id}}"; 
+        let taskId = "{{task.id}}";
 
         fetch(`/task/${taskId}`, {
             method: 'DELETE',
@@ -60,7 +72,12 @@ Task Detail
 
     function toggleEdit() {
         let button = document.getElementById('editButton');
-        let fields = [document.getElementById('taskDescription'), document.getElementById('taskDate'), document.getElementById('taskName'), document.getElementById('taskPriority')]; 
+        let fields = [
+            document.getElementById('taskDescription'),
+            document.getElementById('taskDate'),
+            document.getElementById('taskName'),
+            document.getElementById('taskPriority')
+        ];
         let form = document.getElementById('taskForm');
 
         fields.forEach(function (field) {

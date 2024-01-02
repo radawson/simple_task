@@ -1,16 +1,16 @@
 {% extends 'base.html' %}
 
 {% block title %}
-Tasks
+Templates
 {% endblock %}
 
 {% block content %}
 <div class="container py-5">
-    <h1>Tasks</h1>
+    <h1>Template Management</h1>
     <div class="container">
         <div class="row my-2">
             <div class="col-md-3 ">
-                <label class="form-label select-label" for="filter">Filter</label>
+                
                 <select id="filter" class="form-select" data-mdb-select-init>
                     <!-- <option value="today" selected>Today</option>
                     <option value="all">All</option>
@@ -19,69 +19,64 @@ Tasks
                     <option value="{{ template.id }}">{{ template.name }}</option>
                     {% endfor %}
                 </select>
-
+                <label class="form-label select-label" for="filter">Filter</label>
             </div>
         </div>
-        <div class="row">
-            {% for task in tasks %}
-            <div class="col-md-4 col-sm-12 python_task">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title" id="name_{{task.id}}">{{ task.name }}</h5>
-                        <p class="card-title" id="date_{{task.id}}">{{ task.date }}</p>
-                        <p class="card-text" id="description_{{task.id}}">{{ task.description }}</p>
-                        <p class="card-text" id="templates_{{task.id}}">{{ task.templates }}</p>
-                    </div>
-                    <div class="container">
-                        <div class="form-check float-end">
-                            <input type="checkbox" class="form-check-input" id="task_completed_{{task.id}}" {% if
-                                task.completed %} checked {% endif %} />
-                            <label class="form-check-label" for="task_completed_{{task.id}}">Completed</label>
+        <section>
+            <div class="card shadow-0">
+                <div class="card-header py-4 mb-3">
+                    <h4 class="mb-0">Template Tasks</h4>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-end mb-4">
+                        <div data-mdb-input-init class="form-outline">
+                            <input data-mdb-search data-mdb-target="#table_inputs" type="text" id="search_table_inputs"
+                                class="form-control" />
+                            <label class="form-label" for="search_table_inputs">Search</label>
                         </div>
+                        <button data-mdb-ripple-init class="btn btn-primary btn-sm ms-3" data-mdb-add-entry
+                            data-mdb-target="#table_inputs">
+                            <i class="fa fa-plus"></i>
+                        </button>
                     </div>
-                    <div class="card-footer">
-                        <div class="col-md-6">
-                            <button class="btn btn-primary" id="btn_task_detail_{{task.id}}"
-                                onclick="redirectToTaskDetail('{{task.id}}')">View Details</button>
-                        </div>
+                    <hr />
+                    <div id="table_inputs">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th scope="col">
+                                        Select
+                                    </th>
+                                    <th scope="col">Task</th>
+                                    <th scope="col">Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for task in tasks %}
+                                <tr>
+                                    <td>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" value=""
+                                                id="flexCheckDefault" />
+                                        </div>
+                                    </td>
+                                    <td>{{ task.name }}</td>
+                                    <td>{{ task.description }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
                     </div>
                 </div>
             </div>
-            {% endfor %}
-        </div>
+        </section>
     </div>
-    <button class="btn btn-primary" id="btn_add_task">Add Task</button>
+    <button class="btn btn-primary" id="btn_add_task">Add Template</button>
 </div>
 {% endblock %}
 
 {% block extra_js %}
+<script type="text/javascript" src="{{url_for('static', filename='plugins/js/all.min.js')}}"></script>
 <script>
-    // Loop through each checkbox and add the event listener
-    document.querySelectorAll("[id^='task_completed']").forEach(function (checkbox) {
-        checkbox.addEventListener("change", function () {
-            var completed = this.checked;
-            var taskId = this.id.split("_")[2]; // Extract the event ID from the checkbox ID
-            var url = "{{ url_for('tasks.task_api',id=0) }}";
-            url = url.replace('0', taskId);
-            let formData = new FormData();
-            if (checkbox.checked) {
-                formData.append("completed", "True");
-            } else {
-                formData.append("completed", "False");
-            }
-            fetch(url, {
-                body: formData,
-                method: "PATCH"
-            })
-                .then(response => response.json())
-                .then(data => {
-                    console.log(data);
-                })
-                .catch(error => {
-                    console.error(error);
-                });
-        });
-    });
 
     function redirectToTaskDetail(eventId) {
         url = "{{ url_for('tasks.task_detail', id=0) }}"
@@ -107,27 +102,51 @@ Tasks
 
         for (var i = 0; i < tasks.length; i++) {
             var task = tasks[i];
-            var taskDate = new Date(task.querySelector("[id^='date']").textContent);
+            var templates = task.getAttribute('data-templates').split(',');
 
-            if (filterValue === "today" && !isToday(taskDate)) {
-                task.style.display = "none";
-            } else if (filterValue === "future" && !isFuture(taskDate)) {
-                task.style.display = "none";
-            } else {
+            if (templates.includes(filterValue)) {
                 task.style.display = "block";
+            } else {
+                task.style.display = "none";
             }
         }
     }
 
-    function isToday(date) {
-        var today = new Date();
-        return date.toDateString() === today.toDateString();
-    }
+</script>
+<script>
+    const advancedColumns = [
+        {
+            width: 30,
+            defaultValue: false,
+            inputType: 'checkbox',
+            label: 'Select',
+            field: 'select',
+        },
+        {
+            width: 250,
+            label: 'Task',
+            field: 'task_name',
+            sort: true,
+        },
+        {
+            width: 250,
+            sort: false,
+            label: 'Description',
+            field: 'task_description',
+        },
+        {
+            width: 250,
+            inputType: 'number',
+            label: 'ID',
+            field: 'task_id',
+        },
 
-    function isFuture(date) {
-        var today = new Date();
-        return date > today;
-    }
+    ];
 
+        const tableDisableEdit = new TableEditor(
+        document.getElementById('table_inputs'),
+        { columns: advancedColumns, rows: advancedRows },
+        { entries: 10, entriesOptions: [10, 25, 50] }
+    );
 </script>
 {% endblock %}
