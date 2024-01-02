@@ -25,7 +25,7 @@ def add_event():
     elif request.method == "POST":
         name = request.form.get("name")
         description = request.form.get("description")
-        date = datetime.strptime(request.form["date"], "%Y-%m-%d").date()
+        date = datetime.strptime(request.form.get("date"), "%Y-%m-%d").date()
         time = datetime.strptime(request.form["time"], "%H:%M").time()
         location = request.form.get("location")
         person = request.form.get("person")

@@ -39,6 +39,7 @@ Templates
                         <label class="form-label" for="datatable-search-input">Search</label>
                     </div>
                     <div id="datatable" data-mdb-selectable="true" data-mdb-multi="true" data-mdb-loading="true"></div>
+                    <hidden id="selectedRows"></hidden>
                 </div>
             </div>
         </section>
@@ -50,7 +51,6 @@ Templates
 {% block extra_js %}
 <script type="text/javascript" src="{{url_for('static', filename='plugins/js/all.min.js')}}"></script>
 <script>
-
     function redirectToTaskDetail(eventId) {
         url = "{{ url_for('tasks.task_detail', id=0) }}"
         url = url.replace('0', eventId);
@@ -87,7 +87,11 @@ Templates
     const asyncTable = new mdb.Datatable(
         document.getElementById('datatable'),
         { columns, },
-        { loading: true }
+        {
+            loading: true,
+            striped: true,
+            sortable: true,
+        }
     );
 
     fetchTasks(1);
@@ -97,25 +101,23 @@ Templates
     });
 
     document.getElementById('datatable').addEventListener('rowSelected.mdb.datatable', (e) => {
-        console.log(e.selectedRows, e.selectedIndexes, e.allSelected);
+        document.getElementById('selectedRows').value = e.selectedRows;
     })
 
     document.getElementById('btn_add_task').addEventListener('click', function () {
-        const selectedRowsData = asyncTable.getSelectedRowsData();
+        const selectedRowsData = document.getElementById('selectedRows').value;
+        console.log(selectedRowsData);
+
         const date = document.getElementById('date').value;
 
-        selectedRowsData.forEach(function (data) {
-            const taskId = data.id; // assuming the task id is stored in a field named 'id'
-
+        selectedRowsData.forEach(row => {
+            let formData = new FormData();
+            formData.append('task_id', row.id);
+            formData.append('date', date);
+            console.log(formData)
             fetch(`{{ url_for('tasks.template_task_api') }}`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    taskId: taskId,
-                    date: date,
-                }),
+                body: formData,
             })
                 .then(response => response.json())
                 .then(data => console.log(data))

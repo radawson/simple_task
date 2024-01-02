@@ -9,23 +9,28 @@ Tasks
     <h1>Tasks</h1>
     <div class="container">
         <div class="row my-2">
-            <div class="col-md-3 ">
-                <label class="form-label select-label" for="filter">Filter</label>
+            <div class="col-md-3" <div class="form-control">
                 <select id="filter" class="form-select" data-mdb-select-init>
                     <option value="today" selected>Today</option>
                     <option value="all">All</option>
                     <option value="future">Future</option>
+                    <option value="templates">Templates</option>
                 </select>
-
+                <label class="form-label select-label" for="filter">Filter</label>
             </div>
         </div>
+
         <div class="row">
             {% for task in tasks %}
             <div class="col-md-4 col-sm-12 python_task">
                 <div class="card">
                     <div class="card-body">
                         <h5 class="card-title" id="name_{{task.id}}">{{ task.name }}</h5>
+                        {% if task.template %}
+                        <p class="card-title" id="date_{{task.id}}"><i>template</i></p>
+                        {% else %}
                         <p class="card-title" id="date_{{task.id}}">{{ task.date }}</p>
+                        {% endif %}
                         <p class="card-text" id="description_{{task.id}}">{{ task.description }}</p>
                     </div>
                     <div class="container">
@@ -101,13 +106,18 @@ Tasks
     function filterEvents(filterValue) {
         var tasks = document.getElementsByClassName("python_task");
 
-        for (var i = 0; i < tasks.length; i++) {
+        for (let i = 0; i < tasks.length; i++) {
             var task = tasks[i];
-            var taskDate = new Date(task.querySelector("[id^='date']").textContent);
+            var taskDate = new Date(task.querySelector("[id^='date_']").textContent);
+            console.log(task.querySelector("[id^='date_']").textContent);
+            console.log(taskDate);
+
 
             if (filterValue === "today" && !isToday(taskDate)) {
                 task.style.display = "none";
             } else if (filterValue === "future" && !isFuture(taskDate)) {
+                task.style.display = "none";
+            } else if (filterValue === "templates" && !isTemplate(taskDate)) {
                 task.style.display = "none";
             } else {
                 task.style.display = "block";
@@ -115,15 +125,26 @@ Tasks
         }
     }
 
-    function isToday(date) {
-        var today = new Date();
-        return date.toDateString() === today.toDateString();
-    }
 
     function isFuture(date) {
         var today = new Date();
+        today.setHours(0, 0, 0, 0);
         return date > today;
     }
+
+    function isTemplate(date) {
+        console.log(date)
+        return date === new Date("template");
+    }
+
+    function isToday(date) {
+        let today = new Date();
+        date = new Date(date);
+        console.log("incoming: ", date.toDateString())
+        console.log("calculated:", today.toDateString())
+        return date.toDateString() === today.toDateString();
+    }
+
 
 </script>
 {% endblock %}

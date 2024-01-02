@@ -3,18 +3,21 @@ from flask_login import login_required
 from stasks.models import Task, Template, db
 from datetime import datetime
 
-tasks = Blueprint('tasks', __name__)
+tasks = Blueprint("tasks", __name__)
+
 
 @tasks.route("/tasks")
 def task_list():
     tasks = Task.query.all()
     return render_template("tasks.html", tasks=tasks)
 
+
 @tasks.route("/tasks/<date>")
 def get_tasks_date(date):
     date = datetime.strptime(date, "%Y-%m-%d").date()
     tasks = Task.query.filter_by(date=date).all()
     return render_template("tasks.html", tasks=tasks)
+
 
 @tasks.route("/tasks/<int:id>")
 def task_detail(id):
@@ -23,6 +26,7 @@ def task_detail(id):
         templates = Template.query.all()
         return render_template("detail_task.html", task=task, templates=templates)
     return render_template("detail_task.html", task=task)
+
 
 @tasks.route("/tasks/add", methods=["GET", "POST"])
 @login_required
@@ -36,17 +40,20 @@ def add_task():
         description = request.form.get("description")
         date = datetime.strptime(request.form.get("date"), "%Y-%m-%d").date()
         added_by = request.form.get("added_by")
-        new_task = Task(name=name, description=description, date=date, added_by=added_by)
+        new_task = Task(
+            name=name, description=description, date=date, added_by=added_by
+        )
         db.session.add(new_task)
         db.session.commit()
         message = "Task added successfully"
     return render_template("add_task.html", message=message)
 
-@tasks.route("/task/<int:id>", methods=["GET", "POST","DELETE", "PATCH"])
+
+@tasks.route("/task/<int:id>", methods=["GET", "POST", "DELETE", "PATCH"])
 def task_api(id):
     if request.method == "GET":
         task = Task.query.get(id)
-        message=None
+        message = None
     elif request.method == "POST":
         name = request.form.get("name")
         description = request.form.get("description")
@@ -55,7 +62,7 @@ def task_api(id):
         db.session.add(new_task)
         db.session.commit()
         message = "Task added successfully"
-        task=new_task
+        task = new_task
     elif request.method == "DELETE":
         task = Task.query.get(id)
         db.session.delete(task)
@@ -86,26 +93,30 @@ def task_api(id):
         return jsonify(message)
     return render_template("detail_task.html", task=task, message=message)
 
+
 ## Templates
 
-@tasks.route('/templates')
+
+@tasks.route("/templates")
 @login_required
 def templates():
     tasks = Task.query.filter(Task.templates != None).all()
     templates = Template.query.all()
-    return render_template('templates.html', tasks=tasks, templates=templates)
+    return render_template("templates.html", tasks=tasks, templates=templates)
 
-@tasks.route('/templates/<int:id>')
+
+@tasks.route("/templates/<int:id>")
 @login_required
 def template_detail(id):
     template = Template.query.get(id)
-    return render_template('detail_template.html', template=template)
+    return render_template("detail_template.html", template=template)
 
-@tasks.route('/template/<int:id>/add-task', methods=['GET','POST'])
+
+@tasks.route("/template/<int:id>/add-task", methods=["GET", "POST"])
 @login_required
 def template_add_task(id):
-    if request.method == 'POST':
-        task_id = request.form.get('task_id')
+    if request.method == "POST":
+        task_id = request.form.get("task_id")
         template_id = id
 
         if task_id:
@@ -114,16 +125,17 @@ def template_add_task(id):
             db.session.commit()
             return task.jsonify()
     flash("Get not currently supported")
-    return redirect(url_for('tasks.templates'))
+    return redirect(url_for("tasks.templates"))
 
-@tasks.route('/template/<int:id>/tasks', methods=['GET','POST'])
+
+@tasks.route("/template/<int:id>/tasks", methods=["GET", "POST"])
 def template_tasks_api(id):
-    if request.method == 'GET':
+    if request.method == "GET":
         template = Template.query.get(id)
         tasks = template.tasks
         return jsonify([task.to_dict() for task in tasks])
-    elif request.method == 'POST':
-        task_id = request.form.get('task_id')
+    elif request.method == "POST":
+        task_id = request.form.get("task_id")
         template_id = id
 
         if task_id:
@@ -131,17 +143,29 @@ def template_tasks_api(id):
             task.templates.append(Template.query.get(template_id))
             db.session.commit()
             return task.jsonify()
-        
-@tasks.route('/template/task', methods=['POST'])
-def template_task_api():
-    if request.method == 'POST':
-        task_id = request.form.get('task_id')
-        template_id = request.form.get('template_id')
 
-        if task_id and template_id:
-            task = Task.query.get(task_id)
-            template = Template.query.get(template_id)
-            task.templates.append(template)
+
+@tasks.route("/template/task", methods=["POST"])
+def template_task_api():
+    if request.method == "POST":
+        print(request.form.to_dict())
+        task_id = request.form.get("task_id")
+        raw_date = request.form.get("date")
+        if raw_date:
+            date = datetime.strptime(raw_date, "%Y-%m-%d").date()
+        base_task = Task.query.get(task_id)
+
+        if base_task:
+            new_task = Task(
+                name=base_task.name,
+                description=base_task.description,
+                date=date,
+                added_by="Template API",
+                template=False,
+            )
+            db.session.add(new_task)
             db.session.commit()
-            return task.jsonify()
+
+            return jsonify(str(new_task))
+
     return jsonify({"error": "Invalid data"}), 422

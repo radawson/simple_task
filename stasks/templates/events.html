@@ -109,7 +109,7 @@ Events
 
             for (var i = 0; i < events.length; i++) {
                 var event = events[i];
-                var eventDate = new Date(event.querySelector("[id^='date']").textContent);
+                var eventDate = new Date(event.querySelector("[id^='date_']").textContent);
 
                 if (filterValue === "today" && !isToday(eventDate)) {
                     event.style.display = "none";
