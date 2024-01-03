@@ -34,11 +34,15 @@ Tasks
                         <p class="card-text" id="description_{{task.id}}">{{ task.description }}</p>
                     </div>
                     <div class="container">
+                        {% if task.template %}
+                        <p class="card-text"><i>template</i></p>
+                        {% else %}
                         <div class="form-check float-end">
                             <input type="checkbox" class="form-check-input" id="task_completed_{{task.id}}" {% if
                                 task.completed %} checked {% endif %} />
                             <label class="form-check-label" for="task_completed_{{task.id}}">Completed</label>
                         </div>
+                        {% endif %}
                     </div>
                     <div class="card-footer">
                         <div class="col-md-6">

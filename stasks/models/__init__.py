@@ -95,6 +95,8 @@ def seed_db():
         template=True,
         added_by="admin",
     )
+    task5.templates.append(Template.query.filter_by(name="Daily Tasks").first())
+    tasks.append(task5)
 
     db.session.add_all(tasks)
     message += f"{len(tasks)} tasks added to db.\n"
