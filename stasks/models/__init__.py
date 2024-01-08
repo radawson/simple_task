@@ -97,6 +97,26 @@ def seed_db():
     )
     task5.templates.append(Template.query.filter_by(name="Daily Tasks").first())
     tasks.append(task5)
+    task6 = Task(
+        name="Vacuum second floor carpets",
+        description="Vacuum second floor rugs in hallway and both bedrooms.",
+        completed=False,
+        priority=0,
+        template=True,
+        added_by="admin",
+    )
+    task6.templates.append(Template.query.filter_by(name="Daily Tasks").first())
+    tasks.append(task6)
+    task7 = Task(
+        name="Collect dirty laundry",
+        description="Collect dirty laundry from each senior room. All laundry with urine on it goes into white baskets, bot blue baskets.",
+        completed=False,
+        priority=0,
+        template=True,
+        added_by="admin",
+    )
+    task7.templates.append(Template.query.filter_by(name="Daily Tasks").first())
+    tasks.append(task7)
 
     db.session.add_all(tasks)
     message += f"{len(tasks)} tasks added to db.\n"
