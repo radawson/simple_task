@@ -109,7 +109,7 @@ def seed_db():
     tasks.append(task6)
     task7 = Task(
         name="Collect dirty laundry",
-        description="Collect dirty laundry from each senior room. All laundry with urine on it goes into white baskets, bot blue baskets.",
+        description="Collect dirty laundry from each senior's room. All laundry with urine on it goes into white baskets, bot blue baskets.",
         completed=False,
         priority=0,
         template=True,
