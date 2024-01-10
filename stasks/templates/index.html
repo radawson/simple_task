@@ -6,6 +6,9 @@ Today - {{ date }}
 
 {% block content %}
 <div class="container py-5">
+    {% if current_user.admin %}
+    <button class="btn btn-primary" id="btn_print">Print Daily List</button>
+    {% endif %}
     <div class="card">
         <h3 class="m-2">Tasks</h3>
         <div class="accordion accordion-flush" id="task_accordion">
@@ -29,7 +32,7 @@ Today - {{ date }}
                     {% endif %}
                 </div>
                 <div id="collapse-task-{{task.id}}" class="accordion-collapse collapse"
-                    aria-labelledby="heading-task-{{task.id}}" data-mdb-parent="#task_accordion">
+                    aria-labelledby="heading-task-{{task.id}}">
                     <div class="accordion-body">
                         <div class="form-outline" data-mdb-input-init>
                             <textarea class="form-control" id="task_description_{{task.id}}" {% if not
@@ -137,7 +140,6 @@ Today - {{ date }}
             resizeTextarea(textarea);
         });
 
-
         document.querySelectorAll("[id^='task_description_']").forEach(function (textarea) {
             resizeTextarea(textarea);
         });
@@ -216,9 +218,63 @@ Today - {{ date }}
             });
         });
 
+        document.querySelectorAll("[id^='event_description_']").forEach(function (textarea) {
+            textarea.addEventListener("change", function () {
+                let taskId = textarea.id.split("_")[2];
+                let url = "{{ url_for('events.event_api', id=0) }}";
+                url = url.replace("0", taskId);
+                let formData = new FormData();
+                formData.append("description", textarea.value);
+                fetch(url, {
+                    body: formData,
+                    method: "PATCH"
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log(data);
+                    })
+                    .then(() => {
+                        resizeTextarea(textarea);
+                    })
+                    .catch(error => {
+                        console.error(error);
+                    });
+            });
+        });
+
         function resizeTextarea(textarea) {
             textarea.rows = textarea.value.split("\n").length;
         }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            document.getElementById('btn_print').addEventListener('click', function () {
+                // Expand all accordions
+                let accordionContent = document.querySelectorAll("[id^='collapse-']");
+                accordionContent.forEach(function (accordionContent) {
+                    if (accordionContent) {
+                        accordionContent.classList.add('show');
+                        accordionContent.classList.remove('collapsed');
+                    }
+                });
+
+                // Add print styles
+                document.body.classList.add('print');
+
+                // Invoke print
+                window.print();
+
+                // Remove print styles
+                document.body.classList.remove('print');
+
+                // Collapse all accordions
+                accordionContent.forEach(function (accordionContent) {
+                    if (accordionContent) {
+                        accordionContent.classList.remove('show');
+                        accordionContent.classList.add('collapsed');
+                    }
+                });
+            });
+        });
     </script>
 
     {% endblock %} ```
