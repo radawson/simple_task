@@ -129,6 +129,7 @@ def template_add_task(id):
 
 
 @tasks.route("/template/<int:id>/tasks", methods=["GET", "POST"])
+
 def template_tasks_api(id):
     if request.method == "GET":
         template = Template.query.get(id)

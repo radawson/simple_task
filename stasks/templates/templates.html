@@ -39,9 +39,9 @@ Templates
                             <input type="text" class="form-control" id="datatable-search-input" />
                             <label class="form-label" for="datatable-search-input">Search</label>
                         </div>
-                        <button class="btn btn-primary btn-sm ms-3" >
+                        <a class="btn btn-primary btn-sm ms-3" href="{{url_for('tasks.add_task')}}">
                             <i class="fa fa-plus"></i>
-                        </button>
+                        </a>
                     </div>
                     <div id="datatable" data-mdb-selectable="true" data-mdb-multi="true" data-mdb-loading="true"></div>
                     <hidden id="selectedRows"></hidden>
@@ -78,10 +78,6 @@ Templates
                 );
             });
     }
-
-    document.getElementById('btn_add_template').addEventListener('click', function () {
-        url = "{{ url_for('tasks.add_template') }}"
-    });
 
     document.getElementById('filter').addEventListener('change', function () {
         fetchTasks(this.value);

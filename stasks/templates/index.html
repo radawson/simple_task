@@ -31,8 +31,15 @@ Today - {{ date }}
                 <div id="collapse-task-{{task.id}}" class="accordion-collapse collapse"
                     aria-labelledby="heading-task-{{task.id}}" data-mdb-parent="#task_accordion">
                     <div class="accordion-body">
-                        {{ task.description }}
+                        <div class="form-outline" data-mdb-input-init>
+                            <textarea class="form-control" id="task_description_{{task.id}}" {% if not
+                                current_user.admin %}readonly{% endif %}>{{ task.description }}</textarea>
+                        </div>
                     </div>
+                    <script>
+                        var textarea = document.getElementById("task_description_{{task.id}}");
+                        textarea.rows = textarea.value.split("\n").length;
+                    </script>
                 </div>
             </div>
             {% endfor %}
@@ -68,7 +75,12 @@ Today - {{ date }}
                     <div id="collapse-event-{{event.id}}" class="accordion-collapse collapse"
                         aria-labelledby="heading-event-{{event.id}}" data-mdb-parent="#event_accordion">
                         <div class="accordion-body">
-                            {{ event.description }}
+                            <div class="form-outline">
+                                <textarea id="event_description">
+                                    {{ event.description }}
+                                </textarea>
+                                <label class="form-label" for="event_description">Details</label>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -121,6 +133,15 @@ Today - {{ date }}
             window.location.href = "{{ url_for('notes.add_note') }}";
         });
 
+        document.querySelectorAll("[id^='event_description_']").forEach(function (textarea) {
+            resizeTextarea(textarea);
+        });
+
+
+        document.querySelectorAll("[id^='task_description_']").forEach(function (textarea) {
+            resizeTextarea(textarea);
+        });
+
         document.querySelectorAll("[id^='eventCheck']").forEach(function (checkbox) {
             checkbox.addEventListener("change", function () {
                 let eventId = checkbox.id.split("_")[1];
@@ -170,7 +191,34 @@ Today - {{ date }}
                     });
             });
         });
+
+        document.querySelectorAll("[id^='task_description_']").forEach(function (textarea) {
+            textarea.addEventListener("change", function () {
+                let taskId = textarea.id.split("_")[2];
+                let url = "{{ url_for('tasks.task_api', id=0) }}";
+                url = url.replace("0", taskId);
+                let formData = new FormData();
+                formData.append("description", textarea.value);
+                fetch(url, {
+                    body: formData,
+                    method: "PATCH"
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log(data);
+                    })
+                    .then(() => {
+                        resizeTextarea(textarea);
+                    })
+                    .catch(error => {
+                        console.error(error);
+                    });
+            });
+        });
+
+        function resizeTextarea(textarea) {
+            textarea.rows = textarea.value.split("\n").length;
+        }
     </script>
 
-    {% endblock %}
-    ```
+    {% endblock %} ```

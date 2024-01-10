@@ -69,7 +69,10 @@ def seed_db():
     tasks.append(task2)
     task3 = Task(
         name="Take Out Trash",
-        description="Remove trash from upstairs bathrooms and bedrooms, downstairs bathroom, kitchen, and powder room. replace trash bags in each garbage can.",
+        description="Remove trash from upstairs bathrooms and bedrooms, downstairs bathroom, kitchen, and powder room.\n" +
+        " * replace trash bags in each garbage can\n" + 
+        " * replace box of garbage bags if empty\n" +
+        " * take trash out to the porch and stack neatly\n",
         completed=False,
         priority=0,
         template=True,
