@@ -18,6 +18,11 @@ a.nav-link {
     margin: 0.5em;
 }
 
+.no-border {
+    border: 0;
+    box-shadow: none; /* You may want to include this as bootstrap applies these styles too */
+}
+
 @media print {
     .print {
         width: 100% !important;
