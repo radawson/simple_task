@@ -8,15 +8,20 @@ tasks = Blueprint("tasks", __name__)
 
 @tasks.route("/tasks")
 def task_list():
-    tasks = Task.query.all()
-    return render_template("tasks.html", tasks=tasks)
+    #tasks = Task.query.all()
+    return render_template("tasks.html")
 
 
 @tasks.route("/tasks/<date>")
 def get_tasks_date(date):
-    date = datetime.strptime(date, "%Y-%m-%d").date()
-    tasks = Task.query.filter_by(date=date).all()
-    return render_template("tasks.html", tasks=tasks)
+    if date == "future":
+        tasks = Task.query.filter(Task.date > datetime.now().date()).all()
+    elif date == "all":
+        tasks = Task.query.all()
+    else:
+        date = datetime.strptime(date, "%Y-%m-%d").date()
+        tasks = Task.query.filter_by(date=date).all()
+    return jsonify([task.to_dict() for task in tasks])
 
 
 @tasks.route("/tasks/<int:id>")
@@ -129,7 +134,6 @@ def template_add_task(id):
 
 
 @tasks.route("/template/<int:id>/tasks", methods=["GET", "POST"])
-
 def template_tasks_api(id):
     if request.method == "GET":
         template = Template.query.get(id)

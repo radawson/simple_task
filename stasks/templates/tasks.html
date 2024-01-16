@@ -14,46 +14,31 @@ Tasks
                     <option value="today" selected>Today</option>
                     <option value="all">All</option>
                     <option value="future">Future</option>
-                    <option value="templates">Templates</option>
                 </select>
                 <label class="form-label select-label" for="filter">Filter</label>
             </div>
         </div>
 
-        <div class="row">
-            {% for task in tasks %}
-            <div class="col-md-4 col-sm-12 python_task">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title" id="name_{{task.id}}">{{ task.name }}</h5>
-                        {% if task.template %}
-                        <p class="card-title" id="date_{{task.id}}"><i>template</i></p>
-                        {% else %}
-                        <p class="card-title" id="date_{{task.id}}">{{ task.date }}</p>
-                        {% endif %}
-                        <p class="card-text" id="description_{{task.id}}">{{ task.description }}</p>
-                    </div>
-                    <div class="container">
-                        {% if task.template %}
-                        <p class="card-text"><i>template</i></p>
-                        {% else %}
-                        <div class="form-check float-end">
-                            <input type="checkbox" class="form-check-input" id="task_completed_{{task.id}}" {% if
-                                task.completed %} checked {% endif %} />
-                            <label class="form-check-label" for="task_completed_{{task.id}}">Completed</label>
+        <section>
+            <div class="card shadow-0">
+                <div class="card-header py-4 mb-3">
+                    <h4 class="mb-0">Selected Tasks</h4>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-end mb-4">
+                        <div data-mdb-input-init class="form-outline">
+                            <input type="text" class="form-control" id="datatable-search-input" />
+                            <label class="form-label" for="datatable-search-input">Search</label>
                         </div>
-                        {% endif %}
+                        <a class="btn btn-primary btn-sm ms-3" href="{{url_for('tasks.add_task')}}">
+                            <i class="fa fa-plus"></i>
+                        </a>
                     </div>
-                    <div class="card-footer">
-                        <div class="col-md-6">
-                            <button class="btn btn-primary" id="btn_task_detail_{{task.id}}"
-                                onclick="redirectToTaskDetail('{{task.id}}')">View Details</button>
-                        </div>
-                    </div>
+                    <div id="datatable" class="datatable" data-mdb-datatable-init data-mdb-fixed-header="true"></div>
+                    <hidden id="selectedRows"></hidden>
                 </div>
             </div>
-            {% endfor %}
-        </div>
+        </section>
     </div>
     <button class="btn btn-primary" id="btn_add_task">Add Task</button>
 </div>
@@ -61,32 +46,6 @@ Tasks
 
 {% block extra_js %}
 <script>
-    // Loop through each checkbox and add the event listener
-    document.querySelectorAll("[id^='task_completed']").forEach(function (checkbox) {
-        checkbox.addEventListener("change", function () {
-            var completed = this.checked;
-            var taskId = this.id.split("_")[2]; // Extract the event ID from the checkbox ID
-            var url = "{{ url_for('tasks.task_api',id=0) }}";
-            url = url.replace('0', taskId);
-            let formData = new FormData();
-            if (checkbox.checked) {
-                formData.append("completed", "True");
-            } else {
-                formData.append("completed", "False");
-            }
-            fetch(url, {
-                body: formData,
-                method: "PATCH"
-            })
-                .then(response => response.json())
-                .then(data => {
-                    console.log(data);
-                })
-                .catch(error => {
-                    console.error(error);
-                });
-        });
-    });
 
     function redirectToTaskDetail(eventId) {
         url = "{{ url_for('tasks.task_detail', id=0) }}"
@@ -108,27 +67,15 @@ Tasks
     });
 
     function filterEvents(filterValue) {
-        var tasks = document.getElementsByClassName("python_task");
-
-        for (let i = 0; i < tasks.length; i++) {
-            var task = tasks[i];
-            var taskDate = new Date(task.querySelector("[id^='date_']").textContent);
-            console.log(task.querySelector("[id^='date_']").textContent);
-            console.log(taskDate);
-
-
-            if (filterValue === "today" && !isToday(taskDate)) {
-                task.style.display = "none";
-            } else if (filterValue === "future" && !isFuture(taskDate)) {
-                task.style.display = "none";
-            } else if (filterValue === "templates" && !isTemplate(taskDate)) {
-                task.style.display = "none";
-            } else {
-                task.style.display = "block";
-            }
+        if (filterValue === "today") {
+            let now = new Date().toLocaleDateString("sv");
+            fetchTasks(now);
+        } else if (filterValue === "future") {
+            fetchTasks("future");
+        } else {
+            fetchTasks("all");
         }
     }
-
 
     function isFuture(date) {
         var today = new Date();
@@ -149,6 +96,86 @@ Tasks
         return date.toDateString() === today.toDateString();
     }
 
+    function fetchTasks(query_date) {
+        let url = "{{ url_for('tasks.task_list') }}/".concat(query_date);
+        fetch(url)
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then((data) => {
+                data = data.map((task) => {
+                    const date = new Date(task.date);
+                    task.date = date.toISOString().split('T')[0]; // This will give you the date in 'YYYY-MM-DD' format
+                    task.completed = task.completed ? 'Yes' : 'No'; // Map boolean values to 'Yes' or 'No'
+                    return task;
+                });
+                console.log(data);
+                asyncTable.update(
+                    {
+                        rows: data,
+                    },
+                    { loading: false }
+                );
+            })
+            .catch((error) => {
+                console.error('There was a problem with the fetch operation: ', error);
+            });
+    }
+
+
+
+    const setActions = () => {
+        document.getElementsByClassName('edit-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                console.log(`edit ${btn.attributes['data-mdb-id'].value}`)
+            })
+        })
+
+        document.getElementsByClassName('delete-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                console.log(`delete ${btn.attributes['data-mdb-id'].value}`)
+            })
+        })
+    }
+
+    const columns = [
+        { label: 'Date', field: 'date' },
+        { label: 'Name', field: 'name' },
+        { label: 'Description', field: 'description' },
+        { label: 'Completed', field: 'completed' },
+        { label: 'Actions', field: 'id' },
+    ];
+
+    const asyncTable = new mdb.Datatable(document.getElementById('datatable'),
+        {
+            columns,
+            rows: [].map((row) => {
+                return {
+                    ...row,
+                    id: `
+    <button data-mdb-ripple-init class="edit-btn btn btn-outline-primary btn-floating btn-sm" data-mdb-id="${row.id}"><i class="fa fa-edit"></i></button>
+    <button data-mdb-ripple-init class="delete-btn btn btn-outline-primary btn-floating btn-sm" data-mdb-id="${row.id}"><i class="fa fa-delete"></i></button>`,
+                };
+            }),
+            search: { enabled: true },
+            pagination: { enabled: true },
+        },
+        {
+            loading: true,
+            striped: true,
+            sortable: true,
+        }
+    );
+
+    document.getElementById('datatable').addEventListener('render.mdb.datatable', setActions);
+
+
+    document.getElementById('datatable-search-input').addEventListener('input', (e) => {
+        asyncTable.search(e.target.value);
+    });
 
 </script>
 {% endblock %}
