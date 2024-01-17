@@ -12,6 +12,17 @@ def event_list():
     sorted_events = sorted(events, key=attrgetter('date', 'time'))
     return render_template('events.html', events=sorted_events)
 
+@events.route("/events/<date>")
+def get_events_date(date):
+    if date == "future":
+        events = Event.query.filter(Event.date > datetime.now().date()).all()
+    elif date == "all":
+        events = Event.query.all()
+    else:
+        date = datetime.strptime(date, "%Y-%m-%d").date()
+        events = Event.query.filter_by(date=date).all()
+    return jsonify([event.to_dict() for event in events])
+
 @events.route('/events/<int:id>')
 def event_detail(id):
     event = Event.query.get(id)
