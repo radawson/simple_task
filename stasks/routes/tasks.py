@@ -8,7 +8,7 @@ tasks = Blueprint("tasks", __name__)
 
 @tasks.route("/tasks")
 def task_list():
-    #tasks = Task.query.all()
+    # tasks = Task.query.all()
     return render_template("tasks.html")
 
 
@@ -56,9 +56,9 @@ def add_task():
 
 @tasks.route("/task/<int:id>", methods=["GET", "POST", "DELETE", "PATCH"])
 def task_api(id):
+    message = None
     if request.method == "GET":
         task = Task.query.get(id)
-        message = None
     elif request.method == "POST":
         name = request.form.get("name")
         description = request.form.get("description")
@@ -72,8 +72,9 @@ def task_api(id):
         task = Task.query.get(id)
         db.session.delete(task)
         db.session.commit()
-        message = "Task deleted successfully"
-        return render_template("tasks.html", message=message)
+        message = f"Task {task.id} deleted successfully"
+        flash(message)
+        return jsonify(message)
     elif request.method == "PATCH":
         task = Task.query.get(id)
         form_data = request.form.to_dict()
