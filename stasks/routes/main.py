@@ -88,6 +88,10 @@ def profile():
     user = current_user
     return render_template("profile.html", user=user)
 
+@main.route("/qr")
+def qr_generator():
+    return render_template("qr.html")
+
 
 @main.route("/settings")
 @login_required

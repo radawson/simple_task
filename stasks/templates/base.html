@@ -47,20 +47,23 @@
                         <a class="nav-link" href="{{url_for('main.index')}}">Today</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/events">Events</a>
+                        <a class="nav-link" href="{{url_for('events.event_list')}}">Events</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/notes">Notes</a>
+                        <a class="nav-link" href="{{url_for('notes_note_list')}}">Notes</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/tasks">Tasks</a>
+                        <a class="nav-link" href="{{url_for('tasks.task_list')}}">Tasks</a>
                     </li>
                     {% if current_user.admin %}
                     <li class="nav-item">
-                        <a class="nav-link" href="/templates">Templates</a>
+                        <a class="nav-link" href="{{url_for('tasks.templates')}}">Templates</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{{url_for('main.admin')}}">Admin</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{url_for('main.qr_generator')}}">QR Gen</a>
                     </li>
                     {% endif %}
                 </ul>
