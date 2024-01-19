@@ -7,6 +7,7 @@ class Time(db.Model):
     time_in = db.Column(db.Time)
     time_out = db.Column(db.Time)
     date = db.Column(db.Date)
+    paid = db.Column(db.Boolean, default=False)
     person_id = db.Column(db.Integer, db.ForeignKey('person.id'), nullable=False)
     person = db.relationship('Person', backref='timecards')
     description = db.Column(db.Text, nullable=True)
