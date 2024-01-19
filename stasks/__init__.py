@@ -2,9 +2,9 @@ from flask import Flask
 from flask_migrate import Migrate
 from flask_login import LoginManager
 from .models import db, seed_db
-from .routes import auth, main, notes, tasks, events, test
+from .routes import auth, main, notes, tasks, events, test, times
 
-version = "0.0.4"
+version = "0.0.6"
 
 def create_app():
     # Initialize Flask app
@@ -45,6 +45,7 @@ def create_app():
     app.register_blueprint(notes)
     app.register_blueprint(tasks)
     app.register_blueprint(test)
+    app.register_blueprint(times)
 
     @app.cli.command("seed-db")
     def seed_db_command():

@@ -4,3 +4,4 @@ from .main import main
 from .notes import notes
 from .tasks import tasks
 from .test import test
+from .time import times

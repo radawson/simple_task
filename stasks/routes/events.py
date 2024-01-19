@@ -32,7 +32,7 @@ def event_detail(id):
 @login_required
 def add_event():
     if request.method == "GET":
-        return render_template("add_event.html",  people=Person.get_names())
+        return render_template("add_event.html",  people=Person.get_client_names())
     elif request.method == "POST":
         name = request.form.get("name")
         description = request.form.get("description")

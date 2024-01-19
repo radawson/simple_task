@@ -55,6 +55,9 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{{url_for('tasks.task_list')}}">Tasks</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{url_for('times.timecard')}}">Timecard</a>
+                    </li>
                     {% if current_user.admin %}
                     <li class="nav-item">
                         <a class="nav-link" href="{{url_for('tasks.templates')}}">Templates</a>
@@ -164,16 +167,19 @@
         }
         setInterval(updateDateTime, 1000);
         updateDateTime();
+
+        function showAlert(message) {
+            let toast = new mdb.Toast(document.getElementById('flash-toast'));
+            document.getElementById('flash-toast').getElementsByClassName('toast-header')[0].classList.add('bg-{{ category }}');
+            document.getElementById('flash-toast').getElementsByClassName('toast-body')[0].textContent = message;
+            toast.show();
+        }
     </script>
     {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
     {% for category, message in messages %}
     <script>
-        let message = "{{ message }}"
-        let toast = new mdb.Toast(document.getElementById('flash-toast'));
-        document.getElementById('flash-toast').getElementsByClassName('toast-header')[0].classList.add('bg-{{ category }}');
-        document.getElementById('flash-toast').getElementsByClassName('toast-body')[0].textContent = message;
-        toast.show();
+        showAlert("{{ message }}")
     </script>
     {% endfor %}
     {% endif %}

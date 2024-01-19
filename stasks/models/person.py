@@ -15,12 +15,25 @@ class Person(db.Model):
     country = db.Column(db.String(20))
     birthdate = db.Column(db.Date)
     info = db.Column(db.Text, default="")
+    employee = db.Column(db.Boolean, default=False)
 
     def get_all():
         return Person.query.order_by(Person.first_name).all()
 
-    def get_names():
-        people = Person.query.with_entities(Person.full_name).all()
+    def get_clients():
+        return Person.query.filter_by(employee=False).all()
+
+    def get_client_names():
+        people = Person.query.filter_by(employee=False).with_entities(Person.full_name).all()
+        names = [person[0] for person in people]
+        print(names)
+        return names
+    
+    def get_employees():
+        return Person.query.filter_by(employee=True).all()
+    
+    def get_employees_names():
+        people = Person.query.filter_by(employee=True).with_entities(Person.full_name).all()
         names = [person[0] for person in people]
         return names
 
@@ -30,6 +43,7 @@ class User(UserMixin, Person):
     password = db.Column(db.String(20))
     username = db.Column(db.String(20), unique=True)
     admin = db.Column(db.Boolean, default=False)
+    
 
     def is_admin(self):
         return self.admin

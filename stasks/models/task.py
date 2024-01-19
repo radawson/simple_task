@@ -15,6 +15,7 @@ class Task(db.Model):
     completed = db.Column(db.Boolean, nullable=False, default=False)
     priority = db.Column(db.Integer, default=0)
     added_by = db.Column(db.String(30), nullable=True)
+    assigned_to = db.Column(db.String(30), nullable=True)
     template = db.Column(db.Boolean, nullable=False, default=False)
     templates = db.relationship('Template', secondary=task_to_templates, backref=db.backref('tasks', lazy='dynamic'))
 

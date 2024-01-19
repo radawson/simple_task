@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+
+{% block title %}Timecard{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <h2>Timecard</h2>
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">Check in / out</h5>
+            <hr>
+            <form id="detailForm" action="{{url_for('times.timecard')}}">
+                <div class="form-outline mb-2">
+                    <select class="form-select" id="employees" data-mdb-select-init>
+                        {% for user in users %}
+                        <option value="{{ user.id }}">{{ user.full_name }}</option>
+                        {% endfor %}
+                    </select>
+                    <label class="form-label select-label" for="employees">Person</label>
+                </div>
+                <div class="form-outline mb-2" data-mdb-input-init>
+                    <input type="time" id="time" name="time" class="form-control"  />
+                    <label class="form-label" for="time">Time</label>
+                </div>
+                <div class="form-outline mb-2" data-mdb-input-init>
+                    <textarea id="description" name="description" class="form-control"
+                        ></textarea>
+                    <label class="form-label" for="description">Notes</label>
+                </div>
+                {% if current_user.admin %}
+                <div class="form-outline mb-2" data-mdb-input-init>
+                    <input type="text" id="added_by" name="added_by" class="form-control" readonly
+                        value="{{current_user.name}}" />
+                    <label class="form-label" for="added_by">Created By</label>
+                </div>
+                {% endif %}
+            </form>
+            <button id="inButton" class="btn btn-success" ">Check In</button>
+            <button id="outButton" class="btn btn-danger">Check Out</button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function updateTime() {
+        var now = new Date();
+        var hours = now.getHours();
+        var minutes = now.getMinutes();
+        hours = hours < 10 ? '0' + hours : hours;
+        minutes = minutes < 10 ? '0' + minutes : minutes;
+        document.getElementById('time').value = hours + ':' + minutes;
+    }
+    updateTime();
+    setInterval(updateTime, 30000); // Update time every 30 seconds
+
+    function postTime(formData) {
+        let url = "{{ url_for('times.timecard')}}";
+        fetch(url, {
+            body: formData,
+            method: "POST"
+        })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+                showAlert(data);
+            })
+            .catch(error => {
+                console.error(error);
+            });
+    };
+
+    document.getElementById('inButton').addEventListener('click', function () {
+        let formData = new FormData();
+        date_now = new Date().toLocaleDateString("sv");
+        formData.append("person_id", document.getElementById('employees').value);
+        formData.append("time_in", document.getElementById('time').value);
+        formData.append("date", date_now);
+        formData.append("description", document.getElementById('description').value);
+        postTime(formData);
+    });
+
+    document.getElementById('outButton').addEventListener('click', function () {
+        let formData = new FormData();
+        date_now = new Date().toLocaleDateString("sv");
+        formData.append("person_id", document.getElementById('employees').value);
+        formData.append("time_out", document.getElementById('time').value);
+        formData.append("date", date_now);
+        formData.append("description", document.getElementById('description').value);
+        postTime(formData);
+    });
+
+</script>
+{% endblock %}
