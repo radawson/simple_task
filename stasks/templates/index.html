@@ -123,180 +123,181 @@ Today - {{ date }}
             </div>
         </div>
     </div>
-    {% endblock %}
+</div>
+{% endblock %}
 
-    {% block extra_js %}
-    <script>
-        document.getElementById("btn_tasks").addEventListener("click", function () {
-            window.location.href = "{{ url_for('tasks.add_task') }}";
-        });
-        document.getElementById("btn_events").addEventListener("click", function () {
-            window.location.href = "{{ url_for('events.add_event') }}";
-        });
-        document.getElementById("btn_notes").addEventListener("click", function () {
-            window.location.href = "{{ url_for('notes.add_note') }}";
-        });
+{% block extra_js %}
+{% if current_user.admin %}
+<script>
+    document.getElementById("btn_tasks").addEventListener("click", function () {
+        window.location.href = "{{ url_for('tasks.add_task') }}";
+    });
+    document.getElementById("btn_events").addEventListener("click", function () {
+        window.location.href = "{{ url_for('events.add_event') }}";
+    });
+</script>
+{% endif %}
+<script>
+    document.getElementById("btn_notes").addEventListener("click", function () {
+        window.location.href = "{{ url_for('notes.add_note') }}";
+    });
 
-        document.querySelectorAll("[id^='event_description_']").forEach(function (textarea) {
-            resizeTextarea(textarea);
-        });
+    document.querySelectorAll("[id^='event_description_']").forEach(function (textarea) {
+        resizeTextarea(textarea);
+    });
 
-        document.querySelectorAll("[id^='task_description_']").forEach(function (textarea) {
-            resizeTextarea(textarea);
-        });
+    document.querySelectorAll("[id^='task_description_']").forEach(function (textarea) {
+        resizeTextarea(textarea);
+    });
 
-        document.querySelectorAll("[id^='eventCheck']").forEach(function (checkbox) {
-            checkbox.addEventListener("change", function () {
-                let eventId = checkbox.id.split("_")[1];
-                let url = "{{ url_for('events.event_api', id=0) }}";
-                url = url.replace("0", eventId);
-                let formData = new FormData();
-                if (checkbox.checked) {
-                    formData.append("completed", "True");
-                } else {
-                    formData.append("completed", "False");
-                }
-                fetch(url, {
-                    body: formData,
-                    method: "PATCH"
+    document.querySelectorAll("[id^='eventCheck']").forEach(function (checkbox) {
+        checkbox.addEventListener("click", function () {
+            let eventId = checkbox.id.split("_")[1];
+            let url = "{{ url_for('events.event_api', id=0) }}";
+            url = url.replace("0", eventId);
+            let formData = new FormData();
+            if (checkbox.checked) {
+                formData.append("completed", "True");
+            } else {
+                formData.append("completed", "False");
+            }
+            fetch(url, {
+                body: formData,
+                method: "PATCH"
+            })
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
                 })
-                    .then(response => response.json())
-                    .then(data => {
-                        console.log(data);
-                    })
-                    .catch(error => {
-                        console.error(error);
-                    });
-            });
-        });
-
-        document.querySelectorAll("[id^='taskCheck']").forEach(function (checkbox) {
-            checkbox.addEventListener("change", function () {
-                let taskId = checkbox.id.split("_")[1];
-                let url = "{{ url_for('tasks.task_api', id=0) }}";
-                url = url.replace("0", taskId);
-                let formData = new FormData();
-                if (checkbox.checked) {
-                    formData.append("completed", "True");
-                } else {
-                    formData.append("completed", "False");
-                }
-                fetch(url, {
-                    body: formData,
-                    method: "PATCH"
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        console.log(data);
-                    })
-                    .catch(error => {
-                        console.error(error);
-                    });
-            });
-        });
-
-        document.querySelectorAll("[id^='task_description_']").forEach(function (textarea) {
-            textarea.addEventListener("change", function () {
-                let taskId = textarea.id.split("_")[2];
-                let url = "{{ url_for('tasks.task_api', id=0) }}";
-                url = url.replace("0", taskId);
-                let formData = new FormData();
-                formData.append("description", textarea.value);
-                fetch(url, {
-                    body: formData,
-                    method: "PATCH"
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        console.log(data);
-                    })
-                    .then(() => {
-                        resizeTextarea(textarea);
-                    })
-                    .catch(error => {
-                        console.error(error);
-                    });
-            });
-        });
-
-        document.querySelectorAll("[id^='event_description_']").forEach(function (textarea) {
-            textarea.addEventListener("change", function () {
-                let taskId = textarea.id.split("_")[2];
-                let url = "{{ url_for('events.event_api', id=0) }}";
-                url = url.replace("0", taskId);
-                let formData = new FormData();
-                formData.append("description", textarea.value);
-                fetch(url, {
-                    body: formData,
-                    method: "PATCH"
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        console.log(data);
-                    })
-                    .then(() => {
-                        resizeTextarea(textarea);
-                    })
-                    .catch(error => {
-                        console.error(error);
-                    });
-            });
-        });
-
-        function resizeTextarea(textarea) {
-            textarea.rows = textarea.value.split("\n").length;
-        }
-
-        document.addEventListener('DOMContentLoaded', function () {
-
-
-            document.getElementById('btn_print').addEventListener('click', function () {
-                // Hide navbar
-                let navbar = document.getElementById('navbar');
-                navbar.classList.add('d-none');
-                
-                // Remove padding and make container fluid
-                let main_container = document.getElementById('main_container');
-                main_container.classList.remove('py-5', 'container');
-                main_container.classList.add('py-0', 'container-fluid');
-
-                // Expand all accordions
-                let accordionContent = document.querySelectorAll("[id^='collapse-']");
-                accordionContent.forEach(function (accordionContent) {
-                    if (accordionContent) {
-                        accordionContent.classList.add('show');
-                        accordionContent.classList.remove('collapsed');
-                    }
+                .catch(error => {
+                    console.error(error);
                 });
+        });
+    });
 
-                // Add print styles
-                document.body.classList.add('print');
-
-                // Invoke print
-                window.print();
-
-                // Remove print styles
-                document.body.classList.remove('print');
-
-                main_container.classList.remove('py-0', 'container-fluid');
-                main_container.classList.add('py-5', 'container');
-
-                // Collapse all accordions
-                accordionContent.forEach(function (accordionContent) {
-                    if (accordionContent) {
-                        accordionContent.classList.remove('show');
-                        accordionContent.classList.add('collapsed');
-                    }
+    document.querySelectorAll("[id^='taskCheck']").forEach(function (checkbox) {
+        checkbox.addEventListener("click", function () {
+            let taskId = checkbox.id.split("_")[1];
+            let url = "{{ url_for('tasks.task_api', id=0) }}";
+            url = url.replace("0", taskId);
+            let formData = new FormData();
+            if (checkbox.checked) {
+                formData.append("completed", "True");
+            } else {
+                formData.append("completed", "False");
+            }
+            fetch(url, {
+                body: formData,
+                method: "PATCH"
+            })
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                })
+                .catch(error => {
+                    console.error(error);
                 });
+        });
+    });
 
-                // Show navbar
-                navbar.classList.remove('d-none');
+    document.querySelectorAll("[id^='task_description_']").forEach(function (textarea) {
+        textarea.addEventListener("change", function () {
+            let taskId = textarea.id.split("_")[2];
+            let url = "{{ url_for('tasks.task_api', id=0) }}";
+            url = url.replace("0", taskId);
+            let formData = new FormData();
+            formData.append("description", textarea.value);
+            fetch(url, {
+                body: formData,
+                method: "PATCH"
+            })
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                })
+                .then(() => {
+                    resizeTextarea(textarea);
+                })
+                .catch(error => {
+                    console.error(error);
+                });
+        });
+    });
 
+    document.querySelectorAll("[id^='event_description_']").forEach(function (textarea) {
+        textarea.addEventListener("change", function () {
+            let taskId = textarea.id.split("_")[2];
+            let url = "{{ url_for('events.event_api', id=0) }}";
+            url = url.replace("0", taskId);
+            let formData = new FormData();
+            formData.append("description", textarea.value);
+            fetch(url, {
+                body: formData,
+                method: "PATCH"
+            })
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                })
+                .then(() => {
+                    resizeTextarea(textarea);
+                })
+                .catch(error => {
+                    console.error(error);
+                });
+        });
+    });
+
+    function resizeTextarea(textarea) {
+        textarea.rows = textarea.value.split("\n").length;
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+
+        document.getElementById('btn_print').addEventListener('click', function () {
+            // Hide navbar
+            let navbar = document.getElementById('navbar');
+            navbar.classList.add('d-none');
+
+            // Remove padding and make container fluid
+            let main_container = document.getElementById('main_container');
+            main_container.classList.remove('py-5', 'container');
+            main_container.classList.add('py-0', 'container-fluid');
+
+            // Expand all accordions
+            let accordionContent = document.querySelectorAll("[id^='collapse-']");
+            accordionContent.forEach(function (accordionContent) {
+                if (accordionContent) {
+                    accordionContent.classList.add('show');
+                    accordionContent.classList.remove('collapsed');
+                }
             });
 
+            // Add print styles
+            document.body.classList.add('print');
 
+            // Invoke print
+            window.print();
+
+            // Remove print styles
+            document.body.classList.remove('print');
+
+            main_container.classList.remove('py-0', 'container-fluid');
+            main_container.classList.add('py-5', 'container');
+
+            // Collapse all accordions
+            accordionContent.forEach(function (accordionContent) {
+                if (accordionContent) {
+                    accordionContent.classList.remove('show');
+                    accordionContent.classList.add('collapsed');
+                }
+            });
+
+            // Show navbar
+            navbar.classList.remove('d-none');
 
         });
-    </script>
+    });
+</script>
 
-    {% endblock %} ```
+{% endblock %} ```
