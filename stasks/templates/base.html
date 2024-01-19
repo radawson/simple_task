@@ -5,7 +5,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <meta http-equiv="x-ua-compatible" content="ie=edge" />
-    <meta http-equiv="refresh" content="30" />
+    {% block xtra_head %}{% endblock %}
     <title>{% block title %}{% endblock %}</title>
     <!-- MDB icon -->
     <link rel="icon" href="{{url_for('static', filename='img/favicon.ico')}}" type="image/x-icon" />
@@ -137,18 +137,16 @@
         <!-- Container wrapper -->
     </nav>
     <!-- Navbar -->
-    <!-- Messages -->
-    {% with messages = get_flashed_messages(with_categories=true) %}
-    <!-- Alert -->
-    {% if messages %}
-    {% for category, message in messages %}
-    <div class="alert alert-{{ category }}" id="flash_message">
-        {{ message }}
-        <input type="button" value=&#10006 onclick="removeFlash()" style="float: right">
+    <!-- Toast -->
+    <div class="toast" data-mdb-toast-init data-mdb-autohide="false" id="flash-toast" role="alert" aria-live="assertive"
+        aria-atomic="true">
+        <div class="toast-header">
+            <strong class="me-auto">Notification</strong>
+            <small></small>
+            <button type="button" class="btn-close" data-mdb-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body"></div>
     </div>
-    {% endfor %}
-    {% endif %}
-    {% endwith %}
 
     <!--Main layout-->
     {% block content %}{% endblock %}
@@ -167,13 +165,19 @@
         setInterval(updateDateTime, 1000);
         updateDateTime();
     </script>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    {% for category, message in messages %}
     <script>
-        function removeFlash() {
-            const element = document.getElementById('flash_message');
-            element.remove();
-        }
+        let message = "{{ message }}"
+        let toast = new mdb.Toast(document.getElementById('flash-toast'));
+        document.getElementById('flash-toast').getElementsByClassName('toast-header')[0].classList.add('bg-{{ category }}');
+        document.getElementById('flash-toast').getElementsByClassName('toast-body')[0].textContent = message;
+        toast.show();
     </script>
-
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
     {% block extra_js %}{% endblock %}
 
 </body>

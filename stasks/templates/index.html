@@ -4,6 +4,8 @@
 Today - {{ date }}
 {% endblock %}
 
+{% block xtra_head %}<meta http-equiv="refresh" content="30" />{% endblock %}
+
 {% block content %}
 <div id="main_container" class="container py-5">
     {% if current_user.admin %}
