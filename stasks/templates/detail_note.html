@@ -14,7 +14,7 @@ Note Detail
             <form id="detailForm" action="{{url_for('notes.note_api',id=note.id)}}">
                 <div class="form-outline mb-2" data-mdb-input-init>
                     <textarea id="description" name="description" class="form-control"
-                        readonly>{{note.description}}</textarea>
+                        readonly>{{note.content}}</textarea>
                     <label class="form-label" for="description">Note Contents</label>
                 </div>
                 <div class="form-outline mb-2" data-mdb-input-init>
