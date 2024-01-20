@@ -171,6 +171,20 @@ def seed_db():
     )
     task10.templates.append(Template.query.filter_by(name="Weekly Tasks").first())
     tasks.append(task10)
+    task11 = Task(
+        name="Put away groceries",
+        description="Put away groceries from Instacart delivery:\n" +
+        " * close the front porch gate before the delivery arrives\n" +
+        " * bring groceries into the house\n" +
+        " * rotate older items to the front of the refrigerator and pantry\n" +
+        " * cross items off the white board as you put them away",
+        completed=False,
+        priority=0,
+        template=True,
+        added_by="admin",
+    )
+    task11.templates.append(Template.query.filter_by(name="Weekly Tasks").first())
+    tasks.append(task11)
 
     db.session.add_all(tasks)
     message += f"{len(tasks)} tasks added to db.\n"
