@@ -6,94 +6,90 @@ Notes
 
 {% block content %}
 <div class="container py-5">
-    <h1>Notes</h1>
+    <h1>Selected Notes</h1>
     <div class="container">
-        
-        <div class="container py-5">
-            <h1>Events</h1>
-            <div class="container">
-                <div class="row my-2">
-                    <div class="col-md-3 ">
-                        <label class="form-label select-label" for="filter">Filter</label>
-                        <select id="filter" class="form-select" data-mdb-select-init>
-                            <option value="today" selected>Today</option>
-                            <option value="all">All</option>
-                            <option value="future">Future</option>
-                        </select>
-                        
-                    </div>
-                </div>
-                <div class="row">
-                    {% for note in notes %}
-                    <div class="col-md-4 col-sm-12 python_note">
-                        <div class="card">
-                            <div class="card-body">
-                                <h5 class="card-title" id="name_{{note.id}}">{{ note.title }}</h5>
-                                <p class="card-title" id="date_{{note.id}}">{{ note.date }}</p>
-                                <p class="card-text" id="description_{{note.id}}">{{ note.content }}</p>
-                            </div>
-                            <div class="card-footer">
-                                <div class="col-md-6">
-                                    <button class="btn btn-primary" id="btn_note_detail_{{note.id}}"
-                                        onclick="redirectToNoteDetail('{{note.id}}')">View Details</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    {% endfor %}
-                </div>
+        <div class="row my-2">
+            <div class="col-md-3 ">
+                <label class="form-label select-label" for="filter">Filter</label>
+                <select id="filter" class="form-select" data-mdb-select-init>
+                    <option value="today" selected>Today</option>
+                    <option value="all">All</option>
+                    <option value="future">Future</option>
+                </select>
+
             </div>
         </div>
-        <button class="btn btn-primary m-2" id="btn_add_note">Add Note</button>
+        <div class="row">
+            {% for note in notes %}
+            <div class="col-md-4 col-sm-12 python_note">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title" id="name_{{note.id}}">{{ note.title }}</h5>
+                        <p class="card-title" id="date_{{note.id}}">{{ note.date }}</p>
+                        <p class="card-text" id="description_{{note.id}}">{{ note.content }}</p>
+                    </div>
+                    <div class="card-footer">
+                        <div class="col-md-6">
+                            <button class="btn btn-primary" id="btn_note_detail_{{note.id}}"
+                                onclick="redirectToNoteDetail('{{note.id}}')">View Details</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
         </div>
-        {% endblock %}
+    </div>
+</div>
+<button class="btn btn-primary m-2" id="btn_add_note">Add Note</button>
+</div>
+{% endblock %}
 
-        {% block extra_js %}
-        <script>
-            function redirectToNoteDetail(noteId) {
-                url = "{{ url_for('notes.note_detail', id=0) }}"
-                url = url.replace('0', noteId);
-                window.location.href = url;
+{% block extra_js %}
+<script>
+    function redirectToNoteDetail(noteId) {
+        url = "{{ url_for('notes.note_detail', id=0) }}"
+        url = url.replace('0', noteId);
+        window.location.href = url;
+    }
+
+    document.getElementById("btn_add_note").addEventListener("click", function () {
+        window.location.href = "{{ url_for('notes.add_note') }}";
+    });
+
+    document.addEventListener("DOMContentLoaded", function () {
+        filterEvents("today");
+    });
+
+    document.getElementById("filter").addEventListener("change", function () {
+        var filterValue = this.value;
+        filterEvents(filterValue);
+    });
+
+    function filterEvents(filterValue) {
+        var notes = document.getElementsByClassName("python_note");
+
+        for (var i = 0; i < notes.length; i++) {
+            var note = notes[i];
+            var eventDate = new Date(event.querySelector("[id^='date']").textContent);
+
+            if (filterValue === "today" && !isToday(noteDate)) {
+                event.style.display = "none";
+            } else if (filterValue === "future" && !isFuture(noteDate)) {
+                event.style.display = "none";
+            } else {
+                event.style.display = "block";
             }
+        }
+    }
 
-            document.getElementById("btn_add_note").addEventListener("click", function () {
-                window.location.href = "{{ url_for('notes.add_note') }}";
-            });
+    function isToday(date) {
+        var today = new Date();
+        return date.toDateString() === today.toDateString();
+    }
 
-            document.addEventListener("DOMContentLoaded", function() {
-                filterEvents("today");
-            });
-
-            document.getElementById("filter").addEventListener("change", function () {
-                var filterValue = this.value;
-                filterEvents(filterValue);
-            });
-
-            function filterEvents(filterValue) {
-                var notes = document.getElementsByClassName("python_note");
-
-                for (var i = 0; i < notes.length; i++) {
-                    var note = notes[i];
-                    var eventDate = new Date(event.querySelector("[id^='date']").textContent);
-
-                    if (filterValue === "today" && !isToday(noteDate)) {
-                        event.style.display = "none";
-                    } else if (filterValue === "future" && !isFuture(noteDate)) {
-                        event.style.display = "none";
-                    } else {
-                        event.style.display = "block";
-                    }
-                }
-            }
-
-            function isToday(date) {
-                var today = new Date();
-                return date.toDateString() === today.toDateString();
-            }
-
-            function isFuture(date) {
-                var today = new Date();
-                return date > today;
-            }
-        </script>
-        {% endblock %}
+    function isFuture(date) {
+        var today = new Date();
+        return date > today;
+    }
+</script>
+{% endblock %}
