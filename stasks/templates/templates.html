@@ -87,6 +87,47 @@ Templates
         fetchTasks(this.value);
     });
 
+    const setActions = () => {
+        Array.from(document.getElementsByClassName('edit-btn')).forEach(btn => {
+            btn.addEventListener('click', () => {
+                base_url = "{{ url_for('tasks.task_detail', id=0) }}"
+                url = base_url.replace('0', btn.attributes['data-mdb-id'].value);
+                window.location.assign(url);
+            })
+        })
+
+        Array.from(document.getElementsByClassName('delete-btn')).forEach(btn => {
+            btn.addEventListener('click', () => {
+                let conf_modal = new mdb.Modal(document.getElementById('confirmModal'), {
+                    keyboard: false
+                });
+                conf_modal.show();
+                document.getElementById('confirmModalLabel').innerHTML = "Confirm Delete";
+                document.getElementById('confirm_delete').addEventListener('click', () => {
+                    let url = "{{ url_for('tasks.task_api', id=0) }}";
+                    url = url.replace('0', btn.attributes['data-mdb-id'].value);
+                    console.log("Deleting Task using", url);
+
+                    fetch(url, {
+                        method: 'DELETE',
+                    })
+                        .then(response => response.json())
+                        .then(data => showAlert(data))
+                        .catch((error) => {
+                            console.error('Error:', error);
+                        })
+                        .then(() => {
+                            window.location.href = '/tasks';
+                        });
+
+                })
+            })
+        })
+    }
+
+    document.getElementById('datatable').addEventListener('render.mdb.datatable', setActions);
+
+
     const columns = [
         { label: 'Name', field: 'name' },
         { label: 'Description', field: 'description' },
