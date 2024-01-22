@@ -66,6 +66,12 @@ Templates
         fetch(url)
             .then((response) => response.json())
             .then((data) => {
+                data = data.map((task) => {
+                    task.id = `
+    <button data-mdb-ripple-init class="edit-btn btn btn-outline-primary btn-floating btn-sm" data-mdb-id="${task.id}" data-mdb-tooltip-init title="Edit"><i class="fa fa-edit"></i></button>
+    <button data-mdb-ripple-init class="delete-btn btn btn-outline-primary btn-floating btn-sm" data-mdb-id="${task.id}"><i class="fa fa-trash" data-mdb-tooltip-init title="Delete"></i></button>`;
+                    return task;
+                });
                 asyncTable.update(
                     {
                         rows: data.map((user) => ({
@@ -84,13 +90,15 @@ Templates
     const columns = [
         { label: 'Name', field: 'name' },
         { label: 'Description', field: 'description' },
-        { label: 'ID', field: 'id' },
+        { label: 'Actions', field: 'id' },
     ];
 
     const asyncTable = new mdb.Datatable(
         document.getElementById('datatable'),
         { columns, },
         {
+            search: true,
+            pagination: true,
             loading: true,
             striped: true,
             sortable: true,
