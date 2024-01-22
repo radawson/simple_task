@@ -11,9 +11,7 @@ Templates
         <div class="row my-2">
             <div class="col-md-3 ">
                 <select id="filter" class="form-select" data-mdb-select-init>
-                    <!-- <option value="today" selected>Today</option>
-                    <option value="all">All</option>
-                    <option value="future">Future</option> -->
+                    <option value="0">All</option>
                     {% for template in templates %}
                     <option value="{{ template.id }}">{{ template.name }}</option>
                     {% endfor %}
@@ -99,7 +97,7 @@ Templates
         }
     );
 
-    fetchTasks(1);
+    fetchTasks(0);
 
     document.getElementById('datatable-search-input').addEventListener('input', (e) => {
         asyncTable.search(e.target.value);

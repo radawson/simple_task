@@ -39,19 +39,42 @@ def add_task():
     message = ""
     if request.method == "GET":
         tasks = Task.query.all()
-        return render_template("add_task.html", tasks=tasks)
+        templates = Template.query.all()
+        return render_template("add_task.html", tasks=tasks, templates=templates)
     elif request.method == "POST":
+        message = ""
+        print(request.form.getlist("template_select[]"))
         name = request.form.get("name")
         description = request.form.get("description")
-        date = datetime.strptime(request.form.get("date"), "%Y-%m-%d").date()
+        if request.form.get("date"):
+            date = datetime.strptime(request.form.get("date"), "%Y-%m-%d").date()
         added_by = request.form.get("added_by")
-        new_task = Task(
-            name=name, description=description, date=date, added_by=added_by
-        )
+        if request.form.get("template") == "on":
+            template = True
+            new_task = Task(
+                name=name,
+                description=description,
+                added_by=added_by,
+                template=template,
+            )
+            for template in request.form.getlist("template_select[]"):
+                new_task.templates.append(Template.query.get(template))
+                print(f"Task {new_task.id} added to template {template}")
+            message = f"Template task {new_task.id}"
+        else:
+            template = False
+            new_task = Task(
+                name=name,
+                description=description,
+                date=date,
+                added_by=added_by,
+                template=template,
+            )
+            message = f"Task {new_task.id}"
         db.session.add(new_task)
         db.session.commit()
-        message = "Task added successfully"
-    return render_template("add_task.html", message=message)
+        message += " added successfully"
+    return render_template("tasks.html", message=message)
 
 
 @tasks.route("/task/<int:id>", methods=["GET", "POST", "DELETE", "PATCH"])
@@ -137,8 +160,11 @@ def template_add_task(id):
 @tasks.route("/template/<int:id>/tasks", methods=["GET", "POST"])
 def template_tasks_api(id):
     if request.method == "GET":
-        template = Template.query.get(id)
-        tasks = template.tasks
+        if id == 0:
+            tasks = Task.query.filter(Task.templates != None).all()
+        else:
+            template = Template.query.get(id)
+            tasks = template.tasks
         return jsonify([task.to_dict() for task in tasks])
     elif request.method == "POST":
         task_id = request.form.get("task_id")
