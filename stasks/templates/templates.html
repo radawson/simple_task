@@ -85,7 +85,7 @@ Templates
             .then((response) => response.json())
             .then((data) => {
                 data = data.map((task) => {
-                    task.id = `
+                    task.actions = `
     <button data-mdb-ripple-init class="edit-btn btn btn-outline-primary btn-floating btn-sm" data-mdb-id="${task.id}" data-mdb-tooltip-init title="Edit"><i class="fa fa-edit"></i></button>
     <button data-mdb-ripple-init class="delete-btn btn btn-outline-primary btn-floating btn-sm" data-mdb-id="${task.id}"><i class="fa fa-trash" data-mdb-tooltip-init title="Delete"></i></button>`;
                     return task;
@@ -149,7 +149,8 @@ Templates
     const columns = [
         { label: 'Name', field: 'name' },
         { label: 'Description', field: 'description' },
-        { label: 'Actions', field: 'id' },
+        { label: 'Actions', field: 'actions' },
+        {label: 'ID', field: 'id', hidden: true},
     ];
 
     const asyncTable = new mdb.Datatable(
