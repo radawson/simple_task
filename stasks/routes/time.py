@@ -19,6 +19,7 @@ times = Blueprint("times", __name__)
 def timecard():
     if request.method == "GET":
         users = User.query.filter_by(employee=True).all()
+        print(users)
         return render_template("time.html", users=users)
     elif request.method == "POST":
         print(request.form.to_dict())
@@ -53,5 +54,28 @@ def timecard():
             db.session.commit()
             message = "Time in recorded"
         return jsonify(message)
+    else:
+        pass
+
+@times.route("/time/date/<date>", methods=["GET"])
+def time_by_date(date):
+    if request.method == "GET":
+        if date == "all":
+            times = Time.query.all()
+        else:
+            times = Time.query.filter_by(date=date).all()
+        return jsonify([timecard.to_dict() for timecard in times])
+    else:
+        pass
+
+@times.route("/time/person/<person_id>", methods=["GET"])
+def time_by_person(person_id):
+    if request.method == "GET":
+        if person_id == "all":
+            times = Time.query.all()
+        else:
+            times = Time.query.filter_by(person_id=person_id).all()
+        print([timecard.to_dict() for timecard in times])
+        return jsonify([timecard.to_dict() for timecard in times])
     else:
         pass

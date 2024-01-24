@@ -50,7 +50,7 @@ Admin
             </div>
             <hr />
             <div id="table_timecard"></div>
-            </div>
+        </div>
     </div>
 </main>
 
@@ -61,7 +61,40 @@ Admin
 <!-- MDB PLUGINS -->
 <script type="text/javascript" src="{{url_for('static', filename='plugins/js/all.min.js')}}"></script>
 <script>
-    const advancedColumns = [
+    function fetchTime(filter) {
+        console.log(filter);
+        let url = "{{ url_for('times.time_by_date', date='all')}}";
+        if (filter.person) {
+            url = "{{ url_for('times.time_by_person', person_id=0)}}";
+            url = url.replace('0', filter.person);
+        };
+        if (filter.date) {
+            url = "{{ url_for('times.time_by_date', date=0)}}";
+            url = url.replace('0', filter.date);
+        };
+        console.log(url);
+        fetch(url)
+            .then((response) => response.json())
+            .then((data) => {
+                data = data.map((time) => {
+                    time.actions = `
+    <button data-mdb-ripple-init class="edit-btn btn btn-outline-primary btn-floating btn-sm" data-mdb-id="${time.id}" data-mdb-tooltip-init title="Edit"><i class="fa fa-edit"></i></button>
+    <button data-mdb-ripple-init class="delete-btn btn btn-outline-primary btn-floating btn-sm" data-mdb-id="${time.id}"><i class="fa fa-trash" data-mdb-tooltip-init title="Delete"></i></button>`;
+                    return time;
+                });
+                asyncTable.update(
+                    {
+                        rows: data.map((time) => ({
+                            ...time,
+                        })),
+                    },
+                    { loading: false }
+                );
+            });
+    }
+
+    // Tab 1
+    const advancedColumns1 = [
         {
             width: 250,
             label: 'Company',
@@ -92,7 +125,7 @@ Admin
         },
     ];
 
-    const advancedRows = [
+    const advancedRows1 = [
         {
             company: 'Smith & Johnson',
             office: 'London',
@@ -133,8 +166,54 @@ Admin
 
     const tableDisableEdit = new TableEditor(
         document.getElementById('table_inputs'),
-        { columns: advancedColumns, rows: advancedRows },
+        { columns: advancedColumns1, rows: advancedRows1 },
         { entries: 5, entriesOptions: [5, 10, 15], confirm: true }
     );
+
+    // Tab 2
+    const timecardColumns = [
+        {
+            width: 30,
+            sort: true,
+            label: 'Date',
+            field: 'date',
+        },
+        {
+            width: 50,
+            inputType: 'text',
+            label: 'Employee',
+            field: 'person',
+        },
+        {
+            width: 250,
+            inputType: 'text',
+            label: 'Notes',
+            field: 'description',
+        },
+        {
+            width: 50,
+            defaultValue: false,
+            inputType: 'checkbox',
+            label: 'Paid',
+            field: 'paid',
+        },
+    ];
+
+    const asyncTable = new mdb.Datatable(
+        document.getElementById('table_timecard'),
+        { columns: timecardColumns, },
+        {
+            search: true,
+            pagination: true,
+            loading: true,
+            striped: true,
+            sortable: true,
+            entries: 5,
+            entriesOptions: [5, 15, 25],
+            confirm: true
+        }
+    );
+
+    fetchTime({"person":"all"});
 </script>
 {% endblock %}

@@ -1,3 +1,4 @@
+from datetime import date, time
 from .database import db
 from .person import Person, User
 
@@ -17,4 +18,8 @@ class Time(db.Model):
         return f"<Task {self.id}: {self.name}>"
     
     def to_dict(self):
-        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+        dict_ = {c.name: getattr(self, c.name) for c in self.__table__.columns}
+        for key in dict_:
+            if isinstance(dict_[key], (date, time)):
+                dict_[key] = str(dict_[key])
+        return dict_

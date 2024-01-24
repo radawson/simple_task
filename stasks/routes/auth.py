@@ -48,6 +48,7 @@ def password():
 @auth.route("/register", methods=["GET", "POST"])
 def register():
     if request.method == "POST":
+        print(request.form.to_dict())
         email = request.form.get("email")
         username = request.form.get("username")
         password = request.form.get("password")
@@ -55,11 +56,14 @@ def register():
         last_name = request.form.get("last_name")
         if not first_name:
             first_name = username.split()[0]
-        print(request.form.get('admin'))
         if request.form.get("admin"):
             admin = True
         else:
             admin = False
+        if request.form.get("employee"):
+            employee = True
+        else:
+            employee = False
         user = User.query.filter_by(
             username=username
         ).first()  # if this returns a user, then the email already exists in database
@@ -74,11 +78,14 @@ def register():
             email=email,
             username=username,
             password=generate_password_hash(password),
-            admin=admin
+            admin=admin,
+            employee=employee,
         )
         db.session.add(new_user)
         db.session.commit()
 
+        message = "Account created successfully"
+        flash(message, "success")
         return redirect(url_for("auth.login"))
     return render_template("signup.html")
 

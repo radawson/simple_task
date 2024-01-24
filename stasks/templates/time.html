@@ -13,7 +13,7 @@
                 <div class="form-outline mb-2">
                     <select class="form-select" id="employees" data-mdb-select-init>
                         {% for user in users %}
-                        <option value="{{ user.id }}">{{ user.full_name }}</option>
+                        <option value="{{ user.id }}">{{ user.full_name if user.full_name else user.username }}</option>
                         {% endfor %}
                     </select>
                     <label class="form-label select-label" for="employees">Person</label>

@@ -16,33 +16,37 @@
                             <form method="POST" action="{{url_for('auth.register')}}">
                                 <div class="mb-4 input-group">
                                     <div class="form-outline mb-0 " data-mdb-input-init>
-                                        <input type="text" id="first_name" class="form-control" />
+                                        <input type="text" id="first_name" name="first_name" class="form-control" />
                                         <label class="form-label" for="first_name">First Name</label>
                                     </div>
                                     <div class="form-outline mb-0 " data-mdb-input-init>
-                                        <input type="text" id="last_name" class="form-control" />
+                                        <input type="text" id="last_name" name="last_name" class="form-control" />
                                         <label class="form-label" for="last_name">Last Name</label>
                                     </div>
                                 </div>
-                                <div class="form-outline mb-4">
+                                <div class="form-outline mb-4" data-mdb-input-init>
                                     <input type="text" id="username" name="username" class="form-control" />
                                     <label class="form-label" for="username">Username</label>
                                 </div>
-                                <div class="form-outline mb-4">
+                                <div class="form-outline mb-4" data-mdb-input-init>
                                     <input type="password" id="password" name="password" class="form-control" />
                                     <label class="form-label" for="password">Password</label>
                                 </div>
-                                <div class="form-outline mb-4">
+                                <div class="form-outline mb-4" data-mdb-input-init>
                                     <input class="form-control" type="email" name="email" placeholder="Email"
                                         autofocus />
                                     <label class="form-label" for="email">Email address</label>
                                 </div>
-                                <div class="form-check float-start">
+                                <div class="form-check float-start me-4" data-mdb-check-init>
                                     <input class="form-check-input" type="checkbox" value="false" id="admin"
                                         name="admin" />
                                     <label class="form-check-label" for="admin">Administrator</label>
                                 </div>
-
+                                <div class="form-check float-start" data-mdb-check-init>
+                                    <input class="form-check-input" type="checkbox" value="false" id="employee"
+                                        name="employee" />
+                                    <label class="form-check-label" for="employee">Employee</label>
+                                </div>
                                 <button class="btn btn-primary">Sign Up</button>
                             </form>
                         </div>

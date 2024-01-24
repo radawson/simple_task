@@ -1,4 +1,5 @@
 from .database import db
+from datetime import date, time
 
 task_to_templates = db.Table(
     "task_to_templates",
@@ -23,7 +24,11 @@ class Task(db.Model):
         return f"<Task {self.id}: {self.name}>"
     
     def to_dict(self):
-        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+        dict_ = {c.name: getattr(self, c.name) for c in self.__table__.columns}
+        for key in dict_:
+            if isinstance(dict_[key], (date, time)):
+                dict_[key] = str(dict_[key])
+        return dict_
 
 
 class Template(db.Model):
