@@ -1,3 +1,4 @@
+from sqlite3 import IntegrityError
 from flask import flash, jsonify
 from flask import Blueprint, redirect, render_template, request, url_for
 from flask_login import login_required, login_user, logout_user
@@ -101,3 +102,47 @@ def logout():
 def get_users():
     users = User.query.all()
     return jsonify([user.to_dict() for user in users])
+
+@auth.route("/user/<int:user_id>", methods=["GET", "PATCH", "DELETE"])
+@login_required
+def user_api(user_id):
+    message = {"message": "User not found", "category": "warning"}
+    if request.method == "GET":
+        users = User.query.get(user_id)
+        return jsonify([user.to_dict() for user in users])
+    elif request.method == "PATCH":
+        print(request.form.to_dict())
+        user = User.query.get(user_id)
+        if not user:
+            return jsonify({"message": "User not found",
+                            "category": "danger"}), 404
+        if request.form.get("first_name"):
+            user.first_name = request.form.get("first_name")
+        if request.form.get("last_name"):
+            user.last_name = request.form.get("last_name")
+        if request.form.get("base_pay"):
+            user.base_pay = request.form.get("base_pay")
+        if request.form.get("admin") == "true":
+            user.admin = True
+        else:
+            user.admin = False
+        if request.form.get("employee") == "true":
+            user.employee = True
+        else:
+            user.employee = False
+        db.session.commit()
+        message = {"message": f"User {user.id} updated successfully", "category": "success"}
+    elif request.method == "DELETE":
+        user = User.query.get(user_id)
+        if not user:
+            return jsonify({"message": "User not found",
+                            "category": "danger"}), 404
+        try:
+            db.session.delete(user)
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            message = {"message": f"User {user.id} could not be deleted\n{e}", "category": "danger"}
+        else:
+            message = {"message": f"User {user.id} deleted successfully", "category": "success"}
+    return jsonify(message)

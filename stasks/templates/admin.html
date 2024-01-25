@@ -36,7 +36,7 @@ Admin
             <hr />
             <div id="table_inputs"></div>
         </div>
-        <div class="tab-pane fade show active" id="admin-tabs-2" role="tabpanel" aria-labelledby="admin-tab-2">
+        <div class="tab-pane fade " id="admin-tabs-2" role="tabpanel" aria-labelledby="admin-tab-2">
             <div class="d-flex justify-content-end mb-4">
                 <div data-mdb-input-init class="form-outline">
                     <input data-mdb-search data-mdb-target="#table_timecard" type="text" id="search_table_timecard"
@@ -86,13 +86,13 @@ Admin
             .then((response) => response.json())
             .then((data) => {
                 console.log(data);
-                data = data.map((user) => {
-                    user.base_pay = user.base_pay / 100;
-                });
                 userTable.update(
                     {
                         rows: data.map((user) => ({
                             ...user,
+                            first_name: user.first_name ? user.first_name : '',
+                            last_name: user.last_name ? user.last_name : '',
+                            base_pay: user.base_pay / 100,
                         })),
                     },
                     { loading: false }
@@ -141,6 +141,7 @@ Admin
     }
 
     // Tab 1
+
     const advancedColumns1 = [
         {
             label: 'First Name',
@@ -163,6 +164,11 @@ Admin
             field: 'employee',
         },
         {
+            inputType: 'text',
+            label: 'User Name',
+            field: 'username',
+        },
+        {
             defaultValue: false,
             inputType: 'checkbox',
             label: 'Admin',
@@ -173,11 +179,55 @@ Admin
 
     const userTable = new TableEditor(
         document.getElementById('table_inputs'),
-        { columns: advancedColumns1,  },
+        { columns: advancedColumns1, },
         { entries: 5, entriesOptions: [5, 10, 15], confirm: true }
     );
 
     fetchUsers();
+
+    document.getElementById('table_inputs').addEventListener('delete.mdb.tableEditor', (e) => {
+        let formData = new FormData();
+        let url = "{{ url_for('auth.user_api', user_id=0)}}";
+        url = url.replace('0', e.row.id);
+        fetch(url, {
+            method: "DELETE"
+        })
+            .then(response => response.json())
+            .then(data => {
+                showAlert(data);
+            })
+            .catch(error => {
+                console.error({ messager: error, category: 'danger' });
+            })
+            .finally(() => {
+                fetchUsers();
+            });
+    })
+
+    document.getElementById('table_inputs').addEventListener('update.mdb.tableEditor', (e) => {
+        // here you can create a POST request to update your database
+        let formData = new FormData();
+        formData.append('first_name', e.row.first_name);
+        formData.append('last_name', e.row.last_name);
+        formData.append('base_pay', e.row.base_pay * 100);
+        formData.append('employee', e.row.employee);
+        formData.append('admin', e.row.admin);
+        formData.append('id', e.row.id);
+        let url = "{{ url_for('auth.user_api', user_id=0)}}";
+        url = url.replace('0', e.row.id);
+        fetch(url, {
+            body: formData,
+            method: "PATCH"
+        })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+                showAlert(data);
+            })
+            .catch(error => {
+                console.error({ messager: error, category: 'danger' });
+            });
+    })
 
     // Tab 2
     const setActions = () => {
