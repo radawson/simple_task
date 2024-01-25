@@ -1,4 +1,5 @@
 from flask_login import UserMixin
+from datetime import date, time
 from .database import db
 
 
@@ -16,6 +17,14 @@ class Person(db.Model):
     birthdate = db.Column(db.Date)
     info = db.Column(db.Text, default="")
     employee = db.Column(db.Boolean, default=False)
+    base_pay = db.Column(db.Integer)
+
+    def to_dict(self):
+        dict_ = {c.name: getattr(self, c.name) for c in self.__table__.columns}
+        for key in dict_:
+            if isinstance(dict_[key], (date, time)):
+                dict_[key] = str(dict_[key])
+        return dict_
 
     def get_all():
         return Person.query.order_by(Person.first_name).all()
@@ -43,7 +52,10 @@ class User(UserMixin, Person):
     password = db.Column(db.String(20))
     username = db.Column(db.String(20), unique=True)
     admin = db.Column(db.Boolean, default=False)
-    
+
 
     def is_admin(self):
         return self.admin
+    
+    def is_employee(self):
+        return self.employee

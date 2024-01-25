@@ -80,6 +80,26 @@ Admin
 <!-- MDB PLUGINS -->
 <script type="text/javascript" src="{{url_for('static', filename='plugins/js/all.min.js')}}"></script>
 <script>
+    function fetchUsers() {
+        let url = "{{ url_for('auth.get_users')}}";
+        fetch(url)
+            .then((response) => response.json())
+            .then((data) => {
+                console.log(data);
+                data = data.map((user) => {
+                    user.base_pay = user.base_pay / 100;
+                });
+                userTable.update(
+                    {
+                        rows: data.map((user) => ({
+                            ...user,
+                        })),
+                    },
+                    { loading: false }
+                );
+            });
+    }
+
     function fetchTime(filter) {
         let url = "{{ url_for('times.time_by_date', date='all')}}";
         if (filter.person) {
@@ -90,7 +110,6 @@ Admin
             url = "{{ url_for('times.time_by_date', date=0)}}";
             url = url.replace('0', filter.date);
         };
-        console.log(url);
         fetch(url)
             .then((response) => response.json())
             .then((data) => {
@@ -104,6 +123,7 @@ Admin
                     } else {
                         time.full_name = `${time.first_name} ${time.last_name}`;
                     }
+                    time.base_pay = time.base_pay / 100;
                     time.actions = `
     <button data-mdb-ripple-init class="edit-btn btn btn-outline-primary btn-floating btn-sm" data-mdb-id="${time.id}" data-mdb-tooltip-init title="Edit"><i class="fa fa-edit"></i></button>
     <button data-mdb-ripple-init class="delete-btn btn btn-outline-primary btn-floating btn-sm" data-mdb-id="${time.id}"><i class="fa fa-trash" data-mdb-tooltip-init title="Delete"></i></button>`;
@@ -123,79 +143,41 @@ Admin
     // Tab 1
     const advancedColumns1 = [
         {
-            width: 250,
-            label: 'Company',
-            field: 'company',
+            label: 'First Name',
+            field: 'first_name',
         },
         {
-            width: 250,
-            sort: false,
-            defaultValue: 'Warsaw',
-            options: ['London', 'Warsaw', 'New York'],
-            inputType: 'select',
-            label: 'Office',
-            field: 'office',
+            label: 'Last Name',
+            field: 'last_name',
         },
         {
-            width: 250,
             inputType: 'number',
-            defaultValue: 1,
-            label: 'Employees',
-            field: 'employees',
+            defaultValue: 18,
+            label: 'Base Pay',
+            field: 'base_pay',
         },
         {
-            width: 100,
             defaultValue: false,
             inputType: 'checkbox',
-            label: 'International',
-            field: 'international',
+            label: 'Employee',
+            field: 'employee',
+        },
+        {
+            defaultValue: false,
+            inputType: 'checkbox',
+            label: 'Admin',
+            field: 'admin',
         },
     ];
 
-    const advancedRows1 = [
-        {
-            company: 'Smith & Johnson',
-            office: 'London',
-            employees: 30,
-            international: true,
-        },
-        {
-            company: 'P.J. Company',
-            office: 'London',
-            employees: 80,
-            international: false,
-        },
-        {
-            company: 'Food & Wine',
-            office: 'London',
-            employees: 12,
-            international: false,
-        },
-        {
-            company: 'IT Service',
-            office: 'London',
-            employees: 17,
-            international: false,
-        },
-        {
-            company: 'A. Jonson Gallery',
-            office: 'London',
-            employees: 4,
-            international: false,
-        },
-        {
-            company: 'F.A. Architects',
-            office: 'London',
-            employees: 4,
-            international: false,
-        },
-    ];
 
-    const tableDisableEdit = new TableEditor(
+    const userTable = new TableEditor(
         document.getElementById('table_inputs'),
-        { columns: advancedColumns1, rows: advancedRows1 },
+        { columns: advancedColumns1,  },
         { entries: 5, entriesOptions: [5, 10, 15], confirm: true }
     );
+
+    fetchUsers();
 
     // Tab 2
     const setActions = () => {
@@ -248,44 +230,51 @@ Admin
 
     const timecardColumns = [
         {
-            width: 30,
+
             sort: true,
             label: 'Date',
             field: 'date',
         },
         {
-            width: 50,
+
             inputType: 'text',
             label: 'Employee',
             field: 'full_name',
         },
         {
-            width: 20,
+
             inputType: 'time',
             label: 'Time In',
             field: 'time_in',
         },
         {
-            width: 20,
+
             inputType: 'time',
             label: 'Time Out',
             field: 'time_out',
         },
         {
-            width: 100,
+
+            inputType: 'number',
+            label: 'Base Pay',
+            field: 'base_pay',
+        },
+
+        {
+
             inputType: 'text',
             label: 'Notes',
             field: 'description',
         },
         {
-            width: 10,
+
             defaultValue: false,
             inputType: 'checkbox',
             label: 'Paid',
             field: 'paid',
         },
         {
-            width: 50,
+
             inputType: 'text',
             label: 'Actions',
             field: 'actions',

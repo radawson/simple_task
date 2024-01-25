@@ -25,4 +25,5 @@ class Time(db.Model):
         if self.person:
             dict_['first_name'] = self.person.first_name
             dict_['last_name'] = self.person.last_name
+            dict_['base_pay'] = self.person.base_pay
         return dict_
