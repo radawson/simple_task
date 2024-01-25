@@ -22,4 +22,7 @@ class Time(db.Model):
         for key in dict_:
             if isinstance(dict_[key], (date, time)):
                 dict_[key] = str(dict_[key])
+        if self.person:
+            dict_['first_name'] = self.person.first_name
+            dict_['last_name'] = self.person.last_name
         return dict_

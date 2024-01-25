@@ -79,3 +79,24 @@ def time_by_person(person_id):
         return jsonify([timecard.to_dict() for timecard in times])
     else:
         pass
+
+@times.route("/time/<time_id>", methods=["GET", "PUT", "DELETE"])
+def time_api(time_id):
+    if request.method == "GET":
+        timecard = Time.query.get(time_id)
+        return jsonify(timecard.to_dict())
+    elif request.method == "PUT":
+        timecard = Time.query.get(time_id)
+        timecard.time_in = request.form.get("time_in")
+        timecard.time_out = request.form.get("time_out")
+        timecard.date = request.form.get("date")
+        timecard.description = request.form.get("description")
+        db.session.commit()
+        return jsonify(timecard.to_dict())
+    elif request.method == "DELETE":
+        timecard = Time.query.get(time_id)
+        db.session.delete(timecard)
+        db.session.commit()
+        return jsonify(timecard.to_dict())
+    else:
+        pass
