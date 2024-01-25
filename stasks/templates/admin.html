@@ -96,6 +96,14 @@ Admin
             .then((data) => {
                 console.log(data);
                 data = data.map((time) => {
+                    if (time.first_name == null) {
+                        time.full_name = `Person ID: ${time.person_id}`;
+                    }
+                    else if (time.last_name == null) {
+                        time.full_name = `${time.first_name} ${time.person_id}`;
+                    } else {
+                        time.full_name = `${time.first_name} ${time.last_name}`;
+                    }
                     time.actions = `
     <button data-mdb-ripple-init class="edit-btn btn btn-outline-primary btn-floating btn-sm" data-mdb-id="${time.id}" data-mdb-tooltip-init title="Edit"><i class="fa fa-edit"></i></button>
     <button data-mdb-ripple-init class="delete-btn btn btn-outline-primary btn-floating btn-sm" data-mdb-id="${time.id}"><i class="fa fa-trash" data-mdb-tooltip-init title="Delete"></i></button>`;
@@ -193,9 +201,17 @@ Admin
     const setActions = () => {
         Array.from(document.getElementsByClassName('edit-btn')).forEach(btn => {
             btn.addEventListener('click', () => {
-                base_url = "{{ url_for('events.event_detail', id=0) }}"
+                base_url = "{{ url_for('times.time_api', time_id=0) }}"
                 url = base_url.replace('0', btn.attributes['data-mdb-id'].value);
-                window.location.assign(url);
+                fetch(url, {
+                    method: 'GET',
+                })
+                    .then(response => response.json())
+                    // showAlert found in base.html
+                    .then(data => showAlert(data))
+                    .catch((error) => {
+                        console.error('Error:', error);
+                    })
             })
         })
 
@@ -207,26 +223,26 @@ Admin
                 conf_modal.show();
                 document.getElementById('confirmModalLabel').innerHTML = "Confirm Delete";
                 document.getElementById('confirm_delete').addEventListener('click', () => {
-                    let url = "{{ url_for('times.time_api', id=0) }}";
+                    let url = "{{ url_for('times.time_api', time_id=0) }}";
                     url = url.replace('0', btn.attributes['data-mdb-id'].value);
-                    console.log("Deleting Event using", url);
+                    console.log("Deleting timecard entry using", url);
 
                     fetch(url, {
                         method: 'DELETE',
                     })
                         .then(response => response.json())
-                        .then(data => console.log(data))
+                        // showAlert found in base.html
+                        .then(data => showAlert(data))
                         .catch((error) => {
                             console.error('Error:', error);
                         })
-                        .then(() => {
-                            window.location.href = '/events';
-                        });
 
-                })
+                });
+
             })
         })
     }
+
 
     document.getElementById('table_timecard').addEventListener('render.mdb.datatable', setActions);
 
@@ -241,7 +257,7 @@ Admin
             width: 50,
             inputType: 'text',
             label: 'Employee',
-            field: 'person',
+            field: 'full_name',
         },
         {
             width: 20,

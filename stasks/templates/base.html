@@ -171,8 +171,8 @@
 
         function showAlert(message) {
             let toast = new mdb.Toast(document.getElementById('flash-toast'));
-            document.getElementById('flash-toast').getElementsByClassName('toast-header')[0].classList.add('bg-{{ category }}');
-            document.getElementById('flash-toast').getElementsByClassName('toast-body')[0].textContent = message;
+            document.getElementById('flash-toast').getElementsByClassName('toast-header')[0].classList.add('bg-'+message.category);
+            document.getElementById('flash-toast').getElementsByClassName('toast-body')[0].textContent = message.message;
             toast.show();
         }
     </script>
@@ -180,7 +180,11 @@
     {% if messages %}
     {% for category, message in messages %}
     <script>
-        showAlert("{{ message }}")
+        let message = {
+            "message":"{{ message }}",
+            "category":"{{ category }}"
+        };
+        showAlert(message)
     </script>
     {% endfor %}
     {% endif %}

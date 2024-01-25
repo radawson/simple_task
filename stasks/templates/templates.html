@@ -25,7 +25,7 @@ Templates
                 </div>
             </div>
         </div>
-        <button class="btn btn-primary" id="btn_add_task">Add Selected Items to Date</button>
+        <button class="btn btn-primary" id="btn_add_to_date">Add Selected Items to Date</button>
         <section>
             <div class="card shadow-0">
                 <div class="card-header py-4 mb-3">
@@ -134,8 +134,9 @@ Templates
                         .catch((error) => {
                             console.error('Error:', error);
                         })
-                        .then(() => {
-                            window.location.href = '/tasks';
+                        .finally(() => {
+                            conf_modal.hide();
+                            fetchTasks(document.getElementById('filter').value);
                         });
 
                 })
@@ -174,26 +175,40 @@ Templates
         document.getElementById('selectedRows').value = e.selectedRows;
     })
 
-    document.getElementById('btn_add_task').addEventListener('click', function () {
+    document.getElementById('btn_add_to_date').addEventListener('click', function () {
         const selectedRowsData = document.getElementById('selectedRows').value;
-        console.log(selectedRowsData);
-
         const date = document.getElementById('date').value;
 
-        selectedRowsData.forEach(row => {
+        let message = {
+            "message": `Adding ${selectedRowsData.length} tasks to ${date}`,
+            "category": "success"
+        };
+
+        let fetchPromises = selectedRowsData.map(row => {
             let formData = new FormData();
             formData.append('task_id', row.id);
             formData.append('date', date);
-            console.log(formData)
-            fetch(`{{ url_for('tasks.template_task_api') }}`, {
+            return fetch(`{{ url_for('tasks.template_task_api') }}`, {
                 method: 'POST',
                 body: formData,
             })
                 .then(response => response.json())
-                .then(data => console.log(data))
                 .catch((error) => {
                     console.error('Error:', error);
+                    message.message = error.message || `Error adding task ${row.name} to ${date}`;
+                    message.category = "danger";
                 });
+        })
+
+        Promise.all(fetchPromises).then(() => {
+            document.getElementById('selectedRows').value = [];
+            document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+                checkbox.checked = false;
+            })
+            document.getElementById('date').value = '';
+
+            // showAlert is found on base.html
+            showAlert(message);
         });
     });
 </script>

@@ -64,10 +64,14 @@
             .then(response => response.json())
             .then(data => {
                 console.log(data);
-                showAlert(data);
+                let message = {
+                    message: data,
+                    category: 'success'
+                };
+                showAlert(message);
             })
             .catch(error => {
-                console.error(error);
+                console.error({messager: error, category: 'danger'});
             });
     };
 
