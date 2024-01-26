@@ -18,7 +18,6 @@ def get_notess_date(date):
 
 
 @notes.route("/notes/add", methods=["GET", "POST"])
-@login_required
 def add_note():
     message = ""
     if request.method == "POST":
