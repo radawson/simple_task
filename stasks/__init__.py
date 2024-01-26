@@ -4,7 +4,7 @@ from flask_login import LoginManager
 from .models import db, seed_db
 from .routes import auth, main, notes, tasks, events, test, times
 
-version = "0.0.6"
+version = "0.0.11"
 
 def create_app():
     # Initialize Flask app
