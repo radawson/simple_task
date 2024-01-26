@@ -12,7 +12,6 @@ class Time(db.Model):
     person_id = db.Column(db.Integer, db.ForeignKey('person.id'), nullable=False)
     person = db.relationship('Person', backref='timecards')
     description = db.Column(db.Text, nullable=True)
-   
 
     def __repr__(self):
         return f"<Task {self.id}: {self.name}>"
@@ -22,6 +21,7 @@ class Time(db.Model):
         for key in dict_:
             if isinstance(dict_[key], (date, time)):
                 dict_[key] = str(dict_[key])
+        dict_['minutes'] = (self.time_out.hour * 60 + self.time_out.minute) - (self.time_in.hour * 60 + self.time_in.minute)
         if self.person:
             dict_['first_name'] = self.person.first_name
             dict_['last_name'] = self.person.last_name

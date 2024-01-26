@@ -124,6 +124,7 @@ Admin
                         time.full_name = `${time.first_name} ${time.last_name}`;
                     }
                     time.base_pay = time.base_pay / 100;
+                    time.total = time.base_pay * (time.minutes / 60);
                     time.actions = `
     <button data-mdb-ripple-init class="edit-btn btn btn-outline-primary btn-floating btn-sm" data-mdb-id="${time.id}" data-mdb-tooltip-init title="Edit"><i class="fa fa-edit"></i></button>
     <button data-mdb-ripple-init class="delete-btn btn btn-outline-primary btn-floating btn-sm" data-mdb-id="${time.id}"><i class="fa fa-trash" data-mdb-tooltip-init title="Delete"></i></button>`;
@@ -133,6 +134,7 @@ Admin
                     {
                         rows: data.map((time) => ({
                             ...time,
+
                         })),
                     },
                     { loading: false }
@@ -205,7 +207,6 @@ Admin
     })
 
     document.getElementById('table_inputs').addEventListener('update.mdb.tableEditor', (e) => {
-        // here you can create a POST request to update your database
         let formData = new FormData();
         formData.append('first_name', e.row.first_name);
         formData.append('last_name', e.row.last_name);
@@ -280,51 +281,47 @@ Admin
 
     const timecardColumns = [
         {
-
             sort: true,
             label: 'Date',
             field: 'date',
         },
         {
-
             inputType: 'text',
             label: 'Employee',
             field: 'full_name',
         },
         {
-
             inputType: 'time',
             label: 'Time In',
             field: 'time_in',
         },
         {
-
             inputType: 'time',
             label: 'Time Out',
             field: 'time_out',
         },
         {
-
             inputType: 'number',
             label: 'Base Pay',
             field: 'base_pay',
         },
-
         {
-
-            inputType: 'text',
-            label: 'Notes',
-            field: 'description',
+            inputType: 'number',
+            label: 'Total',
+            field: 'total',
         },
         {
-
             defaultValue: false,
             inputType: 'checkbox',
             label: 'Paid',
             field: 'paid',
         },
         {
-
+            inputType: 'text',
+            label: 'Notes',
+            field: 'description',
+        },
+        {
             inputType: 'text',
             label: 'Actions',
             field: 'actions',
