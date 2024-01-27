@@ -30,7 +30,7 @@ def timecard():
         if request.form.get("time_in"):
             time_in = datetime.strptime(request.form.get("time_in"), "%H:%M").time()
         if request.form.get("time_out"):
-            time_out = datetime.strptime(request.form.get("time_out"),'%H:%M').time()
+            time_out = datetime.strptime(request.form.get("time_out"), "%H:%M").time()
         if request.form.get("date"):
             date = datetime.strptime(request.form.get("date"), "%Y-%m-%d").date()
         description = request.form.get("description")
@@ -57,6 +57,7 @@ def timecard():
     else:
         pass
 
+
 @times.route("/time/date/<date>", methods=["GET"])
 def time_by_date(date):
     if request.method == "GET":
@@ -67,6 +68,7 @@ def time_by_date(date):
         return jsonify([timecard.to_dict() for timecard in times])
     else:
         pass
+
 
 @times.route("/time/person/<person_id>", methods=["GET"])
 def time_by_person(person_id):
@@ -80,22 +82,30 @@ def time_by_person(person_id):
     else:
         pass
 
+
 @times.route("/time/<time_id>", methods=["GET", "PATCH", "DELETE"])
 def time_api(time_id):
     if request.method == "GET":
         timecard = Time.query.get(time_id)
         return jsonify(timecard.to_dict())
     elif request.method == "PATCH":
-
         timecard = Time.query.get(time_id)
         if request.form.get("time_in"):
-           
-            timecard.time_in = datetime.strptime(request.form.get("time_in"), "%H:%M:%S").time()
-        if request.form.get("time_out") is not None and request.form.get("time_out") != "" and request.form.get("time_out") != "null":
-            print(f"Time out is {request.form.get('time_out')} which is a {type(request.form.get('time_out'))}")
-            timecard.time_out = datetime.strptime(request.form.get("time_out"), "%H:%M:%S").time()
+            timecard.time_in = datetime.strptime(
+                request.form.get("time_in"), "%H:%M:%S"
+            ).time()
+        if (
+            request.form.get("time_out")
+            and request.form.get("time_out") != ""
+            and request.form.get("time_out") != "null"
+        ):
+            timecard.time_out = datetime.strptime(
+                request.form.get("time_out"), "%H:%M:%S"
+            ).time()
         if request.form.get("date"):
-            timecard.date = datetime.strptime(request.form.get("date"), "%Y-%M-%d").date()
+            timecard.date = datetime.strptime(
+                request.form.get("date"), "%Y-%M-%d"
+            ).date()
         if request.form.get("paid") == "true":
             timecard.paid = True
         elif request.form.get("paid") == "false":
