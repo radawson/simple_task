@@ -80,19 +80,30 @@ def time_by_person(person_id):
     else:
         pass
 
-@times.route("/time/<time_id>", methods=["GET", "PUT", "DELETE"])
+@times.route("/time/<time_id>", methods=["GET", "PATCH", "DELETE"])
 def time_api(time_id):
     if request.method == "GET":
         timecard = Time.query.get(time_id)
         return jsonify(timecard.to_dict())
-    elif request.method == "PUT":
+    elif request.method == "PATCH":
+
         timecard = Time.query.get(time_id)
-        timecard.time_in = request.form.get("time_in")
-        timecard.time_out = request.form.get("time_out")
-        timecard.date = request.form.get("date")
-        timecard.description = request.form.get("description")
+        if request.form.get("time_in"):
+           
+            timecard.time_in = datetime.strptime(request.form.get("time_in"), "%H:%M:%S").time()
+        if request.form.get("time_out") is not None and request.form.get("time_out") != "" and request.form.get("time_out") != "null":
+            print(f"Time out is {request.form.get('time_out')} which is a {type(request.form.get('time_out'))}")
+            timecard.time_out = datetime.strptime(request.form.get("time_out"), "%H:%M:%S").time()
+        if request.form.get("date"):
+            timecard.date = datetime.strptime(request.form.get("date"), "%Y-%M-%d").date()
+        if request.form.get("paid") == "true":
+            timecard.paid = True
+        elif request.form.get("paid") == "false":
+            timecard.paid = False
+        if request.form.get("description"):
+            timecard.description = request.form.get("description")
         db.session.commit()
-        return jsonify(timecard.to_dict())
+        return jsonify({"message": "Timecard updated", "category": "success"})
     elif request.method == "DELETE":
         timecard = Time.query.get(time_id)
         db.session.delete(timecard)
