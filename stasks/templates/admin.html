@@ -231,64 +231,16 @@ Admin
     })
 
     // Tab 2
-    const setActions = () => {
-        Array.from(document.getElementsByClassName('edit-btn')).forEach(btn => {
-            btn.addEventListener('click', () => {
-                base_url = "{{ url_for('times.time_api', time_id=0) }}"
-                url = base_url.replace('0', btn.attributes['data-mdb-id'].value);
-                fetch(url, {
-                    method: 'GET',
-                })
-                    .then(response => response.json())
-                    // showAlert found in base.html
-                    .then(data => showAlert(data))
-                    .catch((error) => {
-                        showAlert({ message: error, category: 'danger' });
-                    })
-            })
-        })
-
-        Array.from(document.getElementsByClassName('delete-btn')).forEach(btn => {
-            btn.addEventListener('click', () => {
-                let conf_modal = new mdb.Modal(document.getElementById('confirmModal'), {
-                    keyboard: false
-                });
-                conf_modal.show();
-                document.getElementById('confirmModalLabel').innerHTML = "Confirm Delete";
-                document.getElementById('confirm_delete').addEventListener('click', () => {
-                    let url = "{{ url_for('times.time_api', time_id=0) }}";
-                    url = url.replace('0', btn.attributes['data-mdb-id'].value);
-                    console.log("Deleting timecard entry using", url);
-
-                    fetch(url, {
-                        method: 'DELETE',
-                    })
-                        .then(response => response.json())
-                        // showAlert found in base.html
-                        .then(data => showAlert(data))
-                        .catch((error) => {
-                            console.error('Error:', error);
-                        })
-
-                });
-
-            })
-        })
-    }
-
-
-    document.getElementById('table_timecard').addEventListener('render.mdb.datatable', setActions);
-
-    const timecardColumns = [
+    const advancedColumns2 = [
         {
-            sort: true,
+            inputType: 'date',
             label: 'Date',
             field: 'date',
         },
         {
             inputType: 'text',
             label: 'Employee',
-            field: 'full_name',
+            field: 'employee',
         },
         {
             inputType: 'time',
@@ -321,28 +273,175 @@ Admin
             label: 'Notes',
             field: 'description',
         },
-        {
-            inputType: 'text',
-            label: 'Actions',
-            field: 'actions',
-        },
     ];
 
-    const asyncTable = new mdb.Datatable(
+
+    const timecardTable = new TableEditor(
         document.getElementById('table_timecard'),
-        { columns: timecardColumns, },
-        {
-            search: true,
-            pagination: true,
-            loading: true,
-            striped: true,
-            sortable: true,
-            entries: 5,
-            entriesOptions: [5, 15, 25],
-            confirm: true
-        }
+        { columns: advancedColumns2, },
+        { entries: 5, entriesOptions: [5, 15, 25], confirm: true }
     );
 
     fetchTime({ "person": "all" });
+
+    document.getElementById('table_timecard').addEventListener('delete.mdb.tableEditor', (e) => {
+        let formData = new FormData();
+        let url = "{{ url_for('times.time_api', time_id=0)}}";
+        url = url.replace('0', e.row.id);
+        fetch(url, {
+            method: "DELETE"
+        })
+            .then(response => response.json())
+            .then(data => {
+                showAlert(data);
+            })
+            .catch(error => {
+                showAlert({ message: error, category: 'danger' });
+            })
+            .finally(() => {
+                fetchUsers();
+            });
+    })
+
+    document.getElementById('table_timecard').addEventListener('update.mdb.tableEditor', (e) => {
+        let formData = new FormData();
+        formData.append('date', e.row.date);
+        formData.append('time_in', e.row.time_in);
+        formData.append('time_out', e.row.time_out);
+        formData.append('base_pay', e.row.base_pay * 100);
+        formData.append('paid', e.row.paid);
+        formData.append('description', e.row.description);
+        formData.append('employee', e.row.employee);
+        formData.append('id', e.row.id);
+        let url = "{{ url_for('times.time_api', time_id=0)}}";
+        url = url.replace('0', e.row.id);
+        fetch(url, {
+            body: formData,
+            method: "PATCH"
+        })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+                showAlert(data);
+            })
+            .catch(error => {
+                showAlert({ message: error, category: 'danger' });
+            });
+    })
+
+
+    // const setActions = () => {
+    //     Array.from(document.getElementsByClassName('edit-btn')).forEach(btn => {
+    //         btn.addEventListener('click', () => {
+    //             base_url = "{{ url_for('times.time_api', time_id=0) }}"
+    //             url = base_url.replace('0', btn.attributes['data-mdb-id'].value);
+    //             fetch(url, {
+    //                 method: 'GET',
+    //             })
+    //                 .then(response => response.json())
+    //                 // showAlert found in base.html
+    //                 .then(data => showAlert(data))
+    //                 .catch((error) => {
+    //                     showAlert({ message: error, category: 'danger' });
+    //                 })
+    //         })
+    //     })
+
+    //     Array.from(document.getElementsByClassName('delete-btn')).forEach(btn => {
+    //         btn.addEventListener('click', () => {
+    //             let conf_modal = new mdb.Modal(document.getElementById('confirmModal'), {
+    //                 keyboard: false
+    //             });
+    //             conf_modal.show();
+    //             document.getElementById('confirmModalLabel').innerHTML = "Confirm Delete";
+    //             document.getElementById('confirm_delete').addEventListener('click', () => {
+    //                 let url = "{{ url_for('times.time_api', time_id=0) }}";
+    //                 url = url.replace('0', btn.attributes['data-mdb-id'].value);
+    //                 console.log("Deleting timecard entry using", url);
+
+    //                 fetch(url, {
+    //                     method: 'DELETE',
+    //                 })
+    //                     .then(response => response.json())
+    //                     // showAlert found in base.html
+    //                     .then(data => showAlert(data))
+    //                     .catch((error) => {
+    //                         console.error('Error:', error);
+    //                     })
+
+    //             });
+
+    //         })
+    //     })
+    // }
+
+
+    // document.getElementById('table_timecard').addEventListener('render.mdb.datatable', setActions);
+
+    // const timecardColumns = [
+    //     {
+    //         sort: true,
+    //         label: 'Date',
+    //         field: 'date',
+    //     },
+    //     {
+    //         inputType: 'text',
+    //         label: 'Employee',
+    //         field: 'full_name',
+    //     },
+    //     {
+    //         inputType: 'time',
+    //         label: 'Time In',
+    //         field: 'time_in',
+    //     },
+    //     {
+    //         inputType: 'time',
+    //         label: 'Time Out',
+    //         field: 'time_out',
+    //     },
+    //     {
+    //         inputType: 'number',
+    //         label: 'Base Pay',
+    //         field: 'base_pay',
+    //     },
+    //     {
+    //         inputType: 'number',
+    //         label: 'Total',
+    //         field: 'total',
+    //     },
+    //     {
+    //         defaultValue: false,
+    //         inputType: 'checkbox',
+    //         label: 'Paid',
+    //         field: 'paid',
+    //     },
+    //     {
+    //         inputType: 'text',
+    //         label: 'Notes',
+    //         field: 'description',
+    //     },
+    //     {
+    //         inputType: 'text',
+    //         label: 'Actions',
+    //         field: 'actions',
+    //     },
+    // ];
+
+    // const asyncTable = new mdb.Datatable(
+    //     document.getElementById('table_timecard'),
+    //     { columns: timecardColumns, },
+    //     {
+    //         search: true,
+    //         pagination: true,
+    //         loading: true,
+    //         striped: true,
+    //         sortable: true,
+    //         entries: 5,
+    //         entriesOptions: [5, 15, 25],
+    //         confirm: true
+    //     }
+    // );
+
+
 </script>
 {% endblock %}
