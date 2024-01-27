@@ -1,4 +1,5 @@
 from datetime import date, time
+from datetime import datetime
 from .database import db
 from .person import Person, User
 
@@ -21,7 +22,13 @@ class Time(db.Model):
         for key in dict_:
             if isinstance(dict_[key], (date, time)):
                 dict_[key] = str(dict_[key])
-        dict_['minutes'] = (self.time_out.hour * 60 + self.time_out.minute) - (self.time_in.hour * 60 + self.time_in.minute)
+        if self.time_in and self.time_out:
+            dict_['minutes'] = (self.time_out.hour * 60 + self.time_out.minute) - (self.time_in.hour * 60 + self.time_in.minute)
+        elif self.time_in and not self.time_out:
+            now = datetime.now().time()
+            dict_['minutes'] = (now.hour * 60 + now.minute) - (self.time_in.hour * 60 + self.time_in.minute)
+        else:
+            dict_['minutes'] = 0
         if self.person:
             dict_['first_name'] = self.person.first_name
             dict_['last_name'] = self.person.last_name

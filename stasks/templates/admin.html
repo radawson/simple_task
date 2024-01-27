@@ -116,25 +116,25 @@ Admin
                 console.log(data);
                 data = data.map((time) => {
                     if (time.first_name == null) {
-                        time.full_name = `Person ID: ${time.person_id}`;
+                        time.employee = `Person ID: ${time.person_id}`;
                     }
                     else if (time.last_name == null) {
-                        time.full_name = `${time.first_name} ${time.person_id}`;
+                        time.employee = `${time.first_name} ${time.person_id}`;
                     } else {
-                        time.full_name = `${time.first_name} ${time.last_name}`;
+                        time.employee = `${time.first_name} ${time.last_name}`;
                     }
-                    time.base_pay = time.base_pay / 100;
                     time.total = time.base_pay * (time.minutes / 60);
                     time.actions = `
     <button data-mdb-ripple-init class="edit-btn btn btn-outline-primary btn-floating btn-sm" data-mdb-id="${time.id}" data-mdb-tooltip-init title="Edit"><i class="fa fa-edit"></i></button>
     <button data-mdb-ripple-init class="delete-btn btn btn-outline-primary btn-floating btn-sm" data-mdb-id="${time.id}"><i class="fa fa-trash" data-mdb-tooltip-init title="Delete"></i></button>`;
                     return time;
                 });
-                asyncTable.update(
+                timecardTable.update(
                     {
                         rows: data.map((time) => ({
                             ...time,
-
+                            employee: time.employee,
+                            base_pay: time.base_pay / 100,
                         })),
                     },
                     { loading: false }
