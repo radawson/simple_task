@@ -122,6 +122,11 @@ def task_api(id):
         return jsonify(message)
     return render_template("detail_task.html", task=task, message=message)
 
+@tasks.route("/tasks/dump")
+@login_required
+def dump_tasks():
+    tasks = Task.query.all()
+    return jsonify([task.to_dict() for task in tasks])
 
 ## Templates
 

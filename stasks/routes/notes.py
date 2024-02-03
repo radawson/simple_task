@@ -64,3 +64,9 @@ def note_api(id):
         note.date = datetime.strptime(request.form["date"], "%Y-%m-%d").date()
         db.session.commit()
     return render_template("notes.html", message=message)
+
+@notes.route("/notes/dump")
+@login_required
+def dump_notes():
+    notes = Note.query.all()
+    return render_template("notes.html", notes=notes)

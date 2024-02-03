@@ -146,3 +146,9 @@ def user_api(user_id):
         else:
             message = {"message": f"User {user.id} deleted successfully", "category": "success"}
     return jsonify(message)
+
+@auth.route("/users/dump")
+@login_required
+def dump_users():
+    users = User.query.all()
+    return jsonify([user.to_dict() for user in users])

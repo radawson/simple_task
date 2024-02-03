@@ -40,6 +40,7 @@ Events
             </div>
         </section>
         <button class="btn btn-primary" id="btn_add_event">Add Event</button>
+        <button class="btn btn-primary" id="btn_up_ics">Upload ICS file</button>
     </div>
     <!-- Modal -->
     <div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
@@ -74,6 +75,39 @@ Events
 
     document.getElementById("btn_add_event").addEventListener("click", function () {
         window.location.href = "{{ url_for('events.add_event') }}";
+    });
+
+    document.getElementById("btn_up_ics").addEventListener("click", function () {
+        // open file selection menu
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = '.ics';
+        input.onchange = e => {
+            const file = e.target.files[0];
+            const reader = new FileReader();
+            reader.onload = function () {
+                const text = reader.result;
+                console.log(text);
+                fetch("{{ url_for('calendar.ics_to_event') }}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ 'ics': text })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        showAlert(data);
+                        fetchEvents("all");
+                    })
+                    .catch((error) => {
+                        console.error('Error:', error);
+                        showAlert({ 'message': error, 'type': 'danger' });
+                    });
+            };
+            reader.readAsText(file);
+        };
+
     });
 
     document.addEventListener("DOMContentLoaded", function () {

@@ -2,9 +2,9 @@ from flask import Flask
 from flask_migrate import Migrate
 from flask_login import LoginManager
 from .models import db, seed_db
-from .routes import auth, main, notes, tasks, events, test, times
+from .routes import auth, calendar, main, notes, tasks, events, test, times
 
-version = "0.0.11"
+version = "0.1.11"
 
 def create_app():
     # Initialize Flask app
@@ -40,6 +40,7 @@ def create_app():
 
     # Register the blueprints
     app.register_blueprint(auth)
+    app.register_blueprint(calendar)
     app.register_blueprint(events)
     app.register_blueprint(main)
     app.register_blueprint(notes)

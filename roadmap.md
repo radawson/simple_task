@@ -3,6 +3,7 @@
 ## In Progress
 
 * editable description on the main page
+* add .ics import to events
 
 ## Planned
 
