@@ -50,12 +50,14 @@ def add_event():
             new_event.date = datetime.strptime(request.form.get("date"), "%Y-%m-%d").date()
         else:
             message = "Date is required"
-            return jsonify(message)
+            flash(message)
+            return render_template("add_event.html", people=Person.get_client_names())
         if request.form.get("time"):
             new_event.time = datetime.strptime(request.form["time"], "%H:%M").time()
         else:
             message = "Time is required"
-            return jsonify(message)
+            flash(message)
+            return render_template("add_event.html", people=Person.get_client_names())
         new_event.location = request.form.get("location")
         new_event.person = request.form.get("person")
         if request.form.get("tz_id"):
