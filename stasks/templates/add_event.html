@@ -19,21 +19,27 @@ Add Event
             <input type="date" id="date" name="date" class="form-control" />
             <label class="form-label" for="date">Date</label>
         </div>
-        <div class="form-outline mb-2" data-mdb-input-init>
-            <input type="time" id="time" name="time" class="form-control" />
-            <label class="form-label" for="time">Time</label>
+        <div style="display: flex; justify-content: space-between;">
+            <div class="form-outline mb-2" data-mdb-input-init style="flex: 1; margin-right: 10px;">
+                <input type="time" id="time" name="time" class="form-control" />
+                <label class="form-label" for="time">Time</label>
+            </div>
+            <div class="form-outline mb-2" data-mdb-input-init style="flex: 1; margin-left: 10px;">
+                <input type="text" id="time_zone" name="time_zone" class="form-control"/>
+                <label class="form-label" for="time_zone">Time Zone</label>
+            </div>
         </div>
         <div class="form-outline mb-2" data-mdb-input-init>
             <input type="text" id="location" name="location" class="form-control" />
             <label class="form-label" for="location">Location</label>
         </div>
         <div class="form-outline mb-2">
-            <select id="person" name="person" class="form-control mdb-select" data-mdb-select-init >
-            <option></option>
-            <option value="everyone">Everyone</option>
-            {% for person in people %}
-            <option value="{{person}}">{{person}}</option>
-            {% endfor %}
+            <select id="person" name="person" class="form-control mdb-select" data-mdb-select-init>
+                <option></option>
+                <option value="everyone">Everyone</option>
+                {% for person in people %}
+                <option value="{{person}}">{{person}}</option>
+                {% endfor %}
             </select>
             <label class="form-label select-label" for="person">Event Participant</label>
         </div>
@@ -43,7 +49,7 @@ Add Event
 
     <h1>View Events by Date</h1>
     <div class="form-outline">
-        <input type="date" id="view_date" name="view_date" class="form-control"/>
+        <input type="date" id="view_date" name="view_date" class="form-control" />
         <label class="form-label" for="view_date">Date</label>
     </div>
     <button class="btn btn-primary" id="btn_view_date">View Events</button>
@@ -54,10 +60,11 @@ Add Event
 {% block extra_js %}
 
 <script>
+    document.getElementById("time_zone").value = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
     document.getElementById("btn_view_date").addEventListener("click", function () {
         window.location.href = "/date/" + document.getElementById('view_date').value;
     });
 </script>
-    
-{% endblock %}
 
+{% endblock %}
