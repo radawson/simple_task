@@ -133,7 +133,7 @@ def dump_tasks():
 
 @tasks.route("/templates")
 @login_required
-def templates():
+def template_list():
     tasks = Task.query.filter(Task.templates != None).all()
     templates = Template.query.all()
     return render_template("templates.html", tasks=tasks, templates=templates)

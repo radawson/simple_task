@@ -50,6 +50,7 @@ Task Detail
                 {% endif %}
             </form>
             <button id="editButton" class="btn btn-primary" onclick="toggleEdit()">Edit</button>
+            <button id="backButton" class="btn btn-secondary">Back</button>
             <button id="deleteButton" class="btn btn-danger" onclick="deleteTask()">Delete</button>
         </div>
     </div>
@@ -117,5 +118,9 @@ Task Detail
             });
         }
     }
+
+    document.getElementById('backButton').addEventListener('click', () => {
+        window.location.href = "{{url_for('tasks.task_list')}}";
+    });
 </script>
 {% endblock %}

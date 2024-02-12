@@ -30,6 +30,7 @@ Note Detail
                 {% endif %}
             </form>
             <button id="editButton" class="btn btn-primary" onclick="toggleEdit()">Edit</button>
+            <button id="backButton" class="btn btn-secondary">Back</button>
             <button id="deleteButton" class="btn btn-danger" onclick="deleteEvent()">Delete</button>
         </div>
     </div>
@@ -98,6 +99,8 @@ Note Detail
             });
     }
 
-</script>
+    document.getElementById('backButton').addEventListener('click', () => {
+        window.location.href = "{{url_for('notes.note_list')}}";
+    });
 </script>
 {% endblock %}
