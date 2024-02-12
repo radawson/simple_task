@@ -60,8 +60,9 @@ def about():
 @main.route("/admin")
 @login_required
 def admin():
+    version = current_app.__version__
     if current_user.is_admin():
-        return render_template("admin.html")
+        return render_template("admin.html",version=version)
     flash("You do not have administrator permissions")
     return render_template("settings.html")  # temp until admin page is created
 
