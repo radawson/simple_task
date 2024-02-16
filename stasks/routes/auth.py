@@ -11,7 +11,7 @@ auth = Blueprint("auth", __name__)
 @auth.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
-        username = request.form.get("username")
+        username = request.form.get("username").lower()
         password = request.form.get("password")
         remember = True if request.form.get("remember") else False
 
@@ -29,7 +29,7 @@ def login():
 @login_required
 def password():
     if request.method == "POST":
-        username = request.form.get("username")
+        username = request.form.get("username").lower()
         password = request.form.get("password")
         new_password = request.form.get("new_password")
         confirm_password = request.form.get("confirm_password")
@@ -51,7 +51,7 @@ def register():
     if request.method == "POST":
         print(request.form.to_dict())
         email = request.form.get("email")
-        username = request.form.get("username")
+        username = request.form.get("username").lower()
         password = request.form.get("password")
         first_name = request.form.get("first_name")
         last_name = request.form.get("last_name")
