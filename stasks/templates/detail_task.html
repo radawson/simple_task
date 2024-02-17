@@ -12,8 +12,8 @@ Task Detail
             <h5 class="card-title" id="taskName">{{ task.name }}</h5>
             <form id="taskForm" action="{{url_for('tasks.task_api',id=task.id)}}" method="post">
                 <div class="form-outline mb-2" data-mdb-input-init>
-                    <input type="text" id="taskDescription" name="description" readonly class="form-control" value="{{ task.description
-                        }}"" />
+                    <textarea type="text" id="taskDescription" name="description" readonly class="form-control" value="{{ task.description
+                        }}" ></textarea>
                     <label class=" form-label" for="taskDescription">Description</label>
                 </div>
                 <div class="form-outline mb-2" data-mdb-input-init>
