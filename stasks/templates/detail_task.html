@@ -11,7 +11,7 @@ Task Detail
         <div class="card-body">
             <form id="taskForm" action="{{url_for('tasks.task_api',id=task.id)}}" method="post"></form>
             <div class="form-outline mb-2" data-mdb-input-init>
-                <input type="number" class="form-control" id="taskName" name="name" readonly value="{{ task.name }}" />
+                <input type="text" class="form-control" id="taskName" name="name" readonly value="{{ task.name }}" />
                 <label class=" form-label" for="taskName">Title</label>
             </div>
             <div class="form-outline mb-2" data-mdb-input-init>
