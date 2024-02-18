@@ -32,7 +32,7 @@ Task Detail
                         <div class="form-outline mb-2" data-mdb-input-init>
                             <input type="number" class="form-control" id="priority" name="priority" readonly
                                 value="{{ task.priority }}" />
-                            <label class="form-label" for="taskPriority">Priority</label>
+                            <label class="form-label" for="priority">Priority</label>
                         </div>
                     </div>
                 </div>
@@ -97,9 +97,10 @@ Task Detail
             document.getElementById('taskName'),
             document.getElementById('taskDescription'),
             document.getElementById('date'),
+            document.getElementById('priority'),
             document.getElementById('template'),
             document.getElementById('templates'),
-            document.getElementById('priority')
+            
         ];
         let form = document.getElementById('detailForm');
         let formData = new FormData(form);
