@@ -122,8 +122,8 @@ def task_api(id):
             task.template = form_data.get("template")
 
         db.session.commit()
-        message = "Task updated successfully"
-        return jsonify(message)
+        message = f"Task {task.id} updated successfully"
+        return jsonify({'message': message, 'category': 'success'})
     return render_template("detail_task.html", task=task, message=message)
 
 @tasks.route("/tasks/dump")

@@ -123,11 +123,7 @@ Task Detail
                 }
                 return response.json();
             }).then(json => {
-                let message = {
-                    "message": json,
-                    "category": "success"
-                };
-                showAlert(message)
+                showAlert(json)
                 button.textContent = 'Edit';
             }).catch(e => {
                 console.log('There was a problem with the fetch operation: ' + e.message);
