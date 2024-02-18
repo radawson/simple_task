@@ -68,6 +68,8 @@ Task Detail
 
 {% block extra_js %}
 <script>
+window.onload = function () {resizeTextarea(document.getElementById('taskDescription'))};
+
     function deleteTask() {
         let taskId = "{{task.id}}";
 
