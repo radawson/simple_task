@@ -116,6 +116,10 @@ def task_api(id):
             task.completed = form_data.get("completed")
         if form_data.get("priority"):
             task.priority = form_data.get("priority")
+        if form_data.get("added_by"):
+            task.added_by = form_data.get("added_by")
+        if form_data.get("template"):
+            task.template = form_data.get("template")
 
         db.session.commit()
         message = "Task updated successfully"

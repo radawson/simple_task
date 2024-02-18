@@ -9,45 +9,54 @@ Task Detail
     <h1>Task Detail</h1>
     <div class="card">
         <div class="card-body">
-            <h5 class="card-title" id="taskName">{{ task.name }}</h5>
-            <form id="taskForm" action="{{url_for('tasks.task_api',id=task.id)}}" method="post">
-                <div class="form-outline mb-2" data-mdb-input-init>
-                    <textarea type="text" id="taskDescription" name="description" readonly
-                        class="form-control">{{ task.description}}</textarea>
-                    <label class=" form-label" for="taskDescription">Description</label>
+            <form id="taskForm" action="{{url_for('tasks.task_api',id=task.id)}}" method="post"></form>
+            <div class="form-outline mb-2" data-mdb-input-init>
+                <input type="number" class="form-control" id="taskName" name="name" readonly value="{{ task.name }}" />
+                <label class=" form-label" for="taskName">Title</label>
+            </div>
+            <div class="form-outline mb-2" data-mdb-input-init>
+                <textarea type="text" id="taskDescription" name="description" readonly
+                    class="form-control">{{ task.description}}</textarea>
+                <label class=" form-label" for="taskDescription">Description</label>
+            </div>
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="form-outline mb-2" data-mdb-input-init>
+                        <input type="date" class="form-control" id="date" name="date" readonly
+                            value="{{ task.date.strftime('%Y-%m-%d') if task.date else ''}}" />
+                        <label class="form-label" for="taskDate">Date</label>
+                    </div>
                 </div>
-                <div class="form-outline mb-2" data-mdb-input-init>
-                    <input type="date" class="form-control" id="date" name="date" readonly
-                        value="{{ task.date.strftime('%Y-%m-%d') if task.date else ''}}" />
-                    <label class="form-label" for="taskDate">Date</label>
+                <div class="col-md-4">
+                    <div class="form-outline mb-2" data-mdb-input-init>
+                        <input type="number" class="form-control" id="priority" name="priority" readonly
+                            value="{{ task.priority }}" />
+                        <label class="form-label" for="taskPriority">Priority</label>
+                    </div>
                 </div>
-                <div class="form-outline mb-2" data-mdb-input-init>
-                    <input type="number" class="form-control" id="priority" name="priority" readonly
-                        value="{{ task.priority }}" />
-                    <label class="form-label" for="taskPriority">Priority</label>
-                </div>
-                <div class="form-check mb2">
-                    <input class="form-check-input" type="checkbox" id="template" name="template" readonly disabled {%
-                        if task.template %} checked {% endif %} />
-                    <label class="form-check-label" for="template">Template</label>
-                </div>
-                {% if current_user.admin %}
-                {% if templates %}
-                <div class="form-outline mb-2">
-                    <select class="form-select" id="templates" data-mdb-select-init multiple readonly disabled>
-                        {% for template in templates %}
-                        <option value="{{ template.id }}">{{ template.name }}</option>
-                        {% endfor %}
-                    </select>
-                    <label class="form-label select-label" for="templates">Templates</label>
-                </div>
-                {% endif %}
-                <div class="form-outline mb-2" data-mdb-input-init>
-                    <input type="text" id="added_by" name="added_by" class="form-control" readonly
-                        value="{{task.added_by}}" />
-                    <label class="form-label" for="added_by">Created By</label>
-                </div>
-                {% endif %}
+            </div>
+            <div class="form-check mb2">
+                <input class="form-check-input" type="checkbox" id="template" name="template" readonly disabled {% if
+                    task.template %} checked {% endif %} />
+                <label class="form-check-label" for="template">Template</label>
+            </div>
+            {% if current_user.admin %}
+            {% if templates %}
+            <div class="form-outline mb-2">
+                <select class="form-select" id="templates" data-mdb-select-init multiple readonly disabled>
+                    {% for template in templates %}
+                    <option value="{{ template.id }}">{{ template.name }}</option>
+                    {% endfor %}
+                </select>
+                <label class="form-label select-label" for="templates">Templates</label>
+            </div>
+            {% endif %}
+            <div class="form-outline mb-2" data-mdb-input-init>
+                <input type="text" id="added_by" name="added_by" class="form-control" readonly
+                    value="{{task.added_by}}" />
+                <label class="form-label" for="added_by">Created By</label>
+            </div>
+            {% endif %}
             </form>
             <button id="editButton" class="btn btn-primary" onclick="toggleEdit()">Edit</button>
             <button id="backButton" class="btn btn-secondary">Back</button>
@@ -78,9 +87,9 @@ Task Detail
     function toggleEdit() {
         let button = document.getElementById('editButton');
         let fields = [
+            document.getElementById('taskName'),
             document.getElementById('taskDescription'),
             document.getElementById('date'),
-            document.getElementById('taskName'),
             document.getElementById('template'),
             document.getElementById('templates'),
             document.getElementById('priority')
@@ -111,7 +120,11 @@ Task Detail
                 }
                 return response.json();
             }).then(json => {
-                console.log(json);
+                let message = {
+                    "message": json,
+                    "category": "success"
+                };
+                showAlert(message)
                 button.textContent = 'Edit';
             }).catch(e => {
                 console.log('There was a problem with the fetch operation: ' + e.message);
