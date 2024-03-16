@@ -28,5 +28,4 @@ class Event(db.Model):
         if clock_time.startswith('0'):
             clock_time = clock_time[1:]
         dict_['clock_time'] = clock_time
-        print('dict_:', dict_)
         return dict_
