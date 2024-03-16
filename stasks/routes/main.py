@@ -12,7 +12,7 @@ def index():
     # Get the current date
     date = datetime.now().date()
     # Query the database for events, notes, and tasks for the current date
-    events = Event.query.filter_by(date=date).all()
+    events = Event.query.filter_by(date_start=date).all()
     notes = Note.query.filter_by(date=date).all()
     tasks = Task.query.filter_by(date=date).all()
 
@@ -27,7 +27,8 @@ def index():
             }
         ]
     else:
-        events = sorted(events, key=lambda x: x.time)
+        events = sorted(events, key=lambda x: x.time_start)
+        events = [event.to_dict() for event in events]
 
     if notes == []:
         notes = [{"title": "Nothing to show"}]
@@ -47,7 +48,7 @@ def index():
 def get_date(date):
     date = datetime.strptime(date, "%Y-%m-%d").date()
     tasks = Task.query.filter_by(date=date).all()
-    events = Event.query.filter_by(date=date).all()
+    events = Event.query.filter_by(date_start=date).all()
     notes = Note.query.filter_by(date=date).all()
     return render_template(
         "index.html", tasks=tasks, events=events, notes=notes, date=date
