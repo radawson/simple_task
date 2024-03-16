@@ -24,3 +24,6 @@ class Event(db.Model):
             if isinstance(dict_[key], (date, time)):
                 dict_[key] = str(dict_[key])
         return dict_
+    
+    def get_time(self):
+        return self.time.strftime("%-I:%M %p")
