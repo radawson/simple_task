@@ -11,7 +11,7 @@ class Event(db.Model):
     time_start = db.Column(db.Time)
     date_end = db.Column(db.Date)
     time_end = db.Column(db.Time)
-    # person should be selected from the list people
+    # TODO: person should be selected from the list of people
     person = db.Column(db.String(20))
     location = db.Column(db.String(200), nullable=False)
     completed = db.Column(db.Boolean, nullable=False, default=False)
