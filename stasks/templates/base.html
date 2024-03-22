@@ -140,20 +140,24 @@
         <!-- Container wrapper -->
     </nav>
     <!-- Navbar -->
-    <!-- Toast -->
-    <div class="toast fade mx-auto" id="flash-toast" aria-live="assertive" role="alert" aria-atomic="true" data-mdb-toast-init
-        data-mdb-autohide="false" data-mdb-delay="2000" data-mdb-position="top-right" data-mdb-append-to-body="true"
-        data-mdb-stacking="true" data-mdb-width="350px" data-mdb-color="primary">
-        <div class="toast-header">
-            <strong class="me-auto">Notification</strong>
-            <small></small>
-            <button type="button" class="btn-close" data-mdb-dismiss="toast" aria-label="Close"></button>
-        </div>
-        <div class="toast-body"></div>
-    </div>
-
     <!--Main layout-->
-    {% block content %}{% endblock %}
+    <div class="container-fluid">
+        <main>
+            <!-- Toast -->
+            <div class="toast fade mx-auto" id="flash-toast" aria-live="assertive" role="alert" aria-atomic="true"
+                data-mdb-toast-init data-mdb-autohide="false" data-mdb-delay="2000" data-mdb-position="top-right"
+                data-mdb-append-to-body="true" data-mdb-stacking="true" data-mdb-width="350px" data-mdb-color="primary">
+                <div class="toast-header">
+                    <strong class="me-auto">Notification</strong>
+                    <small></small>
+                    <button type="button" class="btn-close" data-mdb-dismiss="toast" aria-label="Close"></button>
+                </div>
+                <div class="toast-body"></div>
+            </div>
+
+            {% block content %}{% endblock %}
+        </main>
+    </div>
     <!--Main layout-->
 
     <!-- MDB -->
@@ -171,7 +175,7 @@
 
         function showAlert(message) {
             let toast = new mdb.Toast(document.getElementById('flash-toast'));
-            document.getElementById('flash-toast').getElementsByClassName('toast-header')[0].classList.add('bg-'+message.category);
+            document.getElementById('flash-toast').getElementsByClassName('toast-header')[0].classList.add('bg-' + message.category);
             document.getElementById('flash-toast').getElementsByClassName('toast-body')[0].textContent = message.message;
             toast.show();
         }
@@ -181,8 +185,8 @@
     {% for category, message in messages %}
     <script>
         let message = {
-            "message":"{{ message }}",
-            "category":"{{ category }}"
+            "message": "{{ message }}",
+            "category": "{{ category }}"
         };
         showAlert(message)
     </script>
