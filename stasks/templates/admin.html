@@ -59,13 +59,23 @@ Admin
         </div>
         <div class="tab-pane fade " id="admin-tabs-3" role="tabpanel" aria-labelledby="admin-tab-3">
             <div class="d-flex justify-content-start mb-4">
-                <button data-mdb-ripple-init class="btn btn-primary btn-sm ms-3" id="btn-events">Dump Events</button>
+                <button data-mdb-ripple-init class="btn btn-primary btn-sm ms-3" id="btn-dump-events">Dump Events</button>
                 Dump the Events Database.
-                <button data-mdb-ripple-init class="btn btn-primary btn-sm ms-3" id="btn-notes">Dump Notes</button>
+                <button data-mdb-ripple-init class="btn btn-primary btn-sm ms-3" id="btn-dump-notes">Dump Notes</button>
                 Dump the Notes Database.
-                <button data-mdb-ripple-init class="btn btn-primary btn-sm ms-3" id="btn-tasks">Dump Tasks</button>
+                <button data-mdb-ripple-init class="btn btn-primary btn-sm ms-3" id="btn-dump-tasks">Dump Tasks</button>
                 Dump the Tasks Database.
-                <button data-mdb-ripple-init class="btn btn-primary btn-sm ms-3" id="btn-users">Dump Users</button>
+                <button data-mdb-ripple-init class="btn btn-primary btn-sm ms-3" id="btn-dump-users">Dump Users</button>
+                Dump the Users Database.
+            </div>
+            <div class="d-flex justify-content-start mb-4">
+                <button data-mdb-ripple-init class="btn btn-primary btn-sm ms-3" id="btn-load-events">Load Events</button>
+                Dump the Events Database.
+                <button data-mdb-ripple-init class="btn btn-primary btn-sm ms-3" id="btn-load-notes">Load Notes</button>
+                Dump the Notes Database.
+                <button data-mdb-ripple-init class="btn btn-primary btn-sm ms-3" id="btn-load-tasks">Load Tasks</button>
+                Dump the Tasks Database.
+                <button data-mdb-ripple-init class="btn btn-primary btn-sm ms-3" id="btn-load-users">Load Users</button>
                 Dump the Users Database.
             </div>
         </div>
@@ -348,7 +358,7 @@ Admin
     })
 
     // Tab 3
-    document.getElementById('btn-events').addEventListener('click', (e) => {
+    document.getElementById('btn-dump-events').addEventListener('click', (e) => {
         let url = "{{ url_for('events.dump_events')}}";
         // download json data from url as a text file
         fetch(url)
@@ -368,7 +378,7 @@ Admin
 
     });
 
-    document.getElementById('btn-notes').addEventListener('click', (e) => {
+    document.getElementById('btn-dump-notes').addEventListener('click', (e) => {
         let url = "{{ url_for('notes.dump_notes')}}";
         // download json data from url as a text file
         fetch(url)
@@ -388,7 +398,7 @@ Admin
 
     });
 
-    document.getElementById('btn-tasks').addEventListener('click', (e) => {
+    document.getElementById('btn-dump-tasks').addEventListener('click', (e) => {
         let url = "{{ url_for('tasks.dump_tasks')}}";
         // download json data from url as a text file
         fetch(url)
@@ -408,7 +418,7 @@ Admin
 
     });
 
-    document.getElementById('btn-users').addEventListener('click', (e) => {
+    document.getElementById('btn-dump-users').addEventListener('click', (e) => {
         let url = "{{ url_for('auth.dump_users')}}";
         // download json data from url as a text file
         fetch(url)
@@ -426,5 +436,138 @@ Admin
                 console.error(error);
             });
     });
+
+    document.getElementById('btn-load-events').addEventListener('click', (e) => {
+        let url = "{{ url_for('events.load_events')}}";
+        // select json file
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = '.json';
+        input.onchange = e => {
+            const file = e.target.files[0];
+            const reader = new FileReader();
+            reader.onload = function () {
+                const text = reader.result;
+                console.log(text);
+                fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: text
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        showAlert(data);
+                    })
+                    .catch((error) => {
+                        console.error('Error:', error);
+                        showAlert({ 'message': error, 'type': 'danger' });
+                    });
+            };
+            reader.readAsText(file);
+        };
+        input.click();
+    });
+
+    document.getElementById('btn-load-notes').addEventListener('click', (e) => {
+        let url = "{{ url_for('notes.load_notes')}}";
+        // select json file
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = '.json';
+        input.onchange = e => {
+            const file = e.target.files[0];
+            const reader = new FileReader();
+            reader.onload = function () {
+                const text = reader.result;
+                console.log(text);
+                fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: text
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        showAlert(data);
+                    })
+                    .catch((error) => {
+                        console.error('Error:', error);
+                        showAlert({ 'message': error, 'type': 'danger' });
+                    });
+            };
+            reader.readAsText(file);
+        };
+        input.click();
+    });
+
+    document.getElementById('btn-load-tasks').addEventListener('click', (e) => {
+        let url = "{{ url_for('tasks.load_tasks')}}";
+        // select json file
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = '.json';
+        input.onchange = e => {
+            const file = e.target.files[0];
+            const reader = new FileReader();
+            reader.onload = function () {
+                const text = reader.result;
+                console.log(text);
+                fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: text
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        showAlert(data);
+                    })
+                    .catch((error) => {
+                        console.error('Error:', error);
+                        showAlert({ 'message': error, 'type': 'danger' });
+                    });
+            };
+            reader.readAsText(file);
+        };
+        input.click();
+    });
+
+    document.getElementById('btn-load-users').addEventListener('click', (e) => {
+        let url = "{{ url_for('auth.load_users')}}";
+        // select json file
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = '.json';
+        input.onchange = e => {
+            const file = e.target.files[0];
+            const reader = new FileReader();
+            reader.onload = function () {
+                const text = reader.result;
+                console.log(text);
+                fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: text
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        showAlert(data);
+                    })
+                    .catch((error) => {
+                        console.error('Error:', error);
+                        showAlert({ 'message': error, 'type': 'danger' });
+                    });
+            };
+            reader.readAsText(file);
+        };
+        input.click();
+    });
+    
 </script>
 {% endblock %}

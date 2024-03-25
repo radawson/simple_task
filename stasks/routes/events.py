@@ -6,12 +6,14 @@ from operator import attrgetter
 
 from operator import attrgetter
 
+
 def sort_key(event):
     # Use a date far in the future for events with no start date
     date_start = event.date_start or date.max
     # Use a time of 00:00 for events with no start time
     time_start = event.time_start or time.min
     return (date_start, time_start)
+
 
 events = Blueprint("events", __name__)
 
@@ -54,15 +56,21 @@ def add_event():
             new_event.date_end = datetime.strptime(
                 request.form.get("date_end"), "%Y-%m-%d"
             ).date()
-            new_event.time_end = datetime.strptime(request.form["time_end"], "%H:%M").time()
+            new_event.time_end = datetime.strptime(
+                request.form["time_end"], "%H:%M"
+            ).time()
         if request.form.get("date_start"):
-            new_event.date_start = datetime.strptime(request.form.get("date_start"), "%Y-%m-%d").date()
+            new_event.date_start = datetime.strptime(
+                request.form.get("date_start"), "%Y-%m-%d"
+            ).date()
         else:
             message = "Date is required"
             flash(message)
             return render_template("add_event.html", people=Person.get_client_names())
         if request.form.get("time_start"):
-            new_event.time_start = datetime.strptime(request.form["time_start"], "%H:%M").time()
+            new_event.time_start = datetime.strptime(
+                request.form["time_start"], "%H:%M"
+            ).time()
         else:
             message = "Time is required"
             flash(message)
@@ -76,7 +84,7 @@ def add_event():
         db.session.commit()
         message = "Event added successfully"
         all_events = Event.query.all()
-        #sorted_events = sorted(events, key=attrgetter("date_start", "time_start"))    
+        # sorted_events = sorted(events, key=attrgetter("date_start", "time_start"))
         sorted_events = sorted(all_events, key=sort_key)
         flash(message)
     return render_template("events.html", events=sorted_events)
@@ -91,7 +99,9 @@ def event_api(id):
     elif request.method == "POST":
         name = request.form.get("name")
         description = request.form.get("description")
-        date_start = datetime.strptime(request.form.get("date_start"), "%Y-%m-%d").date()
+        date_start = datetime.strptime(
+            request.form.get("date_start"), "%Y-%m-%d"
+        ).date()
         time_start = datetime.strptime(request.form.get("time_start"), "%H:%M").time()
         location = request.form.get("location")
         person = request.form.get("person")
@@ -155,8 +165,61 @@ def event_api(id):
         return jsonify(message)
     return render_template("detail_event.html", event=event, message=message)
 
+
 @events.route("/events/dump")
 @login_required
 def dump_events():
     events = Event.query.all()
-    return jsonify([event.to_dict() for event in events])
+    return jsonify([event.to_dump() for event in events])
+
+
+@events.route("/events/load", methods=["POST"])
+@login_required
+def load_events():
+    message = "Importing events"
+    category = "information"
+    count = 1
+    data = request.json
+    for event_data in data:
+        message += f"\nEvent {count}: "
+
+        if event_data["date_end"]:
+            date_end = datetime.strptime(
+                event_data["date_end"], "%Y-%m-%d"
+            ).date()
+        else:
+            date_end = None
+        if event_data["time_end"]:
+            time_end = datetime.strptime(
+                event_data["time_end"], "%H:%M:%S"
+            ).time()
+        else:
+            time_end = None 
+        try:
+            event = Event(
+                name=event_data["name"],
+                cal_uid=event_data["cal_uid"],
+                description=event_data["description"],
+                date_start=datetime.strptime(
+                    event_data["date_start"], "%Y-%m-%d"
+                ).date(),
+                time_start=datetime.strptime(
+                    event_data["time_start"], "%H:%M:%S"
+                ).time(),
+                date_end=date_end,
+                time_end=time_end,
+                person=event_data["person"],
+                location=event_data["location"],
+                completed=event_data["completed"],
+                added_by=event_data["added_by"],
+                tz_id=event_data["tz_id"],
+            )
+        except Exception as e:
+            message += str(e)
+            category = "error"
+        else:
+            message += "Successfully added to the database."
+            db.session.add(event)
+        count += 1
+    db.session.commit()
+    return jsonify({"category": category, "message": message})

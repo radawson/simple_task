@@ -152,3 +152,31 @@ def user_api(user_id):
 def dump_users():
     users = User.query.all()
     return jsonify([user.to_dict() for user in users])
+
+@auth.route("/users/load", methods=["POST"])
+@login_required
+def load_users():
+    message = "Importing users"
+    category = "information"
+    count = 1
+    data = request.json
+    for event_data in data:
+        message += f"\nUser {count}: "
+        try:
+            event = User(
+                name=event_data["name"],
+                description=event_data["description"],
+                person=event_data["person"],
+                location=event_data["location"],
+                completed=event_data["completed"],
+                added_by=event_data["added_by"],
+            )
+        except Exception as e:
+            message += str(e)
+            category = "error"
+        else:
+            message += "Successfully added to the database."
+            db.session.add(event)
+        count += 1
+    db.session.commit()
+    return jsonify({"category": category, "message": message})

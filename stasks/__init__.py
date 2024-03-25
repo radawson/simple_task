@@ -4,7 +4,7 @@ from flask_migrate import Migrate
 from flask_login import LoginManager
 from dotenv import load_dotenv
 from .models import db, seed_db
-from .routes import auth, calendar, main, notes, tasks, events, test, times
+from .routes import auth, calendar, main, meals, notes, tasks, events, test, times
 
 
 version = "0.2.1"
@@ -47,6 +47,7 @@ def create_app():
     app.register_blueprint(calendar)
     app.register_blueprint(events)
     app.register_blueprint(main)
+    app.register_blueprint(meals)
     app.register_blueprint(notes)
     app.register_blueprint(tasks)
     app.register_blueprint(test)

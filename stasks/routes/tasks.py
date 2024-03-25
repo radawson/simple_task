@@ -134,6 +134,56 @@ def dump_tasks():
     tasks = Task.query.all()
     return jsonify([task.to_dict() for task in tasks])
 
+@tasks.route("/tasks/load", methods=["POST"])
+@login_required
+def load_tasks():
+    message = "Importing tasks"
+    category = "information"
+    count = 1
+    data = request.json
+    for event_data in data:
+        message += f"\nTask {count}: "
+
+        if event_data["date_end"]:
+            date_end = datetime.strptime(
+                event_data["date_end"], "%Y-%m-%d"
+            ).date()
+        else:
+            date_end = None
+        if event_data["time_end"]:
+            time_end = datetime.strptime(
+                event_data["time_end"], "%H:%M:%S"
+            ).time()
+        else:
+            time_end = None 
+        try:
+            event = Task(
+                name=event_data["name"],
+                cal_uid=event_data["cal_uid"],
+                description=event_data["description"],
+                date_start=datetime.strptime(
+                    event_data["date_start"], "%Y-%m-%d"
+                ).date(),
+                time_start=datetime.strptime(
+                    event_data["time_start"], "%H:%M:%S"
+                ).time(),
+                date_end=date_end,
+                time_end=time_end,
+                person=event_data["person"],
+                location=event_data["location"],
+                completed=event_data["completed"],
+                added_by=event_data["added_by"],
+            )
+        except Exception as e:
+            message += str(e)
+            category = "error"
+        else:
+            message += "Successfully added to the database."
+            db.session.add(event)
+        count += 1
+    db.session.commit()
+    return jsonify({"category": category, "message": message})
+
 ## Templates
 
 

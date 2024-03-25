@@ -30,3 +30,10 @@ class Event(db.Model):
                 clock_time = clock_time[1:]
             dict_['clock_time'] = clock_time
         return dict_
+
+    def to_dump(self):
+        dict_ = {c.name: getattr(self, c.name) for c in self.__table__.columns}
+        for key in dict_:
+            if isinstance(dict_[key], (date, time)):
+                dict_[key] = str(dict_[key])
+        return dict_
