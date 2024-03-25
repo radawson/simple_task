@@ -1,4 +1,4 @@
-# Simple Task Manage for HomeBranch
+# Simple Task Manager for HomeBranch
 
 ## Partridge Crossing simple home task and schedule manager
 
