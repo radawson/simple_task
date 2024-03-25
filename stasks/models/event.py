@@ -23,9 +23,10 @@ class Event(db.Model):
         for key in dict_:
             if isinstance(dict_[key], (date, time)):
                 dict_[key] = str(dict_[key])
-        clock_time = self.time_start.strftime('%I:%M %p')
-        # Remove leading zero from hour (if any)
-        if clock_time.startswith('0'):
-            clock_time = clock_time[1:]
-        dict_['clock_time'] = clock_time
+        if self.time_start is not None:
+            clock_time = self.time_start.strftime('%I:%M %p')
+            # Remove leading zero from hour (if any)
+            if clock_time.startswith('0'):
+                clock_time = clock_time[1:]
+            dict_['clock_time'] = clock_time
         return dict_
