@@ -15,16 +15,26 @@ Add Event
             <textarea id="description" name="description" class="form-control"></textarea>
             <label class="form-label" for="description">Event Description</label>
         </div>
-        <div class="form-outline mb-2" data-mdb-input-init>
-            <input type="date" id="date" name="date" class="form-control" />
-            <label class="form-label" for="date">Date</label>
+        <div class="d-flex flex-row">
+        <div class="form-outline mb-2 me-1" data-mdb-input-init>
+            <input type="date" id="date_start" name="date_start" class="form-control" />
+            <label class="form-label" for="date">Start Date</label>
         </div>
-        <div style="display: flex; justify-content: space-between;">
-            <div class="form-outline mb-2" data-mdb-input-init style="flex: 1; margin-right: 10px;">
-                <input type="time" id="time" name="time" class="form-control" />
-                <label class="form-label" for="time">Time</label>
+        <div class="form-outline mb-2 ms-1" data-mdb-input-init>
+            <input type="date" id="date_end" name="date_end" class="form-control" />
+            <label class="form-label" for="date_end">End Date</label>
+        </div>
+        </div>
+        <div class="d-flex flex-row">
+            <div class="form-outline mb-2 me-1" data-mdb-input-init>
+                <input type="time" id="time_start" name="time_start" class="form-control" />
+                <label class="form-label" for="time_start">Start Time</label>
             </div>
-            <div class="form-outline mb-2" data-mdb-input-init style="flex: 1; margin-left: 10px;">
+            <div class="form-outline mb-2 mx-1" data-mdb-input-init>
+                <input type="time" id="time_end" name="time_end" class="form-control" />
+                <label class="form-label" for="time_end">End Time</label>
+            </div>
+            <div class="form-outline mb-2 ms-1" data-mdb-input-init >
                 <input type="text" id="time_zone" name="time_zone" class="form-control"/>
                 <label class="form-label" for="time_zone">Time Zone</label>
             </div>

@@ -55,14 +55,14 @@ def add_event():
                 request.form.get("date_end"), "%Y-%m-%d"
             ).date()
             new_event.time_end = datetime.strptime(request.form["time_end"], "%H:%M").time()
-        if request.form.get("date"):
-            new_event.date_start = datetime.strptime(request.form.get("date"), "%Y-%m-%d").date()
+        if request.form.get("date_start"):
+            new_event.date_start = datetime.strptime(request.form.get("date_start"), "%Y-%m-%d").date()
         else:
             message = "Date is required"
             flash(message)
             return render_template("add_event.html", people=Person.get_client_names())
-        if request.form.get("time"):
-            new_event.time_start = datetime.strptime(request.form["time"], "%H:%M").time()
+        if request.form.get("time_start"):
+            new_event.time_start = datetime.strptime(request.form["time_start"], "%H:%M").time()
         else:
             message = "Time is required"
             flash(message)

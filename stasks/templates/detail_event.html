@@ -19,12 +19,24 @@ Event Detail
                     <label class="form-label" for="description">Event Description</label>
                 </div>
                 <div class="form-outline mb-2" data-mdb-input-init>
-                    <input type="date" id="date" name="date" class="form-control" readonly value="{{event.date}}" />
-                    <label class="form-label" for="date">Date</label>
+                    <input type="date" id="date_start" name="date_start" class="form-control" readonly
+                        value="{{event.date_start}}" />
+                    <label class="form-label" for="date_start">Start Date</label>
                 </div>
                 <div class="form-outline mb-2" data-mdb-input-init>
-                    <input type="time" id="time" name="time" class="form-control" readonly value="{{event.time}}" />
-                    <label class="form-label" for="time">Time</label>
+                    <input type="date" id="date_end" name="date_end" class="form-control" readonly
+                        value="{{event.date_end}}" />
+                    <label class="form-label" for="date_end">End Date</label>
+                </div>
+                <div class="form-outline mb-2" data-mdb-input-init>
+                    <input type="time" id="time_start" name="time_start" class="form-control" readonly
+                        value="{{event.time_start}}" />
+                    <label class="form-label" for="time_start">Start Time</label>
+                </div>
+                <div class="form-outline mb-2" data-mdb-input-init>
+                    <input type="time" id="time_end" name="time_end" class="form-control" readonly
+                        value="{{event.time_end}}" />
+                    <label class="form-label" for="time_end">End Time</label>
                 </div>
                 <div class="form-outline mb-2" data-mdb-input-init>
                     <input type="text" id="location" name="location" class="form-control" readonly
@@ -62,7 +74,8 @@ Event Detail
     function toggleEdit() {
         let eventId = "{{event.id}}";
         let button = document.getElementById('editButton');
-        let fields = [document.getElementById('description'), document.getElementById('date'), document.getElementById('time'), document.getElementById('location')];
+        let fieldNames = ['description', 'date_start', 'date_end', 'time_start', 'time_end', 'location'];
+        let fields = fieldNames.map(id => document.getElementById(id));
         let form = document.getElementById('detailForm');
 
         fields.forEach(function (field) {
