@@ -15,7 +15,6 @@ def seed_db():
         people = []
         people.append(Person(first_name="George", last_name="Dirschel"))
         people.append(Person(first_name="Kathy", last_name="Dirschel"))
-        people.append(Person(first_name="Ric", last_name="Dawson"))
         people.append(Person(first_name="Pat", last_name="Dawson"))
         people.append(
             User(

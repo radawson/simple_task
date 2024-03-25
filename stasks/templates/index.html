@@ -65,7 +65,7 @@ Today - {{ date }}
                         <button data-mdb-collapse-init class="accordion-button" type="button" data-mdb-toggle="collapse"
                             data-mdb-target="#collapse-event-{{event.id}}" aria-expanded="false"
                             aria-controls="collapse-event-{{event.id}}">
-                            {{ event.get_time() }}: {{ event.name }} for {{event.person}}
+                            {{ event.clock_time }}: {{ event.name }} for {{event.person}}
                         </button>
                         {% if not event.no_check %}
                         <div class="form-check me-2">

@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request
+from flask import Blueprint, jsonify, render_template, request
 from flask_login import login_required
 from stasks.models import Note, db
 from datetime import datetime
@@ -70,3 +70,53 @@ def note_api(id):
 def dump_notes():
     notes = Note.query.all()
     return render_template("notes.html", notes=notes)
+
+@notes.route("/notes/load", methods=["POST"])
+@login_required
+def load_notes():
+    message = "Importing notes"
+    category = "information"
+    count = 1
+    data = request.json
+    for event_data in data:
+        message += f"\nNote {count}: "
+
+        if event_data["date_end"]:
+            date_end = datetime.strptime(
+                event_data["date_end"], "%Y-%m-%d"
+            ).date()
+        else:
+            date_end = None
+        if event_data["time_end"]:
+            time_end = datetime.strptime(
+                event_data["time_end"], "%H:%M:%S"
+            ).time()
+        else:
+            time_end = None 
+        try:
+            event = Note(
+                name=event_data["name"],
+                cal_uid=event_data["cal_uid"],
+                description=event_data["description"],
+                date_start=datetime.strptime(
+                    event_data["date_start"], "%Y-%m-%d"
+                ).date(),
+                time_start=datetime.strptime(
+                    event_data["time_start"], "%H:%M:%S"
+                ).time(),
+                date_end=date_end,
+                time_end=time_end,
+                person=event_data["person"],
+                location=event_data["location"],
+                completed=event_data["completed"],
+                added_by=event_data["added_by"],
+            )
+        except Exception as e:
+            message += str(e)
+            category = "error"
+        else:
+            message += "Successfully added to the database."
+            db.session.add(event)
+        count += 1
+    db.session.commit()
+    return jsonify({"category": category, "message": message})

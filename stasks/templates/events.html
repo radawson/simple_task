@@ -141,8 +141,10 @@ Events
             })
             .then((data) => {
                 data = data.map((event) => {
-                    const date = new Date(event.date);
+                    const date = new Date(event.date_start);
+                    const time = new Date(event.time_start);
                     event.date = date.toISOString().split('T')[0]; // This will give you the date in 'YYYY-MM-DD' format
+                    event.time = time.toLocaleTimeString('sv').split(' ')[0]; // This will give you the time in 'HH:MM:SS' format
                     event.completed = event.completed ? 'Yes' : 'No'; // Map boolean values to 'Yes' or 'No'
                     event.id = `
     <button data-mdb-ripple-init class="edit-btn btn btn-outline-primary btn-floating btn-sm" data-mdb-id="${event.id}" data-mdb-tooltip-init title="Edit"><i class="fa fa-edit"></i></button>
@@ -203,8 +205,8 @@ Events
     document.getElementById('datatable').addEventListener('render.mdb.datatable', setActions);
 
     const columns = [
-        { label: 'Date', field: 'date' },
-        { label: 'Time', field: 'time'},
+        { label: 'Start Date', field: 'date_start' },
+        { label: 'Start Time', field: 'time_start'},
         { label: 'Event', field: 'name' },
         { label: 'For Person', field: 'person'},
         { label: 'Description', field: 'description' },

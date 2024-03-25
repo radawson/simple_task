@@ -35,7 +35,6 @@ class Person(db.Model):
     def get_client_names():
         people = Person.query.filter_by(employee=False).with_entities(Person.full_name).all()
         names = [person[0] for person in people]
-        print(names)
         return names
     
     def get_employees():
