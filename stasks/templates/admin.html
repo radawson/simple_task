@@ -25,6 +25,7 @@ Admin
         </li>
     </ul>
     <!-- Tabs navs -->
+    <hr class="hr" />
     <!-- Tabs content -->
     <div class="tab-content" id="admin-content">
         <div class="tab-pane fade show active" id="admin-tabs-1" role="tabpanel" aria-labelledby="admin-tab-1">
@@ -43,7 +44,18 @@ Admin
             <div id="table_users"></div>
         </div>
         <div class="tab-pane fade " id="admin-tabs-2" role="tabpanel" aria-labelledby="admin-tab-2">
-            <div class="d-flex justify-content-end mb-4">
+            <div class="form-outline mb-3">
+                <label for="filter_person" class="form-label select-label">Filter by Person:</label>
+                <select data-mdb-select data-mdb-filter data-mdb-target="#table_timecard" id="filter_person"
+                    class="form-select">
+                    <option value="all">All</option>
+                    {% for employee in employees %}
+                    <option value="{{employee.id}}">{{employee.first_name}} {{employee.last_name}}</option>
+                    {% endfor %}
+                </select>
+                
+            </div>
+            <div class="d-flex justify-content-end mb-3">
                 <div data-mdb-input-init class="form-outline">
                     <input data-mdb-search data-mdb-target="#table_timecard" type="text" id="search_table_timecard"
                         class="form-control" />
@@ -151,10 +163,10 @@ Admin
                     } else {
                         time.employee = `${time.first_name} ${time.last_name}`;
                     }
-                    time.total = time.base_pay * (time.minutes / 60);
+                    time.total = ((new Date(`${time.date} ${time.time_out}`).getTime() - new Date(`${time.date} ${time.time_in}`).getTime()) / 3600000);
                     time.actions = `
     <button data-mdb-ripple-init class="edit-btn btn btn-outline-primary btn-floating btn-sm" data-mdb-id="${time.id}" data-mdb-tooltip-init title="Edit"><i class="fa fa-edit"></i></button>
-    <button data-mdb-ripple-init class="delete-btn btn btn-outline-primary btn-floating btn-sm" data-mdb-id="${time.id}"><i class="fa fa-trash" data-mdb-tooltip-init title="Delete"></i></button>`;
+    <button data-mdb-ripple-init class="delete-btn btn btn-outline-primary btn-floating btn-sm" data-mdb-id="${time.id}" data-mdb-tooltip-init title="Delete"><i class="fa fa-trash" ></i></button>`;
                     return time;
                 });
                 timecardTable.update(
@@ -284,11 +296,13 @@ Admin
             inputType: 'number',
             label: 'Base Pay',
             field: 'base_pay',
+            editable: false,
         },
         {
-            inputType: 'number',
-            label: 'Total',
+            inputType: 'text',
+            label: 'Total Hours',
             field: 'total',
+            editable: false,
         },
         {
             defaultValue: false,
@@ -327,7 +341,7 @@ Admin
                 showAlert({ message: error, category: 'danger' });
             })
             .finally(() => {
-                fetchUsers();
+                fetchTime({ "person": "all" });
             });
     })
 
@@ -351,6 +365,7 @@ Admin
             .then(data => {
                 console.log(data);
                 showAlert(data);
+                fetchTime({ "person": "all" });
             })
             .catch(error => {
                 showAlert({ message: error, category: 'danger' });

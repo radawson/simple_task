@@ -1,7 +1,16 @@
-from flask import Blueprint, current_app, flash, redirect, render_template, request, url_for
+from flask import (
+    Blueprint,
+    current_app,
+    flash,
+    redirect,
+    render_template,
+    request,
+    url_for,
+)
 from flask_login import current_user, fresh_login_required, login_required
-from stasks.models import db, Event, Note, Task, User
+from stasks.models import db, Event, Note, Task, Person, User
 from datetime import datetime
+
 
 main = Blueprint("main", __name__)
 
@@ -54,41 +63,32 @@ def get_date(date):
         "index.html", tasks=tasks, events=events, notes=notes, date=date
     )
 
-@main.route('/about')
+
+@main.route("/about")
 def about():
-    return render_template('about.html', version=current_app.__version__)
+    return render_template("about.html", version=current_app.__version__)
+
 
 @main.route("/admin")
 @login_required
 def admin():
     version = current_app.__version__
     if current_user.is_admin():
-        return render_template("admin.html",version=version)
+        return render_template("admin.html", version=version, employees=Person.get_employees())
     flash("You do not have administrator permissions")
     return render_template("settings.html")  # temp until admin page is created
 
+@main.route("/calendar")
+def calendar():
+    return render_template("calendar.html")
 
-@main.route("/profile", methods=["GET", "POST"])
+
+@main.route("/profile", methods=["GET"])
 @fresh_login_required
 def profile():
-    if request.method == "POST":
-        print(request.form)
-        user = User.query.get(current_user.id)
-        if request.form.get('first_name'):
-            user.first_name = request.form.get('first_name')
-        if request.form.get('last_name'):
-            user.last_name = request.form.get('last_name')
-        if request.form.get('birthdate'):
-            user.birthdate = request.form.get('birthdate')
-        if request.form.get('email'):
-            user.email = request.form.get('email')
-        if request.form.get('info'):
-            user.info = request.form.get('info')
-        db.session.commit()
-        flash("Profile updated", "success")
-        return redirect(url_for("main.profile"))
     user = current_user
     return render_template("profile.html", user=user)
+
 
 @main.route("/qr")
 def qr_generator():

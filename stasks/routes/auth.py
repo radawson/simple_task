@@ -1,7 +1,8 @@
+from datetime import datetime
 from sqlite3 import IntegrityError
 from flask import flash, jsonify
 from flask import Blueprint, redirect, render_template, request, url_for
-from flask_login import login_required, login_user, logout_user
+from flask_login import current_user, login_required, login_user, logout_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from stasks.models import db, User
 
@@ -87,7 +88,10 @@ def register():
 
         message = "Account created successfully"
         flash(message, "success")
-        return redirect(url_for("auth.login"))
+        if current_user.is_authenticated:
+            return redirect(url_for("main.index"))
+        else:
+            return redirect(url_for("auth.login"))
     return render_template("signup.html")
 
 
@@ -120,8 +124,29 @@ def user_api(user_id):
             user.first_name = request.form.get("first_name")
         if request.form.get("last_name"):
             user.last_name = request.form.get("last_name")
+        if request.form.get("email"):
+            user.email = request.form.get("email")
+        if request.form.get("username"):
+            user.username = request.form.get("username")
+        if request.form.get("phone"):
+            user.phone = request.form.get("phone")
         if request.form.get("base_pay"):
             user.base_pay = request.form.get("base_pay")
+        if request.form.get("address"):
+            user.address = request.form.get("address")
+        if request.form.get("city"):
+            user.city = request.form.get("city")
+        if request.form.get("state"):
+            user.state = request.form.get("state")
+        if request.form.get("zip_code"):
+            user.zip_code = request.form.get("zip_code")
+        if request.form.get("country"):
+            user.country = request.form.get("country")
+        if request.form.get("birthdate"):
+            user.birthdate = datetime.strptime(request.form.get("birthdate"), "%Y-%m-%d"
+            ).date()
+        if request.form.get("info"):
+            user.info = request.form.get("info")
         if request.form.get("admin") == "true":
             user.admin = True
         else:

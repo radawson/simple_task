@@ -9,6 +9,7 @@ class Person(db.Model):
     last_name = db.Column(db.String(20))
     full_name = db.Column(db.String(40), db.Computed("first_name || ' ' || last_name"))
     phone = db.Column(db.String(20))
+    email = db.Column(db.String(40))
     address = db.Column(db.String(40))
     city = db.Column(db.String(20))
     state = db.Column(db.String(2))
@@ -33,28 +34,30 @@ class Person(db.Model):
         return Person.query.filter_by(employee=False).all()
 
     def get_client_names():
-        people = Person.query.filter_by(employee=False).with_entities(Person.full_name).all()
+        people = (
+            Person.query.filter_by(employee=False).with_entities(Person.full_name).all()
+        )
         names = [person[0] for person in people]
         return names
-    
+
     def get_employees():
         return Person.query.filter_by(employee=True).all()
-    
+
     def get_employees_names():
-        people = Person.query.filter_by(employee=True).with_entities(Person.full_name).all()
+        people = (
+            Person.query.filter_by(employee=True).with_entities(Person.full_name).all()
+        )
         names = [person[0] for person in people]
         return names
 
 
 class User(UserMixin, Person):
-    email = db.Column(db.String(40))
     password = db.Column(db.String(20))
     username = db.Column(db.String(20), unique=True)
     admin = db.Column(db.Boolean, default=False)
 
-
     def is_admin(self):
         return self.admin
-    
+
     def is_employee(self):
         return self.employee

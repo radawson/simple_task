@@ -5,92 +5,99 @@ Profile
 {% endblock %}
 
 {% block content %}
-<main class="my-5">
-  <div class="container px-4">
-    <!--Section: Profile-->
-    <section>
-      <div class="row gx-xl-5">
-        <div class="mb-4 mb-md-0">
-          <div class="card shadow-0 mb-5">
-            <div class="card-header py-3">
-              <h4 class="mb-0">Edit profile</h4>
-            </div>
-            <div class="card-body text-center">
 
-              <form action="{{url_for('main.profile')}}" method="post">
-                <!-- <div class="d-flex justify-content-center mb-4">
+<div class="container px-4">
+  <!--Section: Profile-->
+  <section>
+    <div class="row gx-xl-5">
+      <div class="mb-4 mb-md-0">
+        <div class="card shadow-0 mb-5">
+          <div class="card-header py-3">
+            <h4 class="mb-0">Edit profile</h4>
+          </div>
+          <div class="card-body text-center">
+
+            <form id="user_profile_form" action="{{url_for('auth.user_api',user_id=user.id)}}">
+              <!-- <div class="d-flex justify-content-center mb-4">
                   <div id="dnd-default-value" class="file-upload-wrapper shadow-5" style="max-width: 300px">
                     <input type="file" class="file-upload-input"
                       data-mdb-default-file="https://mdbootstrap.com/img/new/avatars/1.jpg" data-mdb-file-upload-init />
                   </div>
                 </div> -->
-                <div class="mb-4 input-group">
-                  <div class="form-outline mb-0 " data-mdb-input-init>
-                    <input type="text" id="first_name" name="first_name" class="form-control" value="{{current_user.first_name}}" />
-                    <label class="form-label" for="first_name">First Name</label>
-                  </div>
-                  <div class="form-outline mb-0 " data-mdb-input-init>
-                    <input type="text" id="last_name" name="last_name" class="form-control" value="{{current_user.last_name}}" />
-                    <label class="form-label" for="last_name">Last Name</label>
-                  </div>
+              <div class="mb-3 input-group">
+                <div class="form-outline me-1" data-mdb-input-init>
+                  <input type="text" id="first_name" name="first_name" class="form-control"
+                    value="{{current_user.first_name}}" />
+                  <label class="form-label" for="first_name">First Name</label>
                 </div>
-                <div class="form-outline mb-4" data-mdb-input-init>
-                  <input type="email" id="email" name="email" class="form-control" value="{{ current_user.email if current_user.email else ''}}" />
-                  <label class="form-label" for="email">Email</label>
+                <div class="form-outline ms-1" data-mdb-input-init>
+                  <input type="text" id="last_name" name="last_name" class="form-control"
+                    value="{{current_user.last_name}}" />
+                  <label class="form-label" for="last_name">Last Name</label>
                 </div>
+              </div>
+              <div class="form-outline mb-3" data-mdb-input-init>
+                <input type="email" id="email" name="email" class="form-control"
+                  value="{{ current_user.email if current_user.email else ''}}" />
+                <label class="form-label" for="email">Email</label>
+              </div>
+              <div class="form-outline mb-3" data-mdb-input-init>
+                <input type="tel" id="phone" name="phone" class="form-control"
+                  value="{{ current_user.phone if current_user.phone else ''}}" />
+                <label class="form-label" for="phone">Phone Number</label>
+              </div>
 
-                <div class="form-outline mb-4" data-mdb-input-init>
-                  <input type="date" id="birthdate" name="birthdate" class="form-control" value="{{current_user.birthday}}" />
-                  <label class="form-label" for="birthdate">Birthdate</label>
-                </div>
+              <div class="form-outline mb-3" data-mdb-input-init>
+                <input type="date" id="birthdate" name="birthdate" class="form-control"
+                  value="{{current_user.birthdate}}" />
+                <label class="form-label" for="birthdate">Birthdate</label>
+              </div>
 
-                <div class="form-outline mb-4" data-mdb-input-init>
-                  <textarea class="form-control" id="info" name="info" rows="4">{{current_user.info}}
+              <div class="form-outline mb-4" data-mdb-input-init>
+                <textarea class="form-control" id="info" name="info" rows="4">{{current_user.info}}
                   </textarea>
-                  <label class="form-label" for="info">Information</label>
-                </div>
+                <label class="form-label" for="info">Additional Information</label>
+              </div>
 
-                <button type="submit" class="btn btn-primary mb-2" data-mdb-ripple-init>
-                  Update profile
-                </button>
-              </form>
-            </div>
+              <button type="button" class="btn btn-primary mb-2" id="update_profile_button" data-mdb-ripple-init>
+                Update profile
+              </button>
+            </form>
           </div>
+        </div>
 
-          <div class="card shadow-0">
-            <div class="card-header py-3"><strong>Change password</strong></div>
-            <div class="card-body text-center pt-4">
+        <div class="card shadow-0">
+          <div class="card-header py-3"><strong>Change password</strong></div>
+          <div class="card-body text-center pt-4">
 
-              <form action="{{url_for('auth.password')}}" method="post">
-                <div class="form-outline mb-4" data-mdb-input-init>
-                  <input type="password" id="password" name="password" class="form-control" />
-                  <label class="form-label" for="password">Current password</label>
-                </div>
+            <form action="{{url_for('auth.password')}}" method="post">
+              <div class="form-outline mb-4" data-mdb-input-init>
+                <input type="password" id="password" name="password" class="form-control" />
+                <label class="form-label" for="password">Current password</label>
+              </div>
 
-                <div class="form-outline mb-4" data-mdb-input-init>
-                  <input type="password" id="newPassword" name="new_password" class="form-control" />
-                  <label class="form-label" for="newPassword">New password</label>
-                </div>
+              <div class="form-outline mb-4" data-mdb-input-init>
+                <input type="password" id="newPassword" name="new_password" class="form-control" />
+                <label class="form-label" for="newPassword">New password</label>
+              </div>
 
-                <div class="form-outline mb-4" data-mdb-input-init>
-                  <input type="password" id="confirmPassword" name="confirm_password" class="form-control" />
-                  <label class="form-label" for="confirmPassword">Confirm password</label>
-                </div>
-                <input type="hidden" name="username" value="{{ current_user.username }}" />
-                <button type="submit" class="btn btn-primary mb-2" data-mdb-ripple-init>Apply</button>
-              </form>
+              <div class="form-outline mb-4" data-mdb-input-init>
+                <input type="password" id="confirmPassword" name="confirm_password" class="form-control" />
+                <label class="form-label" for="confirmPassword">Confirm password</label>
+              </div>
+              <input type="hidden" name="username" value="{{ current_user.username }}" />
+              <button type="submit" class="btn btn-primary mb-2" data-mdb-ripple-init>Apply</button>
+            </form>
 
-            </div>
           </div>
         </div>
       </div>
-    </section>
-    <!--Section: Profile-->
+    </div>
+  </section>
+  <!--Section: Profile-->
 
-  </div>
-  <!-- Container for demo purpose -->
-</main>
-<!--Main layout-->
+</div>
+
 {% endblock %}
 
 {% block extra_js %}
@@ -100,11 +107,21 @@ Profile
   const input = document.querySelector('.file-upload-input');
   const preview = document.querySelector('.file-upload-default-value');
 
-  input.addEventListener('change', updateImageDisplay);
-
-</script>
-<script>
-  // 
+  document.getElementById("update_profile_button").addEventListener("click", function () {
+    let form = document.getElementById("user_profile_form");
+    let formData = new FormData(form);
+    fetch(form.action, {
+      method: "PATCH",
+      body: formData
+    }).then(response => response.json())
+      .then(data => {
+        showAlert(data);
+      })
+      .catch((error) => {
+        console.error('Error:', error);
+        showAlert({ 'message': error, 'type': 'danger' });
+      });
+  });
 </script>
 
 {% endblock %}
