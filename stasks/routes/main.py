@@ -8,8 +8,9 @@ from flask import (
     url_for,
 )
 from flask_login import current_user, fresh_login_required, login_required
-from stasks.models import db, Event, Note, Task, User
+from stasks.models import db, Event, Note, Task, Person, User
 from datetime import datetime
+
 
 main = Blueprint("main", __name__)
 
@@ -73,7 +74,7 @@ def about():
 def admin():
     version = current_app.__version__
     if current_user.is_admin():
-        return render_template("admin.html", version=version)
+        return render_template("admin.html", version=version, employees=Person.get_employees())
     flash("You do not have administrator permissions")
     return render_template("settings.html")  # temp until admin page is created
 

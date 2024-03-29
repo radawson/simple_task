@@ -91,15 +91,25 @@ def time_api(time_id):
     elif request.method == "PATCH":
         timecard = Time.query.get(time_id)
         if request.form.get("time_in"):
-            timecard.time_in = datetime.strptime(
-                request.form.get("time_in"), "%H:%M:%S"
-            ).time()
+            try:
+                timecard.time_in = datetime.strptime(
+                    request.form.get("time_in"), "%H:%M"
+                ).time()
+            except:
+                timecard.time_in = datetime.strptime(
+                    request.form.get("time_in"), "%H:%M:%S"
+                ).time()
         if (
             request.form.get("time_out")
             and request.form.get("time_out") != ""
             and request.form.get("time_out") != "null"
         ):
-            timecard.time_out = datetime.strptime(
+            try:
+                timecard.time_out = datetime.strptime(
+                    request.form.get("time_out"), "%H:%M"
+                ).time()
+            except:
+                timecard.time_out = datetime.strptime(
                 request.form.get("time_out"), "%H:%M:%S"
             ).time()
         if request.form.get("date"):
@@ -110,6 +120,8 @@ def time_api(time_id):
             timecard.paid = True
         elif request.form.get("paid") == "false":
             timecard.paid = False
+        if request.form.get("base_pay"):
+            timecard.base_pay = request.form.get("base_pay")
         if request.form.get("description"):
             timecard.description = request.form.get("description")
         db.session.commit()
