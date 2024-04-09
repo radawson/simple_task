@@ -93,7 +93,7 @@
         data.append("person_id", person_id);
         data.append("time_in", document.getElementById('time').value);
         data.append("date", date_now);
-        data.append("description", document.getElementById('description').value);
+        data.append("description", "Employee Check In");
         postTime(data);
     }
 
@@ -104,7 +104,7 @@
         data.append("person_id", person_id);
         data.append("time_out", document.getElementById('time').value);
         data.append("date", date_now);
-        data.append("description", document.getElementById('description').value);
+        data.append("description", "Employee Check Out");
         postTime(data);
     }
 
