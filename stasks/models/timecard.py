@@ -3,7 +3,7 @@ from datetime import datetime
 from .database import db
 from .person import Person, User
 
-class Time(db.Model):
+class Timecard(db.Model):
     __tablename__ = "timecards"
     id = db.Column(db.Integer, primary_key=True)
     time_in = db.Column(db.Time)
