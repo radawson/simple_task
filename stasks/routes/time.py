@@ -9,7 +9,7 @@ from flask import (
     url_for,
 )
 from flask_login import current_user, fresh_login_required, login_required
-from stasks.models import db, Event, Note, Task, Time, User
+from stasks.models import db, Event, Note, Task, Timecard, User
 from datetime import datetime
 
 times = Blueprint("times", __name__)
@@ -19,41 +19,53 @@ times = Blueprint("times", __name__)
 def timecard():
     if request.method == "GET":
         users = User.query.filter_by(employee=True).all()
-        print(users)
         return render_template("time.html", users=users)
     elif request.method == "POST":
+        message = "Post timecard request received"
         print(request.form.to_dict())
-        message = "Post request received"
         person_id = request.form.get("person_id")
         if not person_id:
-            return jsonify("No person selected")
+            return jsonify({'message':'No person selected', 'category':'error'})
+        if request.form.get("date"):
+            date = datetime.strptime(request.form.get("date"), "%Y-%M-%d").date()
+        else:
+            return jsonify({'message':'No date selected', 'category':'error'})
+        description = request.form.get("description")
         if request.form.get("time_in"):
             time_in = datetime.strptime(request.form.get("time_in"), "%H:%M").time()
         if request.form.get("time_out"):
             time_out = datetime.strptime(request.form.get("time_out"), "%H:%M").time()
-        if request.form.get("date"):
-            date = datetime.strptime(request.form.get("date"), "%Y-%m-%d").date()
-        description = request.form.get("description")
+        
+        
         # Check to see if the user has already clocked in
-        if Time.query.filter_by(person_id=person_id, date=date).first():
-            time_entry = Time.query.filter_by(person_id=person_id, date=date).first()
+        if Timecard.query.filter_by(person_id=person_id, date=date).first():
+            time_entry = Timecard.query.filter_by(person_id=person_id, date=date).first()
+            # User has clocked in but not clocked out
             if time_entry.time_in and not time_entry.time_out:
-                time_entry.time_out = time_out
-                db.session.commit()
-                message = "Time out updated"
-            else:
-                message = "Time in already recorded"
+                # Trying to clock out
+                if request.form.get("time_out"):
+                    time_entry.time_out = time_out
+                    db.session.commit()
+                    message = "Time out updated"
+                # Trying to clock in again    
+                else:
+                    message = "Time in already recorded"
+            # User has clocked in and out, so make a new entry
         else:
-            time_entry = Time(
+            # User has clocked out without clocking in
+            if not request.form.get("time_in"):
+                return jsonify({'message': "Time in required before time out", 'category':'warning'})
+            time_entry = Timecard(
                 person_id=person_id,
                 time_in=time_in,
                 date=date,
                 description=description,
             )
-            db.session.add(time_entry)
-            db.session.commit()
             message = "Time in recorded"
-        return jsonify(message)
+        db.session.add(time_entry)
+        db.session.commit()
+        
+        return jsonify({'message':message, 'category':'success'})
     else:
         pass
 
@@ -62,9 +74,9 @@ def timecard():
 def time_by_date(date):
     if request.method == "GET":
         if date == "all":
-            times = Time.query.all()
+            times = Timecard.query.all()
         else:
-            times = Time.query.filter_by(date=date).all()
+            times = Timecard.query.filter_by(date=date).all()
         return jsonify([timecard.to_dict() for timecard in times])
     else:
         pass
@@ -74,9 +86,9 @@ def time_by_date(date):
 def time_by_person(person_id):
     if request.method == "GET":
         if person_id == "all":
-            times = Time.query.all()
+            times = Timecard.query.all()
         else:
-            times = Time.query.filter_by(person_id=person_id).all()
+            times = Timecard.query.filter_by(person_id=person_id).all()
         print([timecard.to_dict() for timecard in times])
         return jsonify([timecard.to_dict() for timecard in times])
     else:
@@ -86,10 +98,10 @@ def time_by_person(person_id):
 @times.route("/time/<time_id>", methods=["GET", "PATCH", "DELETE"])
 def time_api(time_id):
     if request.method == "GET":
-        timecard = Time.query.get(time_id)
+        timecard = Timecard.query.get(time_id)
         return jsonify(timecard.to_dict())
     elif request.method == "PATCH":
-        timecard = Time.query.get(time_id)
+        timecard = Timecard.query.get(time_id)
         if request.form.get("time_in"):
             try:
                 timecard.time_in = datetime.strptime(
@@ -127,7 +139,7 @@ def time_api(time_id):
         db.session.commit()
         return jsonify({"message": "Timecard updated", "category": "success"})
     elif request.method == "DELETE":
-        timecard = Time.query.get(time_id)
+        timecard = Timecard.query.get(time_id)
         db.session.delete(timecard)
         db.session.commit()
         return jsonify(timecard.to_dict())

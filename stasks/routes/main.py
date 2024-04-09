@@ -76,7 +76,7 @@ def admin():
     if current_user.is_admin():
         return render_template("admin.html", version=version, employees=Person.get_employees())
     flash("You do not have administrator permissions")
-    return render_template("settings.html")  # temp until admin page is created
+    return render_template("settings.html", employees=Person.get_employees_names())  # temp until admin page is created
 
 @main.route("/calendar")
 def calendar():

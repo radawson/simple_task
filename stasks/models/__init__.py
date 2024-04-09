@@ -3,7 +3,7 @@ from .event import Event
 from .note import Note
 from .person import Person, User
 from .task import Task, Template, task_to_templates
-from .time import Time
+from .timecard import Timecard
 
 
 def seed_db():

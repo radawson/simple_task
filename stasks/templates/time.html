@@ -8,6 +8,11 @@
     <div class="card">
         <div class="card-body">
             <h5 class="card-title">Check in / out</h5>
+            <div class="form-outline mb-2" data-mdb-input-init>
+                <input type="time" id="time" name="time" class="form-control" />
+                <label class="form-label" for="time">Time</label>
+            </div>
+            {% if current_user.admin %}
             <hr>
             <form id="detailForm" action="{{url_for('times.timecard')}}">
                 <div class="form-outline mb-2">
@@ -18,13 +23,9 @@
                     </select>
                     <label class="form-label select-label" for="employees">Person</label>
                 </div>
+
                 <div class="form-outline mb-2" data-mdb-input-init>
-                    <input type="time" id="time" name="time" class="form-control"  />
-                    <label class="form-label" for="time">Time</label>
-                </div>
-                <div class="form-outline mb-2" data-mdb-input-init>
-                    <textarea id="description" name="description" class="form-control"
-                        ></textarea>
+                    <textarea id="description" name="description" class="form-control"></textarea>
                     <label class="form-label" for="description">Notes</label>
                 </div>
                 {% if current_user.admin %}
@@ -35,8 +36,21 @@
                 </div>
                 {% endif %}
             </form>
-            <button id="inButton" class="btn btn-success" ">Check In</button>
-            <button id="outButton" class="btn btn-danger">Check Out</button>
+            <button id="inButton" class="btn btn-success btn-lg" data-mdb-ripple-init>Check In</button>
+            <button id="outButton" class="btn btn-danger btn-lg" data-mdb-ripple-init>Check Out</button>
+            {% endif %}
+            <hr>
+            {% for user in users %}
+            <div class="d-flex p-2 justify-content-between">
+                <div>
+                <h4>{{ user.full_name if user.full_name else user.username }}</h4>  
+                </div>
+                <div >
+                    <button id="inButton-{{ user.id }}" class="btn btn-success" onclick="checkIn({{ user.id }})" data-mdb-ripple-init>Check In</button>
+                    <button id="outButton-{{ user.id }}" class="btn btn-danger" onclick="checkOut({{ user.id }})" data-mdb-ripple-init>Check Out</button>
+                </div>
+            </div>
+            {% endfor %}
         </div>
     </div>
 </div>
@@ -44,6 +58,8 @@
 
 {% block extra_js %}
 <script>
+    const timecard_url = "{{ url_for('times.timecard')}}";
+
     function updateTime() {
         var now = new Date();
         var hours = now.getHours();
@@ -56,24 +72,41 @@
     setInterval(updateTime, 30000); // Update time every 30 seconds
 
     function postTime(formData) {
-        let url = "{{ url_for('times.timecard')}}";
-        fetch(url, {
+        fetch(timecard_url, {
             body: formData,
             method: "POST"
         })
             .then(response => response.json())
             .then(data => {
                 console.log(data);
-                let message = {
-                    message: data,
-                    category: 'success'
-                };
-                showAlert(message);
+                showAlert(data);
             })
             .catch(error => {
-                console.error({messager: error, category: 'danger'});
+                console.error({ message: error, category: 'danger' });
             });
     };
+
+    function checkIn(person_id) {
+        console.log(`Check in: ${person_id}`);
+        let data = new FormData();
+        date_now = new Date().toLocaleDateString("sv");
+        data.append("person_id", person_id);
+        data.append("time_in", document.getElementById('time').value);
+        data.append("date", date_now);
+        data.append("description", document.getElementById('description').value);
+        postTime(data);
+    }
+
+    function checkOut(person_id){
+        console.log(`Check out: ${person_id}`);
+        let data = new FormData();
+        date_now = new Date().toLocaleDateString("sv");
+        data.append("person_id", person_id);
+        data.append("time_out", document.getElementById('time').value);
+        data.append("date", date_now);
+        data.append("description", document.getElementById('description').value);
+        postTime(data);
+    }
 
     document.getElementById('inButton').addEventListener('click', function () {
         let formData = new FormData();

@@ -53,7 +53,7 @@ Admin
                     <option value="{{employee.id}}">{{employee.first_name}} {{employee.last_name}}</option>
                     {% endfor %}
                 </select>
-                
+
             </div>
             <div class="d-flex justify-content-end mb-3">
                 <div data-mdb-input-init class="form-outline">
@@ -71,7 +71,8 @@ Admin
         </div>
         <div class="tab-pane fade " id="admin-tabs-3" role="tabpanel" aria-labelledby="admin-tab-3">
             <div class="d-flex justify-content-start mb-4">
-                <button data-mdb-ripple-init class="btn btn-primary btn-sm ms-3" id="btn-dump-events">Dump Events</button>
+                <button data-mdb-ripple-init class="btn btn-primary btn-sm ms-3" id="btn-dump-events">Dump
+                    Events</button>
                 Dump the Events Database.
                 <button data-mdb-ripple-init class="btn btn-primary btn-sm ms-3" id="btn-dump-notes">Dump Notes</button>
                 Dump the Notes Database.
@@ -81,7 +82,8 @@ Admin
                 Dump the Users Database.
             </div>
             <div class="d-flex justify-content-start mb-4">
-                <button data-mdb-ripple-init class="btn btn-primary btn-sm ms-3" id="btn-load-events">Load Events</button>
+                <button data-mdb-ripple-init class="btn btn-primary btn-sm ms-3" id="btn-load-events">Load
+                    Events</button>
                 Dump the Events Database.
                 <button data-mdb-ripple-init class="btn btn-primary btn-sm ms-3" id="btn-load-notes">Load Notes</button>
                 Dump the Notes Database.
@@ -169,7 +171,7 @@ Admin
     <button data-mdb-ripple-init class="delete-btn btn btn-outline-primary btn-floating btn-sm" data-mdb-id="${time.id}" data-mdb-tooltip-init title="Delete"><i class="fa fa-trash" ></i></button>`;
                     return time;
                 });
-                timecardTable.update(
+                tableEditor.update(
                     {
                         rows: data.map((time) => ({
                             ...time,
@@ -278,48 +280,53 @@ Admin
             field: 'date',
         },
         {
-            inputType: 'text',
+            inputType: 'select',
             label: 'Employee',
             field: 'employee',
-        },
-        {
-            inputType: 'time',
+            options: [
+                {% for employee in employees %}
+                '<option value="{{employee.id}}">{{employee.first_name}} {{employee.last_name}}</option>',
+        {% endfor %}
+        ],
+    },
+    {
+        inputType: 'time',
             label: 'Time In',
-            field: 'time_in',
+                field: 'time_in',
         },
-        {
-            inputType: 'time',
+    {
+        inputType: 'time',
             label: 'Time Out',
-            field: 'time_out',
+                field: 'time_out',
         },
-        {
-            inputType: 'number',
+    {
+        inputType: 'number',
             label: 'Base Pay',
-            field: 'base_pay',
-            editable: false,
+                field: 'base_pay',
+                    editable: false,
         },
-        {
-            inputType: 'text',
+    {
+        inputType: 'text',
             label: 'Total Hours',
-            field: 'total',
-            editable: false,
+                field: 'total',
+                    editable: false,
         },
-        {
-            defaultValue: false,
+    {
+        defaultValue: false,
             inputType: 'checkbox',
-            label: 'Paid',
-            field: 'paid',
+                label: 'Paid',
+                    field: 'paid',
         },
-        {
-            inputType: 'text',
+    {
+        inputType: 'text',
             label: 'Notes',
-            field: 'description',
+                field: 'description',
         },
     ];
 
 
-    const timecardTable = new TableEditor(
-        document.getElementById('table_timecard'),
+    const timecardTable = document.getElementById('table_timecard')
+    const tableEditor = new TableEditor(timecardTable,
         { columns: advancedColumns2, },
         { entries: 5, entriesOptions: [5, 15, 25], confirm: true }
     );
@@ -345,7 +352,8 @@ Admin
             });
     })
 
-    document.getElementById('table_timecard').addEventListener('update.mdb.tableEditor', (e) => {
+    timecardTable.addEventListener('edit.mdb.tableEditor', (e) => {
+        console.log(e.row.date);
         let formData = new FormData();
         formData.append('date', e.row.date);
         formData.append('time_in', e.row.time_in);
@@ -354,7 +362,8 @@ Admin
         formData.append('paid', e.row.paid);
         formData.append('description', e.row.description);
         formData.append('employee', e.row.employee);
-        formData.append('id', e.row.id);
+        formData.append('id', e.row.person_id);
+        console.log(formData.get('date'));
         let url = "{{ url_for('times.time_api', time_id=0)}}";
         url = url.replace('0', e.row.id);
         fetch(url, {
@@ -363,7 +372,6 @@ Admin
         })
             .then(response => response.json())
             .then(data => {
-                console.log(data);
                 showAlert(data);
                 fetchTime({ "person": "all" });
             })
@@ -583,6 +591,6 @@ Admin
         };
         input.click();
     });
-    
+
 </script>
 {% endblock %}
