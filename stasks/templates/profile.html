@@ -35,6 +35,11 @@ Profile
                     value="{{current_user.last_name}}" />
                   <label class="form-label" for="last_name">Last Name</label>
                 </div>
+                <div class="form-outline ms-1" data-mdb-input-init>
+                  <input type="text" id="goes_by" name="goes_by" class="form-control"
+                    value="{{current_user.goes_by}}" />
+                  <label class="form-label" for="goes_by">Goes By</label>
+                </div>
               </div>
               <div class="form-outline mb-3" data-mdb-input-init>
                 <input type="email" id="email" name="email" class="form-control"
@@ -57,6 +62,13 @@ Profile
                 <textarea class="form-control" id="info" name="info" rows="4">{{current_user.info}}
                   </textarea>
                 <label class="form-label" for="info">Additional Information</label>
+              </div>
+              {% if current_user.admin %}
+              <hr>
+              <div class="form-outline ms-1" data-mdb-input-init>
+                <input type="text" id="base_pay" name="base_pay" class="form-control"
+                  value="{{current_user.base_pay}}" />
+                <label class="form-label" for="base_pay">Base Pay</label>
               </div>
 
               <button type="button" class="btn btn-primary mb-2" id="update_profile_button" data-mdb-ripple-init>

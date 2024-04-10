@@ -124,6 +124,8 @@ def user_api(user_id):
             user.first_name = request.form.get("first_name")
         if request.form.get("last_name"):
             user.last_name = request.form.get("last_name")
+        if request.form.get("goes_by"):
+            user.goes_by = request.form.get("goes_by")
         if request.form.get("email"):
             user.email = request.form.get("email")
         if request.form.get("username"):
