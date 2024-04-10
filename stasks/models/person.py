@@ -7,6 +7,7 @@ class Person(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     first_name = db.Column(db.String(20), nullable=False)
     last_name = db.Column(db.String(20))
+    goes_by = db.Column(db.String(20))
     full_name = db.Column(db.String(40), db.Computed("first_name || ' ' || last_name"))
     phone = db.Column(db.String(20))
     email = db.Column(db.String(40))

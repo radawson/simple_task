@@ -41,9 +41,9 @@
             {% endif %}
             <hr>
             {% for user in users %}
-            <div class="d-flex p-2 justify-content-between">
+            <div class="d-flex p-2 justify-content-between border-primary">
                 <div>
-                <h4>{{ user.full_name if user.full_name else user.username }}</h4>  
+                <h4>{{ user.goes_by if user.goes_by else user.first_name }}</h4>  
                 </div>
                 <div >
                     <button id="inButton-{{ user.id }}" class="btn btn-success" onclick="checkIn({{ user.id }})" data-mdb-ripple-init>Check In</button>
