@@ -99,9 +99,10 @@ Task Detail
             document.getElementById('date'),
             document.getElementById('priority'),
             document.getElementById('template'),
-            document.getElementById('templates'),
-            
         ];
+        if (document.getElementById('templates')) {
+            fields.push(document.getElementById('templates'));
+        }
         let form = document.getElementById('detailForm');
         let formData = new FormData(form);
 
