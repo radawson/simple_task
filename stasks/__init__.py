@@ -2,6 +2,7 @@ import os
 from flask import Flask
 from flask_migrate import Migrate
 from flask_login import LoginManager
+from flask-cors import CORS
 from dotenv import load_dotenv
 from .models import db, seed_db
 from .routes import auth, calendar, main, meals, notes, tasks, events, test, times
@@ -12,6 +13,8 @@ version = "0.2.1"
 def create_app():
     # Initialize Flask app
     app = Flask(__name__)
+    # Enable CORS
+    CORS(app)
     app.__version__ = version
     load_dotenv()
     # Set up the SQLAlchemy database URI
