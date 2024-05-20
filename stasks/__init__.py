@@ -2,7 +2,7 @@ import os
 from flask import Flask
 from flask_migrate import Migrate
 from flask_login import LoginManager
-from flask-cors import CORS
+from flask_cors import CORS
 from dotenv import load_dotenv
 from .models import db, seed_db
 from .routes import auth, calendar, main, meals, notes, tasks, events, test, times
