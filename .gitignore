@@ -27,3 +27,4 @@ migrations/
 # Configuration files
 # -------------------
 .env
+client_secrets.json

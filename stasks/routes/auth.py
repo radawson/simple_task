@@ -5,10 +5,12 @@ from flask import Blueprint, redirect, render_template, request, url_for
 from flask_login import current_user, login_required, login_user, logout_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from stasks.models import db, User
+from flask_oidc import OpenIDConnect
 
 auth = Blueprint("auth", __name__)
+oidc = OpenIDConnect()
 
-
+# Traditional Username/Password Login
 @auth.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
@@ -25,6 +27,27 @@ def login():
         login_user(user, remember=remember)
         return redirect(url_for("main.index"))
     return render_template("login.html")
+
+# New Route for OIDC-based Login
+@auth.route("/oidc_login")
+@oidc.require_login
+def oidc_login():
+    if oidc.user_loggedin:
+        oidc_user_info = oidc.user_getinfo(["email", "sub"])
+        email = oidc_user_info.get("email")
+        sub = oidc_user_info.get("sub")
+
+        # Check if the user already exists in the database
+        user = User.query.filter_by(email=email).first()
+        if not user:
+            # Register a new user if they do not exist
+            user = User(username=email.split('@')[0], email=email, oidc_sub=sub, password="")  # Empty password
+            db.session.add(user)
+            db.session.commit()
+        
+        login_user(user)  # Log the user in
+        return redirect(url_for("main.index"))
+    return redirect(url_for("auth.login"))
 
 @auth.route('/password', methods=['POST'])
 @login_required
@@ -50,26 +73,15 @@ def password():
 @auth.route("/register", methods=["GET", "POST"])
 def register():
     if request.method == "POST":
-        print(request.form.to_dict())
         email = request.form.get("email")
         username = request.form.get("username").lower()
         password = request.form.get("password")
         first_name = request.form.get("first_name")
         last_name = request.form.get("last_name")
-        if not first_name:
-            first_name = username.split()[0]
-        if request.form.get("admin"):
-            admin = True
-        else:
-            admin = False
-        if request.form.get("employee"):
-            employee = True
-        else:
-            employee = False
-        user = User.query.filter_by(
-            username=username
-        ).first()  # if this returns a user, then the email already exists in database
+        admin = True if request.form.get("admin") else False
+        employee = True if request.form.get("employee") else False
 
+        user = User.query.filter_by(username=username).first()
         if user:
             flash("Username already exists", "warning")
             return redirect(url_for("auth.register"))
@@ -85,9 +97,8 @@ def register():
         )
         db.session.add(new_user)
         db.session.commit()
+        flash("Account created successfully", "success")
 
-        message = "Account created successfully"
-        flash(message, "success")
         if current_user.is_authenticated:
             return redirect(url_for("main.index"))
         else:
@@ -99,6 +110,14 @@ def register():
 @login_required
 def logout():
     logout_user()
+    if oidc.user_loggedin:
+        oidc.logout()
+        return redirect(url_for("auth.oidc_logout"))
+    return redirect(url_for("main.index"))
+
+@auth.route("/oidc_logout")
+def oidc_logout():
+    oidc.logout()
     return redirect(url_for("main.index"))
 
 @auth.route("/users")
