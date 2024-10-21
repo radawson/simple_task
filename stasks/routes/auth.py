@@ -12,11 +12,11 @@ logger = Logger().get_logger()
 
 auth = Blueprint("auth", __name__)
 
-@auth.before_app_request
-def setup_oidc():
-    """Ensure OIDC is set up properly."""
-    if not hasattr(auth, 'oidc'):
-        auth.oidc = current_app.oidc
+# @auth.before_app_request
+# def setup_oidc():
+#     """Ensure OIDC is set up properly."""
+#     if not hasattr(auth, 'oidc'):
+#         auth.oidc = current_app.oidc
 
 # Traditional Username/Password Login
 @auth.route("/login", methods=["GET", "POST"])
