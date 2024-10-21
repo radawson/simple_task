@@ -57,9 +57,9 @@ def create_app():
     logger.debug("Migrate initialized")
 
     # Initialize OIDC
-    oidc = OpenIDConnect(app)
-    app.oidc = oidc
-    logger.debug("OIDC initialized")
+    # oidc = OpenIDConnect(app)
+    # app.oidc = oidc
+    # logger.debug("OIDC initialized")
 
     # Initialize the login manager
     login_manager = LoginManager()
