@@ -5,10 +5,18 @@ from flask import Blueprint, redirect, render_template, request, url_for
 from flask_login import current_user, login_required, login_user, logout_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from stasks.models import db, User
-from flask_oidc import OpenIDConnect
+from flask import current_app
+from logger import Logger
+
+logger = Logger().get_logger()
 
 auth = Blueprint("auth", __name__)
-oidc = OpenIDConnect()
+
+@auth.before_app_request
+def setup_oidc():
+    """Ensure OIDC is set up properly."""
+    if not hasattr(auth, 'oidc'):
+        auth.oidc = current_app.oidc
 
 # Traditional Username/Password Login
 @auth.route("/login", methods=["GET", "POST"])
@@ -30,12 +38,15 @@ def login():
 
 # New Route for OIDC-based Login
 @auth.route("/oidc_login")
-@oidc.require_login
 def oidc_login():
+    oidc = auth.oidc
+    logger.debug("Entering OIDC login route.")
     if oidc.user_loggedin:
+        logger.debug("User successfully logged in via OIDC.")
         oidc_user_info = oidc.user_getinfo(["email", "sub"])
         email = oidc_user_info.get("email")
         sub = oidc_user_info.get("sub")
+        logger.debug(f"OIDC user email: {email}")
 
         # Check if the user already exists in the database
         user = User.query.filter_by(email=email).first()
@@ -48,6 +59,14 @@ def oidc_login():
         login_user(user)  # Log the user in
         return redirect(url_for("main.index"))
     return redirect(url_for("auth.login"))
+
+@auth.route('/oidc_callback')
+def oidc_callback():
+    oidc = auth.oidc
+    # Handle the callback logic here, e.g., finalize login
+    if oidc.user_loggedin:
+        return redirect(url_for('main.index'))
+    return redirect(url_for('auth.oidc_login'))
 
 @auth.route('/password', methods=['POST'])
 @login_required
@@ -109,6 +128,7 @@ def register():
 @auth.route("/logout")
 @login_required
 def logout():
+    oidc = auth.oidc
     logout_user()
     if oidc.user_loggedin:
         oidc.logout()
@@ -117,6 +137,7 @@ def logout():
 
 @auth.route("/oidc_logout")
 def oidc_logout():
+    oidc = auth.oidc
     oidc.logout()
     return redirect(url_for("main.index"))
 
