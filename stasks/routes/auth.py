@@ -155,16 +155,29 @@ def register():
 @login_required
 def logout():
     oidc = auth.oidc
+    # Log out the user from the Flask-Login session
     logout_user()
+
+    # If the user is logged in via OIDC, perform Keycloak logout
     if oidc.user_loggedin:
+        logger.debug("Logging out from Keycloak...")
         oidc.logout()
         return redirect(url_for("auth.oidc_logout"))
+
+    # Redirect to main page after traditional logout
+    flash("Successfully logged out.", "success")
     return redirect(url_for("main.index"))
 
 @auth.route("/oidc_logout")
 def oidc_logout():
     oidc = auth.oidc
+    logger.debug("Performing OIDC logout...")
+    
+    # Call the OIDC logout method, which should redirect to Keycloak's logout endpoint
     oidc.logout()
+    
+    # Redirect back to the main page after OIDC logout
+    flash("Successfully logged out from Keycloak.", "success")
     return redirect(url_for("main.index"))
 
 @auth.route("/users")
