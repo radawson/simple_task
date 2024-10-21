@@ -41,23 +41,45 @@ def login():
 def oidc_login():
     oidc = auth.oidc
     logger.debug("Entering OIDC login route.")
+    
     if oidc.user_loggedin:
         logger.debug("User successfully logged in via OIDC.")
-        oidc_user_info = oidc.user_getinfo(["email", "sub"])
+        
+        # Extract user info and roles from OIDC
+        oidc_user_info = oidc.user_getinfo(["email", "sub", "roles"])
         email = oidc_user_info.get("email")
         sub = oidc_user_info.get("sub")
-        logger.debug(f"OIDC user email: {email}")
+        roles = oidc_user_info.get("roles", [])
+
+        logger.debug(f"OIDC user email: {email}, roles: {roles}")
+
+        # Check if 'admin' role is present in roles
+        is_admin = 'admin' in roles
 
         # Check if the user already exists in the database
         user = User.query.filter_by(email=email).first()
         if not user:
             # Register a new user if they do not exist
-            user = User(username=email.split('@')[0], email=email, oidc_sub=sub, password="")  # Empty password
+            user = User(
+                first_name=email.split('@')[0],
+                email=email,
+                username=email.split('@')[0],
+                oidc_sub=sub,
+                password="",  # No password needed for OIDC users
+                admin=is_admin
+            )
             db.session.add(user)
             db.session.commit()
-        
+            logger.debug(f"New user registered: {user.username}, admin: {is_admin}")
+        else:
+            # Update the admin flag if the user already exists
+            user.admin = is_admin
+            db.session.commit()
+            logger.debug(f"Existing user updated: {user.username}, admin: {is_admin}")
+
         login_user(user)  # Log the user in
         return redirect(url_for("main.index"))
+    
     return redirect(url_for("auth.login"))
 
 @auth.route('/oidc_callback')
