@@ -9,7 +9,7 @@ from logger import Logger
 from .models import db, seed_db
 from .routes import auth, calendar, main, meals, notes, tasks, events, test, times
 
-version = "0.3.0"
+version = "0.3.2"
 
 logger = Logger().get_logger()
 
@@ -18,6 +18,8 @@ def create_app():
 
     # Initialize Flask app
     app = Flask(__name__)
+    app.config['DEBUG'] = True
+    app.config['PROPAGATE_EXCEPTIONS'] = True
     logger.debug(f"Flask app initialized with version {version}")
 
     # Enable CORS
@@ -72,15 +74,6 @@ def create_app():
         user = User.query.get(int(user_id))
         logger.debug(f"User loaded: {user}")
         return user
-    
-    # # Redirect to OIDC login if the user is not authenticated
-    # @app.before_request
-    # def check_oidc_authentication():
-    #     if request.endpoint in ['auth.oidc_login', 'auth.oidc_logout']:
-    #         return
-    #     if not current_user.is_authenticated and not oidc.user_loggedin:
-    #         logger.debug("User not authenticated, redirecting to OIDC login")
-    #         return redirect(url_for('auth.oidc_login'))
 
     # Register the blueprints
     app.register_blueprint(auth)

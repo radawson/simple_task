@@ -21,7 +21,9 @@ def setup_oidc():
 # Traditional Username/Password Login
 @auth.route("/login", methods=["GET", "POST"])
 def login():
+    logger.debug(f"Accessing /login: {request.method}")
     if request.method == "POST":
+        logger.debug("Handling traditional login...")
         # Handle traditional login
         username = request.form.get("username").lower()
         password = request.form.get("password")
@@ -35,9 +37,10 @@ def login():
 
         login_user(user, remember=remember)
         return redirect(url_for("main.index"))
-    
-    # If GET request, render the login page with options
-    return render_template("login.html")
+    else:
+        logger.debug("Rendering login form")
+        return render_template("login.html")
+
 
 # New Route for OIDC-based Login
 @auth.route("/oidc_login")
