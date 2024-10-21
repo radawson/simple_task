@@ -6,7 +6,22 @@
         <div class="row d-flex justify-content-center">
             <div class="col-lg-6">
                 <h3 class="title">Login</h3>
-                <form method="POST" action="{{url_for('auth.login')}}">
+
+                <!-- Flash messages -->
+                {% with messages = get_flashed_messages(with_categories=True) %}
+                    {% if messages %}
+                        <div class="container mt-3">
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                {% endwith %}
+
+                <form method="POST" action="{{ url_for('auth.login') }}">
 
                     <div class="form-outline mb-4" data-mdb-input-init>
                         <input type="text" id="username" name="username" class="form-control" />
@@ -24,7 +39,7 @@
                         <div class="col-md-6 d-flex justify-content-center">
                             <!-- Checkbox -->
                             <div class="form-check mb-3 mb-md-0">
-                                <input class="form-check-input" type="checkbox" value="" id="remember" checked />
+                                <input class="form-check-input" type="checkbox" name="remember" value="on" id="remember" />
                                 <label class="form-check-label" for="remember">
                                     Remember me
                                 </label>
@@ -42,6 +57,15 @@
                         Sign in
                     </button>
                 </form>
+                <hr>
+
+                <!-- Keycloak (OIDC) Login Button -->
+                <div class="text-center mt-4">
+                    <p>Or, log in with:</p>
+                    <a href="{{ url_for('auth.oidc_login') }}" class="btn btn-secondary btn-block">
+                        Login with PTX SSO
+                    </a>
+                </div>
             </div>
         </div>
     </section>

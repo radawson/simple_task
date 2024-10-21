@@ -22,6 +22,7 @@ def setup_oidc():
 @auth.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
+        # Handle traditional login
         username = request.form.get("username").lower()
         password = request.form.get("password")
         remember = True if request.form.get("remember") else False
@@ -34,6 +35,8 @@ def login():
 
         login_user(user, remember=remember)
         return redirect(url_for("main.index"))
+    
+    # If GET request, render the login page with options
     return render_template("login.html")
 
 # New Route for OIDC-based Login
@@ -77,7 +80,8 @@ def oidc_login():
             db.session.commit()
             logger.debug(f"Existing user updated: {user.username}, admin: {is_admin}")
 
-        login_user(user)  # Log the user in
+        login_user(user)
+        flash("Successfully logged in with Keycloak!", "success")
         return redirect(url_for("main.index"))
     
     return redirect(url_for("auth.login"))
