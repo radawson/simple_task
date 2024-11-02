@@ -9,7 +9,7 @@ from logger import Logger
 from .models import db, seed_db
 from .routes import auth, calendar, main, meals, notes, tasks, events, test, times
 
-version = "0.3.2"
+version = "0.4.0"
 
 logger = Logger().get_logger()
 
@@ -57,9 +57,10 @@ def create_app():
     logger.debug("Migrate initialized")
 
     # Initialize OIDC
-    # oidc = OpenIDConnect(app)
-    # app.oidc = oidc
-    # logger.debug("OIDC initialized")
+    oidc = OpenIDConnect(app)
+    app.oidc = oidc
+    auth.oidc = oidc  # Make OIDC available to auth blueprint
+    logger.debug("OIDC initialized")
 
     # Initialize the login manager
     login_manager = LoginManager()

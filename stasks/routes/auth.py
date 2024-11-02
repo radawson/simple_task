@@ -1,22 +1,21 @@
 from datetime import datetime
 from sqlite3 import IntegrityError
 from flask import flash, jsonify
-from flask import Blueprint, redirect, render_template, request, url_for
+from flask import Blueprint, current_app, redirect, render_template, request, url_for, session
 from flask_login import current_user, login_required, login_user, logout_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from stasks.models import db, User
-from flask import current_app
 from logger import Logger
 
 logger = Logger().get_logger()
 
 auth = Blueprint("auth", __name__)
 
-# @auth.before_app_request
-# def setup_oidc():
-#     """Ensure OIDC is set up properly."""
-#     if not hasattr(auth, 'oidc'):
-#         auth.oidc = current_app.oidc
+@auth.before_app_request
+def setup_oidc():
+    """Ensure OIDC is set up properly."""
+    if not hasattr(auth, 'oidc'):
+        auth.oidc = current_app.oidc
 
 # Traditional Username/Password Login
 @auth.route("/login", methods=["GET", "POST"])
@@ -160,6 +159,9 @@ def logout():
     oidc = auth.oidc
     # Log out the user from the Flask-Login session
     logout_user()
+    # Clear the local session
+    session.clear()
+
 
     # If the user is logged in via OIDC, perform Keycloak logout
     if oidc.user_loggedin:
@@ -182,6 +184,10 @@ def oidc_logout():
     # Redirect back to the main page after OIDC logout
     flash("Successfully logged out from Keycloak.", "success")
     return redirect(url_for("main.index"))
+
+@auth.route('/oidc_logout_callback')
+def oidc_logout_callback():
+    return redirect(url_for('index'))
 
 @auth.route("/users")
 @login_required
