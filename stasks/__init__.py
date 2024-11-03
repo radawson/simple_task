@@ -41,15 +41,6 @@ def create_app():
     app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
     logger.debug("Secret key loaded from environment")
 
-    # OpenID Connect configurations
-    app.config['OIDC_CLIENT_SECRETS'] = 'client_secrets.json'
-    app.config['OIDC_COOKIE_SECURE'] = False
-    app.config['OIDC_SCOPES'] = ['openid', 'email', 'profile']
-    app.config['OIDC_INTROSPECTION_AUTH_METHOD'] = 'client_secret_post'
-    app.config['ENABLE_OIDC'] = True  # Make this configurable via environment
-    app.config['OIDC_REQUIRE_VERIFIED_EMAIL'] = False
-    logger.debug("OIDC configurations set")
-
     # Initialize the database with the app
     db.init_app(app)
     logger.debug("Database initialized with Flask app")
@@ -58,11 +49,18 @@ def create_app():
     migrate = Migrate(app, db)
     logger.debug("Migrate initialized")
 
-    # Initialize OIDC
-    oidc = OpenIDConnect(app)
-    app.oidc = oidc
-    auth.oidc = oidc  # Make OIDC available to auth blueprint
-    logger.debug("OIDC initialized")
+# Optional OIDC configuration
+    if os.getenv('ENABLE_SSO', 'False').lower() == 'true':
+        app.config['OIDC_CLIENT_SECRETS'] = 'client_secrets.json'
+        app.config['OIDC_COOKIE_SECURE'] = False
+        app.config['OIDC_SCOPES'] = ['openid', 'email', 'profile']
+        app.config['OIDC_INTROSPECTION_AUTH_METHOD'] = 'client_secret_post'
+        oidc = OpenIDConnect(app)
+        app.oidc = oidc
+        logger.debug("OIDC initialized")
+    else:
+        app.oidc = None
+    
 
     # Initialize the login manager
     login_manager = LoginManager()
