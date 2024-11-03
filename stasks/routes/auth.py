@@ -20,59 +20,55 @@ def setup_oidc():
 # Traditional Username/Password Login
 @auth.route("/login", methods=["GET", "POST"])
 def login():
-    logger.debug(f"Accessing /login: {request.method}")
-    # If already logged in via OIDC, redirect
-    if hasattr(auth, 'oidc') and auth.oidc.user_loggedin:
-        return redirect(url_for('main.index'))
+    # If already logged in, redirect to index
+    if current_user.is_authenticated:
+        return redirect(url_for("main.index"))
 
     if request.method == "POST":
-        logger.debug("Handling traditional login...")
-        # Handle traditional login
-        username = request.form.get("username").lower()
+        username = request.form.get("username")
         password = request.form.get("password")
         remember = True if request.form.get("remember") else False
 
         user = User.query.filter_by(username=username).first()
+        if user and check_password_hash(user.password, password):
+            login_user(user, remember=remember)
+            next_page = request.args.get('next')
+            return redirect(next_page or url_for("main.index"))
+            
+        flash("Invalid username or password", "danger")
+        return redirect(url_for("auth.login"))
 
-        if not user or not check_password_hash(user.password, password):
-            flash("Please check your login details and try again.", "danger")
-            return redirect(url_for("auth.login"))
-
-        login_user(user, remember=remember)
-        return redirect(url_for("main.index"))
-    else:
-        logger.debug("Rendering login form")
-        return render_template("login.html")
+    # Show login page with both options
+    return render_template("login.html", enable_sso=current_app.config.get('ENABLE_SSO'))
 
 
-# New Route for OIDC-based Login
 @auth.route("/oidc_login")
 def oidc_login():
-    if not current_app.config.get('ENABLE_OIDC', False):
-        flash("SSO login is not enabled", "error")
-        return redirect(url_for('auth.login'))
-        
-    return auth.oidc.redirect_to_auth_server()
+    if not current_app.config.get('ENABLE_SSO'):
+        flash("SSO login is not enabled", "danger")
+        return redirect(url_for("auth.login"))
+    return current_app.oidc.redirect_to_auth_server()
 
 @auth.route('/oidc_callback')
 def oidc_callback():
-    # Handle the OIDC callback and get user info
-    user_info = auth.oidc.user_getinfo(['sub', 'name', 'email'])
-
-    # Find or create the user in the database
-    user = User.query.filter_by(email=user_info['email']).first()
+    info = current_app.oidc.user_getinfo(['email', 'preferred_username'])
+    
+    user = User.query.filter_by(email=info.get('email')).first()
     if not user:
-        user = User(username=user_info['name'], email=user_info['email'], role='admin')
+        # Create new user from OIDC info
+        user = User(
+            username=info.get('preferred_username'),
+            email=info.get('email'),
+            admin=True  # Make SSO users administrators
+        )
         db.session.add(user)
+        db.session.commit()
     else:
-        user.role = 'admin'  # Ensure the user has the 'admin' role
-
-    db.session.commit()
-
-    # Log the user in (this depends on your authentication setup)
-    session['user_id'] = user.id
-
-    return redirect(url_for('index'))
+        # Temporarily promote existing user to admin for this session
+        session['admin'] = True
+    
+    login_user(user)
+    return redirect(url_for('main.index'))
 
 @auth.route('/password', methods=['POST'])
 @login_required
@@ -134,21 +130,13 @@ def register():
 @auth.route("/logout")
 @login_required
 def logout():
-    oidc = auth.oidc
-    # Log out the user from the Flask-Login session
+    if current_app.config.get('ENABLE_SSO') and current_app.oidc.user_loggedin:
+        logout_user()
+        session.clear()
+        return current_app.oidc.logout()
+    
     logout_user()
-    # Clear the local session
     session.clear()
-
-
-    # If the user is logged in via OIDC, perform Keycloak logout
-    if oidc.user_loggedin:
-        logger.debug("Logging out from Keycloak...")
-        oidc.logout()
-        return redirect(url_for("auth.oidc_logout"))
-
-    # Redirect to main page after traditional logout
-    flash("Successfully logged out.", "success")
     return redirect(url_for("main.index"))
 
 @auth.route("/oidc_logout")

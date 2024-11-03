@@ -1,3 +1,4 @@
+from flask import session
 from flask_login import UserMixin
 from datetime import date, time
 from .database import db
@@ -58,7 +59,7 @@ class User(UserMixin, Person):
     oidc_sub = db.Column(db.String(255), unique=True, nullable=True)  # OIDC subject identifier
 
     def is_admin(self):
-        return self.admin
+        return self.admin or session.get('admin', False)
 
     def is_employee(self):
         return self.employee
