@@ -10,7 +10,8 @@ class Person(db.Model):
     goes_by = db.Column(db.String(20))
     full_name = db.Column(db.String(40), db.Computed("first_name || ' ' || last_name"))
     phone = db.Column(db.String(20))
-    email = db.Column(db.String(40), unique=True)
+    email = db.Column(db.String(40), unique=True,
+                     name='uq_person_email')
     address = db.Column(db.String(40))
     city = db.Column(db.String(20))
     state = db.Column(db.String(2))
@@ -56,7 +57,8 @@ class User(UserMixin, Person):
     password = db.Column(db.String(128))  # Increased length for hashed passwords
     username = db.Column(db.String(20), unique=True)
     admin = db.Column(db.Boolean, default=False)
-    oidc_sub = db.Column(db.String(255), unique=True, nullable=True)  # OIDC subject identifier
+    oidc_sub = db.Column(db.String(255), unique=True,
+                        name='uq_user_oidc_sub')  # OIDC subject identifier
 
     def is_admin(self):
         return self.admin or session.get('admin', False)
