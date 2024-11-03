@@ -46,6 +46,8 @@ def create_app():
     app.config['OIDC_COOKIE_SECURE'] = False
     app.config['OIDC_SCOPES'] = ['openid', 'email', 'profile']
     app.config['OIDC_INTROSPECTION_AUTH_METHOD'] = 'client_secret_post'
+    app.config['ENABLE_OIDC'] = True  # Make this configurable via environment
+    app.config['OIDC_REQUIRE_VERIFIED_EMAIL'] = False
     logger.debug("OIDC configurations set")
 
     # Initialize the database with the app

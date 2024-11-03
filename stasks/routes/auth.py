@@ -21,6 +21,10 @@ def setup_oidc():
 @auth.route("/login", methods=["GET", "POST"])
 def login():
     logger.debug(f"Accessing /login: {request.method}")
+    # If already logged in via OIDC, redirect
+    if hasattr(auth, 'oidc') and auth.oidc.user_loggedin:
+        return redirect(url_for('main.index'))
+
     if request.method == "POST":
         logger.debug("Handling traditional login...")
         # Handle traditional login
@@ -44,57 +48,31 @@ def login():
 # New Route for OIDC-based Login
 @auth.route("/oidc_login")
 def oidc_login():
-    oidc = auth.oidc
-    logger.debug("Entering OIDC login route.")
-    
-    if oidc.user_loggedin:
-        logger.debug("User successfully logged in via OIDC.")
+    if not current_app.config.get('ENABLE_OIDC', False):
+        flash("SSO login is not enabled", "error")
+        return redirect(url_for('auth.login'))
         
-        # Extract user info and roles from OIDC
-        oidc_user_info = oidc.user_getinfo(["email", "sub", "roles"])
-        email = oidc_user_info.get("email")
-        sub = oidc_user_info.get("sub")
-        roles = oidc_user_info.get("roles", [])
-
-        logger.debug(f"OIDC user email: {email}, roles: {roles}")
-
-        # Check if 'admin' role is present in roles
-        is_admin = 'admin' in roles
-
-        # Check if the user already exists in the database
-        user = User.query.filter_by(email=email).first()
-        if not user:
-            # Register a new user if they do not exist
-            user = User(
-                first_name=email.split('@')[0],
-                email=email,
-                username=email.split('@')[0],
-                oidc_sub=sub,
-                password="",  # No password needed for OIDC users
-                admin=is_admin
-            )
-            db.session.add(user)
-            db.session.commit()
-            logger.debug(f"New user registered: {user.username}, admin: {is_admin}")
-        else:
-            # Update the admin flag if the user already exists
-            user.admin = is_admin
-            db.session.commit()
-            logger.debug(f"Existing user updated: {user.username}, admin: {is_admin}")
-
-        login_user(user)
-        flash("Successfully logged in with Keycloak!", "success")
-        return redirect(url_for("main.index"))
-    
-    return redirect(url_for("auth.login"))
+    return auth.oidc.redirect_to_auth_server()
 
 @auth.route('/oidc_callback')
 def oidc_callback():
-    oidc = auth.oidc
-    # Handle the callback logic here, e.g., finalize login
-    if oidc.user_loggedin:
-        return redirect(url_for('main.index'))
-    return redirect(url_for('auth.oidc_login'))
+    # Handle the OIDC callback and get user info
+    user_info = auth.oidc.user_getinfo(['sub', 'name', 'email'])
+
+    # Find or create the user in the database
+    user = User.query.filter_by(email=user_info['email']).first()
+    if not user:
+        user = User(username=user_info['name'], email=user_info['email'], role='admin')
+        db.session.add(user)
+    else:
+        user.role = 'admin'  # Ensure the user has the 'admin' role
+
+    db.session.commit()
+
+    # Log the user in (this depends on your authentication setup)
+    session['user_id'] = user.id
+
+    return redirect(url_for('index'))
 
 @auth.route('/password', methods=['POST'])
 @login_required
