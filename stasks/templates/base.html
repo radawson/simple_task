@@ -79,7 +79,7 @@
                         {% if current_user.is_authenticated %}
                         <i class="fas fa-user me-2"></i>
                         {% else %}
-                        <a href="{{ url_for('auth.oidc_login') }}" class="navbar-item">
+                        <a href="{{ url_for('auth.login') }}" class="navbar-item">
                             <i class="fas fa-arrow-right-to-bracket me-2"></i>
                         </a>
                         {% endif %}
