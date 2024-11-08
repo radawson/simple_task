@@ -76,6 +76,11 @@ class Config {
           origins: (process.env.CORS_ALLOWED_ORIGINS || '*').split(','),
           credentials: true
         }
+      },
+      storage: {
+        path: process.env.STORAGE_PATH || path.join(__dirname, '../../storage'),
+        tempPath: process.env.TEMP_STORAGE_PATH || path.join(__dirname, '../../storage/temp'),
+        maxFileSize: parseInt(process.env.MAX_FILE_SIZE) || 200 * 1024 * 1024, // 200MB default
       }
     };
 

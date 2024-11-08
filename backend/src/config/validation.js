@@ -67,7 +67,12 @@ const configSchema = Joi.object({
             origins: Joi.array().items(Joi.string()).required(),
             credentials: Joi.boolean().required()
         }).required()
-    }).required()
+    }).required(),
+    storage: Joi.object({
+        path: Joi.string().required(),
+        tempPath: Joi.string().required(),
+        maxFileSize: Joi.number().min(0).required()
+    }).required(),
 });
 
 module.exports = configSchema;

@@ -74,6 +74,40 @@ class AuthController {
         }
     }
 
+    async register(req, res) {
+        try {
+            const { username, password, email, firstName, lastName } = req.body;
+            const hashedPassword = await argon2.hash(password);
+            
+            const user = await User.create({
+                username,
+                password: hashedPassword,
+                email,
+                firstName,
+                lastName
+            });
+
+            logger.info(`New user registered: ${username}`);
+            res.status(201).json({ 
+                message: 'Registration successful',
+                userId: user.id 
+            });
+        } catch (error) {
+            logger.error(`Registration failed: ${error.message}`);
+            res.status(400).json({ message: 'Registration failed' });
+        }
+    }
+
+    async logout(req, res) {
+        try {
+            // Clear session/token logic here
+            res.status(200).json({ message: 'Logout successful' });
+        } catch (error) {
+            logger.error(`Logout failed: ${error.message}`);
+            res.status(500).json({ message: 'Logout failed' });
+        }
+    }
+
     async refreshToken(req, res) {
         const { refreshToken } = req.body;
         if (!refreshToken) {

@@ -1,8 +1,8 @@
 // src/routes/timecard.routes.js
 const router = require('express').Router();
 const timecardController = require('../controllers/timecard.controller');
-const { validateTimecard } = require('../middleware/validation');
-const { authenticate, authorize } = require('../middleware/auth');
+const { validateTimecard } = require('../middleware/validation.middleware');
+const { authenticate, authorize } = require('../middleware/auth.middleware');
 
 router.get('/timecards', authenticate, timecardController.list);
 router.get('/timecards/:id', authenticate, timecardController.get);

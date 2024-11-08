@@ -1,8 +1,8 @@
 // src/routes/person.routes.js
 const router = require('express').Router();
 const personController = require('../controllers/person.controller');
-const { validatePerson } = require('../middleware/validation');
-const { authenticate, authorize } = require('../middleware/auth');
+const { validatePerson } = require('../middleware/validation.middleware');
+const { authenticate, authorize } = require('../middleware/auth.middleware');
 
 // Basic CRUD with admin/manager authorization
 router.get('/persons', 

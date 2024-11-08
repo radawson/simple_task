@@ -1,7 +1,7 @@
 const router = require('express').Router();
 const userController = require('../controllers/user.controller');
-const { validateUser, validatePassword } = require('../middleware/validation');
-const { authenticate, authorize } = require('../middleware/auth');
+const { validateUser, validatePassword } = require('../middleware/validation.middleware');
+const { authenticate, authorize } = require('../middleware/auth.middleware');
 
 // Admin routes
 router.get('/users', 

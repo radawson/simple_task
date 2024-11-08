@@ -1,43 +1,61 @@
-module.exports = (sequelize, DataTypes) => {
-    return sequelize.define('Filedata', {
-        id: {
-            type: DataTypes.UUID,
-            defaultValue: DataTypes.UUIDV4,
-            primaryKey: true,
-        },
-        sender: {
-            type: DataTypes.TEXT,
-            allowNull: false,
-        },
-        receiver: {
-            type: DataTypes.TEXT,
-            allowNull: false,
-        },
-        hash: {
-            type: DataTypes.TEXT,
-            allowNull: false,
-            unique: true,
-        },
-        size: {
-            type: DataTypes.INTEGER,
-            allowNull: true,
-        },
-        filename: {
-            type: DataTypes.TEXT,
-            allowNull: true,
-        },
-        created_at: {
-            type: DataTypes.DATE,
-            allowNull: true,
-        }
-    }, {
-        tableName: 'filedata',
-        timestamps: true,
-        indexes: [
-            {
-                unique: true,
-                fields: ['sender', 'receiver', 'hash'],
+const BaseModel = require('./base.model');
+const { DataTypes } = require('sequelize');
+
+class Filedata extends BaseModel {
+    static init(sequelize) {
+        return super.init({
+            id: {
+                type: DataTypes.UUID,
+                defaultValue: DataTypes.UUIDV4,
+                primaryKey: true
+            },
+            sender: {
+                type: DataTypes.STRING,
+                allowNull: false
+            },
+            receiver: {
+                type: DataTypes.STRING,
+                allowNull: false
+            },
+            hash: {
+                type: DataTypes.STRING,
+                allowNull: false,
+                unique: true
+            },
+            size: {
+                type: DataTypes.INTEGER,
+                allowNull: true
+            },
+            filename: {
+                type: DataTypes.STRING,
+                allowNull: true
             }
-        ]
-    });
-};
+        }, {
+            sequelize,
+            modelName: 'Filedata',
+            tableName: 'filedata',
+            timestamps: true,
+            indexes: [
+                {
+                    unique: true,
+                    fields: ['sender', 'receiver', 'hash']
+                }
+            ]
+        });
+    }
+
+    static associate(models) {
+        this.belongsTo(models.User, {
+            foreignKey: 'sender',
+            targetKey: 'username',
+            as: 'senderUser'
+        });
+        this.belongsTo(models.User, {
+            foreignKey: 'receiver',
+            targetKey: 'username',
+            as: 'receiverUser'
+        });
+    }
+}
+
+module.exports = Filedata;

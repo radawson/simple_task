@@ -1,8 +1,8 @@
 // src/routes/task.routes.js
 const router = require('express').Router();
 const taskController = require('../controllers/task.controller');
-const { validateTask } = require('../middleware/validation');
-const { authenticate } = require('../middleware/auth');
+const { validateTask } = require('../middleware/validation.middleware');
+const { authenticate } = require('../middleware/auth.middleware');
 
 router.get('/tasks', authenticate, taskController.list);
 router.post('/tasks', authenticate, validateTask, taskController.create);

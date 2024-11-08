@@ -42,6 +42,14 @@ const eventSchema = Joi.object({
     priority: Joi.number().min(0).max(9)
 });
 
+const fileSchema = Joi.object({
+    filename: Joi.string().required(),
+    metadata: Joi.object({
+        sender: Joi.string().required(),
+        receiver: Joi.string().required()
+    }).required()
+});
+
 // Validation middleware factory
 const validate = (schema) => {
     return (req, res, next) => {
@@ -67,6 +75,7 @@ module.exports = {
     validateUser: validate(userSchema),
     validateTask: validate(taskSchema),
     validateEvent: validate(eventSchema),
+    validateFile: validate(fileSchema),
     validateUpdatePassword: validate(Joi.object({
         currentPassword: Joi.string().required(),
         newPassword: Joi.string().pattern(new RegExp('^[a-zA-Z0-9!@#$%^&*]{6,30}$')).required(),

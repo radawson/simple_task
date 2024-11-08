@@ -1,8 +1,8 @@
 // src/routes/template.routes.js
 const router = require('express').Router();
 const templateController = require('../controllers/template.controller');
-const { validateTemplate } = require('../middleware/validation');
-const { authenticate } = require('../middleware/auth');
+const { validateTemplate } = require('../middleware/validation.middleware');
+const { authenticate } = require('../middleware/auth.middleware');
 
 router.get('/templates', authenticate, templateController.list);
 router.get('/templates/:id', authenticate, templateController.get);

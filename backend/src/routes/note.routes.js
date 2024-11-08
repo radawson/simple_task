@@ -1,8 +1,8 @@
 // src/routes/note.routes.js
 const router = require('express').Router();
 const noteController = require('../controllers/note.controller');
-const { validateNote } = require('../middleware/validation');
-const { authenticate } = require('../middleware/auth');
+const { validateNote } = require('../middleware/validation.middleware');
+const { authenticate } = require('../middleware/auth.middleware');
 
 router.get('/notes', authenticate, noteController.list);
 router.get('/notes/:id', authenticate, noteController.get);

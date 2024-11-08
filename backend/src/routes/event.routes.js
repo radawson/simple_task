@@ -1,8 +1,8 @@
 // src/routes/event.routes.js
 const router = require('express').Router();
 const eventController = require('../controllers/event.controller');
-const { validateEvent } = require('../middleware/validation');
-const { authenticate } = require('../middleware/auth');
+const { validateEvent } = require('../middleware/validation.middleware');
+const { authenticate } = require('../middleware/auth.middleware');
 
 router.get('/events', authenticate, eventController.list);
 router.get('/events/:id', authenticate, eventController.get);
