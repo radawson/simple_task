@@ -3,8 +3,10 @@ const path = require('path');
 // Load environment early to ensure all configs are available
 require('dotenv').config();
 
-// Get logger instance early for startup logging
-const logger = require('./src/core/Logger').getInstance();
+// Load config and initialize logger
+const config = require('./src/config');
+const Logger = require('./src/core/Logger');
+const logger = new Logger(config.logger);  // Initialize first
 logger.info(`Server process starting with pid: ${process.pid}`);
 
 // Process lifecycle handling
