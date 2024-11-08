@@ -25,50 +25,84 @@ class FileController {
                 cb(null, `${Date.now()}-${file.originalname}`);
             }
         });
-        this.upload = multer({ 
+        this.upload = multer({
             storage: this.storage,
             limits: {
                 fileSize: config.storage.maxFileSize
             }
         }).single('file');
     }
+    upload = async (req, res) => {
+        // ... existing upload logic
+    }
 
-    async handleUpload(req, res) {
+    listFiles = async (req, res) => {
         try {
-            const tempFilePath = req.file.path;
-            const hash = await FileUtil.calculateFileHash(tempFilePath);
-            const relativePath = FileUtil.generateStoragePath(hash, req.file.originalname);
-            const finalPath = path.join(this.storagePath, relativePath);
-
-            // Create directory structure
-            await fs.mkdir(path.dirname(finalPath), { recursive: true });
-            
-            // Move file to final location
-            await fs.rename(tempFilePath, finalPath);
-
-            // Store metadata
-            const filedata = await Filedata.create({
-                sender: req.user.username,
-                receiver: req.params.username,
-                hash: hash,
-                size: req.file.size,
-                filename: req.file.originalname,
-                path: relativePath
+            const files = await Filedata.findAll({
+                where: {
+                    receiver: req.params.username
+                }
             });
 
-            logger.info(`File uploaded: ${hash} by ${req.user.username}`);
-            res.status(201).json({
-                message: 'File uploaded successfully',
-                fileId: filedata.id
-            });
-
+            logger.info(`Listed files for user: ${req.params.username}`);
+            res.json(files);
         } catch (error) {
-            logger.error(`Upload failed: ${error.message}`);
-            res.status(500).json({ message: 'File upload failed' });
+            logger.error(`File listing failed: ${error.message}`);
+            res.status(500).json({ message: 'Failed to list files' });
         }
     }
 
-    async verifyFile(req, res) {
+    download = async (req, res) => {
+        try {
+            const filedata = await Filedata.findOne({
+                where: {
+                    receiver: req.params.username,
+                    filename: req.params.filename
+                }
+            });
+
+            if (!filedata) {
+                return res.status(404).json({ message: 'File not found' });
+            }
+
+            const filePath = path.join(this.storagePath, filedata.path);
+            res.download(filePath, filedata.filename);
+
+            logger.info(`File downloaded: ${filedata.filename}`);
+        } catch (error) {
+            logger.error(`Download failed: ${error.message}`);
+            res.status(500).json({ message: 'File download failed' });
+        }
+    }
+
+    deleteFile = async (req, res) => {
+        try {
+            const filedata = await Filedata.findOne({
+                where: {
+                    receiver: req.params.username,
+                    filename: req.params.filename
+                }
+            });
+
+            if (!filedata) {
+                return res.status(404).json({ message: 'File not found' });
+            }
+
+            const filePath = path.join(this.storagePath, filedata.path);
+            await fs.unlink(filePath);
+            await filedata.destroy();
+
+            logger.info(`File deleted: ${filedata.filename}`);
+            res.status(204).send();
+        } catch (error) {
+            logger.error(`File deletion failed: ${error.message}`);
+            res.status(500).json({ message: 'File deletion failed' });
+        }
+    }
+
+
+
+    verifyFile = async (req, res) => {
         try {
             const { hash } = req.params;
             const filedata = await Filedata.findOne({ where: { hash } });
@@ -85,7 +119,7 @@ class FileController {
                 return res.status(400).json({ message: 'File integrity check failed' });
             }
 
-            res.json({ 
+            res.json({
                 verified: true,
                 metadata: {
                     filename: filedata.filename,
@@ -99,6 +133,7 @@ class FileController {
             res.status(500).json({ message: 'File verification failed' });
         }
     }
+
 }
 
 module.exports = new FileController();
