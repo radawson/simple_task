@@ -1,0 +1,45 @@
+project/
+├── backend/
+│   ├── src/
+│   │   ├── config/
+│   │   │   ├── database.config.js
+│   │   │   ├── logger.config.js
+│   │   │   ├── server.config.js
+│   │   │   └── index.js
+│   │   ├── core/
+│   │   │   ├── Database.js
+│   │   │   ├── Logger.js
+│   │   │   └── Server.js
+│   │   ├── models/
+│   │   │   ├── base.model.js
+│   │   │   ├── task.model.js
+│   │   │   ├── user.model.js
+│   │   │   └── index.js
+│   │   ├── controllers/
+│   │   │   ├── auth.controller.js
+│   │   │   ├── task.controller.js
+│   │   │   └── index.js
+│   │   ├── middleware/
+│   │   │   ├── auth.middleware.js
+│   │   │   ├── error.middleware.js
+│   │   │   └── cors.middleware.js
+│   │   ├── routes/
+│   │   │   ├── auth.routes.js
+│   │   │   ├── task.routes.js
+│   │   │   └── index.js
+│   │   └── utils/
+│   │       ├── ssl.util.js
+│   │       └── validation.util.js
+│   ├── logs/
+│   ├── certs/
+│   ├── package.json
+│   └── server.js
+└── frontend/
+    |── public/
+    ├── src/
+    │   ├── components/
+    │   ├── pages/
+    │   ├── services/
+    │   └── store/
+    ├── package.json
+    └── index.html
