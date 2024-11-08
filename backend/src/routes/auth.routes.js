@@ -1,24 +1,19 @@
-const express = require('express');
-const router = express.Router();
+const router = require('express').Router();
 const authController = require('../controllers/auth.controller');
-const generateScramKeys = require('../middleware/scram.middleware');
+const { validateLogin, validateRegistration } = require('../middleware/validation');
 
-/**
- * POST /api/auth/login
- * Purpose: login a user
- */
-router.post('/login', authController.login);
-
-/**
- * POST /api/auth/logout
- * Purpose: logout a user
- */
+// Local auth
+router.post('/login', validateLogin, authController.login);
+router.post('/register', validateRegistration, authController.register);
 router.post('/logout', authController.logout);
 
-/**
- * POST /api/auth/register
- * Purpose: create a new user
- */
-router.post('/register', generateScramKeys(), authController.register);
+// OIDC/Keycloak routes
+router.get('/sso', authController.initiateSSO);
+router.get('/sso/callback', authController.handleSSOCallback);
+router.get('/sso/logout', authController.handleSSOLogout);
+
+// Token validation
+router.post('/verify', authController.verifyToken);
+router.post('/refresh', authController.refreshToken);
 
 module.exports = router;
