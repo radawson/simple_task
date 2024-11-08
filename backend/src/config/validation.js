@@ -34,6 +34,30 @@ const configSchema = Joi.object({
         maxFiles: Joi.string().required(),
         format: Joi.string().valid('json', 'simple').required()
     }).required(),
+    oidc: Joi.object({
+        enabled: Joi.boolean().default(false),
+        issuerUrl: Joi.string().uri().when('enabled', {
+            is: true,
+            then: Joi.required()
+        }),
+        clientId: Joi.string().when('enabled', {
+            is: true,
+            then: Joi.required()
+        }),
+        clientSecret: Joi.string().when('enabled', {
+            is: true,
+            then: Joi.required()
+        }),
+        redirectUri: Joi.string().uri().when('enabled', {
+            is: true,
+            then: Joi.required()
+        }),
+        postLogoutRedirectUri: Joi.string().uri(),
+        scope: Joi.string().default('openid profile email'),
+        responseType: Joi.string().valid('code').default('code'),
+        pkce: Joi.boolean().default(true),
+        timeout: Joi.number().default(5000)
+    }).required(),
     server: Joi.object({
         port: Joi.number().required(),
         sslPort: Joi.number().required(),

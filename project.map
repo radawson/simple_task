@@ -3,9 +3,12 @@ project/
 │   ├── src/
 │   │   ├── config/
 │   │   │   ├── database.config.js
-│   │   │   ├── logger.config.js
+│   │   │   ├── logger.config.js    
 │   │   │   ├── server.config.js
+                socket.config.js
 │   │   │   ├── storage.config.js    # New: File storage config
+                types.ts
+                validation.js
 │   │   │   └── index.js
 │   │   ├── core/
 │   │   │   ├── Database.js
@@ -13,15 +16,19 @@ project/
 │   │   │   ├── Server.js
 │   │   │   └── Storage.js           # New: Storage management
 │   │   ├── models/
+│               audit.model.js      
 │   │   │   ├── base.model.js
-│   │   │   ├── event.model.js       # New
+│   │   │   ├── calendar.model.js
+│   │   │   ├── event.model.js       
 │   │   │   ├── filedata.model.js
 │   │   │   ├── message.model.js
-│   │   │   ├── note.model.js        # New
-│   │   │   ├── person.model.js      # New
+│   │   │   ├── note.model.js 
+                notification.model.js      
+│   │   │   ├── person.model.js      
+                setting.model.js     
 │   │   │   ├── task.model.js
-│   │   │   ├── template.model.js    # New
-│   │   │   ├── timecard.model.js    # New
+│   │   │   ├── template.model.js    
+│   │   │   ├── timecard.model.js    
 │   │   │   └── index.js
 │   │   ├── controllers/
 │   │   │   ├── auth.controller.js
@@ -34,9 +41,9 @@ project/
 │   │   │   ├── timecard.controller.js # New
 │   │   │   └── index.js
 │   │   ├── middleware/
-│   │   │   ├── auth.middleware.js
-│   │   │   ├── cors.middleware.js
-│   │   │   ├── error.middleware.js
+│   │   │   ├── auth.middleware.js  # New
+│   │   │   ├── cors.middleware.js  # New
+│   │   │   ├── error.middleware.js # New
 │   │   │   ├── jwt.middleware.js
 │   │   │   ├── logger.middleware.js   # New
 │   │   │   ├── rate.middleware.js     # New
@@ -46,19 +53,29 @@ project/
 │   │   │   └── index.js
 │   │   ├── routes/
 │   │   │   ├── auth.routes.js
-│   │   │   ├── event.routes.js       # New
+│   │   │   ├── event.routes.js      
 │   │   │   ├── file.routes.js
-│   │   │   ├── note.routes.js        # New
-│   │   │   ├── person.routes.js      # New
+│   │   │   ├── note.routes.js       
+│   │   │   ├── person.routes.js     
 │   │   │   ├── task.routes.js
-│   │   │   ├── template.routes.js    # New
-│   │   │   ├── timecard.routes.js    # New
+│   │   │   ├── template.routes.js    
+│   │   │   ├── timecard.routes.js
+                user.routes.js    
 │   │   │   └── index.js
+│   │   ├── services/
+│   │   │   ├── chat.service.js
+│   │   │   └── socket.service.js      
 │   │   └── utils/
 │   │       ├── date.util.js          # New
 │   │       ├── model.util.js         # New: Model conversion helpers
 │   │       ├── ssl.util.js
 │   │       └── validation.util.js
+│   ├── tests/
+│   │   ├── unit/
+│   │   ├── integration/
+│   │   └── fixtures/
+│   ├── scripts/
+│   ├── docs/
 │   ├── logs/
 │   ├── certs/
 │   ├── package.json

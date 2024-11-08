@@ -22,22 +22,6 @@ class Config {
     const config = {
       env: process.env.NODE_ENV || 'development',
       serverUid: process.env.SERVER_UID || crypto.randomBytes(4).toString('hex'),
-      security: {
-        rateLimiting: {
-          windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS) || 900000, // 15 minutes
-          max: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS) || 100
-        },
-        helmet: {
-          contentSecurityPolicy: {
-            directives: {
-              defaultSrc: ["'self'"],
-              scriptSrc: ["'self'", "'unsafe-inline'"],
-              styleSrc: ["'self'", "'unsafe-inline'"],
-              imgSrc: ["'self'", "data:", "https:"],
-            }
-          }
-        }
-      },
       database: {
         type: process.env.DB_TYPE || 'sqlite',
         database: process.env.DB_NAME || 'stasks',
@@ -54,6 +38,34 @@ class Config {
         directory: path.join(__dirname, '../../logs'),
         maxFiles: '14d',
         format: process.env.LOG_FORMAT || 'json'
+      },
+      oidc: {
+        enabled: process.env.ENABLE_SSO === 'true',
+        issuerUrl: process.env.OIDC_ISSUER_URL,
+        clientId: process.env.OIDC_CLIENT_ID,
+        clientSecret: process.env.OIDC_CLIENT_SECRET,
+        redirectUri: process.env.OIDC_REDIRECT_URI,
+        postLogoutRedirectUri: process.env.OIDC_POST_LOGOUT_REDIRECT_URI,
+        scope: process.env.OIDC_SCOPE || 'openid profile email',
+        responseType: 'code',
+        pkce: true,
+        timeout: parseInt(process.env.OIDC_TIMEOUT) || 5000
+      },
+      security: {
+        rateLimiting: {
+          windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS) || 900000, // 15 minutes
+          max: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS) || 100
+        },
+        helmet: {
+          contentSecurityPolicy: {
+            directives: {
+              defaultSrc: ["'self'"],
+              scriptSrc: ["'self'", "'unsafe-inline'"],
+              styleSrc: ["'self'", "'unsafe-inline'"],
+              imgSrc: ["'self'", "data:", "https:"],
+            }
+          }
+        }
       },
       server: {
         port: parseInt(process.env.PORT) || 3000,
