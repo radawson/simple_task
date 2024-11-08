@@ -10,7 +10,7 @@ class Config {
     if (Config.#instance) {
       return Config.#instance;
     }
-    
+
     this.#config = this.#loadConfig();
     Object.freeze(this.#config);
     Config.#instance = this;
@@ -18,10 +18,26 @@ class Config {
 
   #loadConfig() {
     require('dotenv').config();
-    
+
     const config = {
       env: process.env.NODE_ENV || 'development',
       serverUid: process.env.SERVER_UID || crypto.randomBytes(4).toString('hex'),
+      security: {
+        rateLimiting: {
+          windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS) || 900000, // 15 minutes
+          max: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS) || 100
+        },
+        helmet: {
+          contentSecurityPolicy: {
+            directives: {
+              defaultSrc: ["'self'"],
+              scriptSrc: ["'self'", "'unsafe-inline'"],
+              styleSrc: ["'self'", "'unsafe-inline'"],
+              imgSrc: ["'self'", "data:", "https:"],
+            }
+          }
+        }
+      },
       database: {
         type: process.env.DB_TYPE || 'sqlite',
         database: process.env.DB_NAME || 'stasks',

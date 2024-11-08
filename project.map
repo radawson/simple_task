@@ -5,29 +5,58 @@ project/
 │   │   │   ├── database.config.js
 │   │   │   ├── logger.config.js
 │   │   │   ├── server.config.js
+│   │   │   ├── storage.config.js    # New: File storage config
 │   │   │   └── index.js
 │   │   ├── core/
 │   │   │   ├── Database.js
 │   │   │   ├── Logger.js
-│   │   │   └── Server.js
+│   │   │   ├── Server.js
+│   │   │   └── Storage.js           # New: Storage management
 │   │   ├── models/
 │   │   │   ├── base.model.js
+│   │   │   ├── event.model.js       # New
+│   │   │   ├── filedata.model.js
+│   │   │   ├── message.model.js
+│   │   │   ├── note.model.js        # New
+│   │   │   ├── person.model.js      # New
 │   │   │   ├── task.model.js
-│   │   │   ├── user.model.js
+│   │   │   ├── template.model.js    # New
+│   │   │   ├── timecard.model.js    # New
 │   │   │   └── index.js
 │   │   ├── controllers/
 │   │   │   ├── auth.controller.js
+│   │   │   ├── event.controller.js   # New
+│   │   │   ├── file.controller.js
+│   │   │   ├── note.controller.js    # New
+│   │   │   ├── person.controller.js  # New
 │   │   │   ├── task.controller.js
+│   │   │   ├── template.controller.js # New
+│   │   │   ├── timecard.controller.js # New
 │   │   │   └── index.js
 │   │   ├── middleware/
 │   │   │   ├── auth.middleware.js
+│   │   │   ├── cors.middleware.js
 │   │   │   ├── error.middleware.js
-│   │   │   └── cors.middleware.js
+│   │   │   ├── jwt.middleware.js
+│   │   │   ├── logger.middleware.js   # New
+│   │   │   ├── rate.middleware.js     # New
+│   │   │   ├── scram.middleware.js
+│   │   │   ├── store.middleware.js
+│   │   │   ├── validation.middleware.js
+│   │   │   └── index.js
 │   │   ├── routes/
 │   │   │   ├── auth.routes.js
+│   │   │   ├── event.routes.js       # New
+│   │   │   ├── file.routes.js
+│   │   │   ├── note.routes.js        # New
+│   │   │   ├── person.routes.js      # New
 │   │   │   ├── task.routes.js
+│   │   │   ├── template.routes.js    # New
+│   │   │   ├── timecard.routes.js    # New
 │   │   │   └── index.js
 │   │   └── utils/
+│   │       ├── date.util.js          # New
+│   │       ├── model.util.js         # New: Model conversion helpers
 │   │       ├── ssl.util.js
 │   │       └── validation.util.js
 │   ├── logs/
