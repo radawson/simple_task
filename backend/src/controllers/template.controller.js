@@ -130,6 +130,38 @@ class TemplateController {
             res.status(500).json({ message: 'Failed to generate tasks' });
         }
     }
+
+    async removeTask(req, res) {
+        try {
+            const template = await Template.findByPk(req.params.id);
+            const task = await Task.findByPk(req.params.taskId);
+
+            if (!template) {
+                logger.warn(`Template not found for task removal: ${req.params.id}`);
+                return res.status(404).json({ message: 'Template not found' });
+            }
+
+            if (!task) {
+                logger.warn(`Task not found for removal: ${req.params.taskId}`);
+                return res.status(404).json({ message: 'Task not found' });
+            }
+
+            await template.removeTask(task);
+            logger.info(`Task ${req.params.taskId} removed from template ${req.params.id}`);
+            res.status(200).json({
+                message: 'Task removed from template',
+                templateId: template.id,
+                taskId: task.id
+            });
+
+        } catch (error) {
+            logger.error(`Failed to remove task from template: ${error.message}`);
+            res.status(500).json({
+                message: 'Failed to remove task from template',
+                error: error.message
+            });
+        }
+    }
 }
 
 module.exports = new TemplateController();

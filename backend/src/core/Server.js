@@ -90,27 +90,14 @@ async setupMiddleware() {
     }
 
     async setupErrorHandling() {
-        this.logger.debug('Configuring error handlers...');
-
-        // 404 handler
-        this.app.use((req, res, next) => {
-            this.logger.warn(`404 Not Found: ${req.method} ${req.url}`);
-            res.status(404).json({ error: 'Resource not found' });
-        });
-
-        // Global error handler
-        this.app.use((err, req, res, next) => {
-            this.logger.error(`Server error processing ${req.method} ${req.url}`, {
-                error: err.message,
-                stack: err.stack,
-                body: req.body,
-                params: req.params,
-                query: req.query,
-                ip: req.ip
-            });
-            res.status(500).json({ error: 'Internal server error' });
-        });
-
+        const { errorHandler, notFound } = require('../middleware/error.middleware');
+        
+        // Handle 404s
+        this.app.use(notFound);
+    
+        // Central error handler
+        this.app.use(errorHandler);
+        
         this.logger.debug('Error handlers configured');
     }
 

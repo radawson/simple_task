@@ -1,6 +1,10 @@
 const router = require('express').Router();
 const userController = require('../controllers/user.controller');
-const { validateUser, validatePassword } = require('../middleware/validation.middleware');
+const { 
+    validateUser, 
+    validatePassword,
+    validateUpdatePassword  
+} = require('../middleware/validation.middleware');
 const { authenticate, authorize } = require('../middleware/auth.middleware');
 
 // Admin routes
@@ -17,26 +21,7 @@ router.post('/users',
     userController.create
 );
 
-router.get('/users/:id', 
-    authenticate, 
-    authorize(['admin']), 
-    userController.get
-);
-
-router.put('/users/:id', 
-    authenticate, 
-    authorize(['admin']), 
-    validateUser, 
-    userController.update
-);
-
-router.delete('/users/:id', 
-    authenticate, 
-    authorize(['admin']), 
-    userController.delete
-);
-
-// User profile routes
+// Profile routes
 router.get('/profile', 
     authenticate, 
     userController.getProfile
@@ -50,7 +35,7 @@ router.put('/profile',
 
 router.put('/profile/password', 
     authenticate, 
-    validatePassword, 
+    validateUpdatePassword,  
     userController.updatePassword
 );
 
@@ -64,34 +49,18 @@ router.post('/password/reset/:token',
     userController.resetPassword
 );
 
-// User preferences
-router.get('/preferences', 
-    authenticate, 
-    userController.getPreferences
-);
-
-router.put('/preferences', 
-    authenticate, 
-    userController.updatePreferences
-);
-
-// Employee management
-router.get('/employees', 
-    authenticate, 
-    authorize(['admin', 'manager']), 
-    userController.listEmployees
-);
-
-router.put('/users/:id/activate', 
+// SSO specific routes
+router.post('/users/sso', 
     authenticate, 
     authorize(['admin']), 
-    userController.activateUser
+    validateUser, 
+    userController.createSSOUser
 );
 
-router.put('/users/:id/deactivate', 
+router.put('/users/sso/:id/sync', 
     authenticate, 
     authorize(['admin']), 
-    userController.deactivateUser
+    userController.syncSSOUser
 );
 
 module.exports = router;

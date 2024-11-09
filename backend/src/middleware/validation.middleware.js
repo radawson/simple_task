@@ -9,15 +9,6 @@ const loginSchema = Joi.object({
     password: Joi.string().required()
 });
 
-const userSchema = Joi.object({
-    username: Joi.string().alphanum().min(3).max(30).required(),
-    password: Joi.string().pattern(new RegExp('^[a-zA-Z0-9!@#$%^&*]{6,30}$')),
-    email: Joi.string().email(),
-    firstName: Joi.string().max(50),
-    lastName: Joi.string().max(50),
-    isAdmin: Joi.boolean()
-});
-
 const taskSchema = Joi.object({
     name: Joi.string().required().max(200),
     description: Joi.string(),
@@ -50,6 +41,74 @@ const fileSchema = Joi.object({
     }).required()
 });
 
+const noteSchema = Joi.object({
+    title: Joi.string()
+        .required()
+        .max(200)
+        .messages({
+            'string.empty': 'Title is required',
+            'string.max': 'Title cannot be longer than 200 characters'
+        }),
+    content: Joi.string()
+        .allow('', null),
+    date: Joi.date()
+        .default(Date.now),
+    addedBy: Joi.string(),
+    tags: Joi.array()
+        .items(Joi.string())
+        .default([])
+});
+
+const passwordSchema = Joi.object({
+    currentPassword: Joi.string().required(),
+    newPassword: Joi.string()
+        .pattern(new RegExp('^[a-zA-Z0-9!@#$%^&*]{6,30}$'))
+        .required(),
+    confirmPassword: Joi.ref('newPassword')
+});
+
+const templateSchema = Joi.object({
+    name: Joi.string().required().max(200),
+    description: Joi.string(),
+    schedule: Joi.string().valid('daily', 'weekly', 'monthly', 'custom'),
+    active: Joi.boolean().default(true),
+    addedBy: Joi.string()
+});
+
+const userSchema = Joi.object({
+    username: Joi.string()
+        .alphanum()
+        .min(3)
+        .max(30)
+        .required(),
+    email: Joi.string()
+        .email()
+        .required(),
+    firstName: Joi.string()
+        .max(50),
+    lastName: Joi.string()
+        .max(50),
+    password: Joi.string()
+        .pattern(new RegExp('^[a-zA-Z0-9!@#$%^&*]{6,30}$'))
+        .when('host', {
+            is: Joi.exist(),
+            then: Joi.optional(),
+            otherwise: Joi.required()
+        }),
+    isAdmin: Joi.boolean()
+        .default(false),
+    type: Joi.string()
+        .valid('account', 'roster')
+        .default('account'),
+    host: Joi.string()
+        .uri({ scheme: ['http', 'https'] })
+        .optional(),
+    isActive: Joi.boolean()
+        .default(true),
+    preferences: Joi.object()
+        .default({})
+});
+
 // Validation middleware factory
 const validate = (schema) => {
     return (req, res, next) => {
@@ -72,10 +131,10 @@ const validate = (schema) => {
 // Export validation middlewares
 module.exports = {
     validateLogin: validate(loginSchema),
-    validateUser: validate(userSchema),
-    validateTask: validate(taskSchema),
     validateEvent: validate(eventSchema),
     validateFile: validate(fileSchema),
+    validateNote: validate(noteSchema),
+    validatePassword: validate(passwordSchema),
     validateUpdatePassword: validate(Joi.object({
         currentPassword: Joi.string().required(),
         newPassword: Joi.string().pattern(new RegExp('^[a-zA-Z0-9!@#$%^&*]{6,30}$')).required(),
@@ -84,8 +143,13 @@ module.exports = {
     validateRegistration: validate(userSchema.fork(['password'], (schema) => schema.required())),
     schemas: {
         loginSchema,
+        passwordSchema,
         userSchema,
         taskSchema,
         eventSchema
-    }
+    },
+    validateTask: validate(taskSchema),
+    validateTemplate: validate(templateSchema),
+    validateUser: validate(userSchema),
+
 };

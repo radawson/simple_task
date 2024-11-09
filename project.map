@@ -32,18 +32,18 @@ project/
 │   │   │   └── index.js
 │   │   ├── controllers/
 │   │   │   ├── auth.controller.js
-│   │   │   ├── event.controller.js   # New
+│   │   │   ├── event.controller.js   
 │   │   │   ├── file.controller.js
-│   │   │   ├── note.controller.js    # New
-│   │   │   ├── person.controller.js  # New
+│   │   │   ├── note.controller.js    
+│   │   │   ├── person.controller.js  
 │   │   │   ├── task.controller.js
-│   │   │   ├── template.controller.js # New
-│   │   │   ├── timecard.controller.js # New
+│   │   │   ├── template.controller.js 
+│   │   │   ├── timecard.controller.js 
 │   │   │   └── index.js
 │   │   ├── middleware/
-│   │   │   ├── auth.middleware.js  # New
+│   │   │   ├── auth.middleware.js  
 │   │   │   ├── cors.middleware.js  # New
-│   │   │   ├── error.middleware.js # New
+│   │   │   ├── error.middleware.js 
 │   │   │   ├── jwt.middleware.js
 │   │   │   ├── logger.middleware.js   # New
 │   │   │   ├── rate.middleware.js     # New
