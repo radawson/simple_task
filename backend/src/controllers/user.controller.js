@@ -36,6 +36,45 @@ class UserController {
         }
     }
 
+    createSSOUser = async (req, res) => {
+        try {
+            const hashedPassword = await argon2.hash(crypto.randomBytes(32).toString('hex'));
+            const user = await User.create({
+                ...req.body,
+                password: hashedPassword,
+                type: 'account',
+                host: new URL(process.env.OIDC_ISSUER_URL).hostname
+            });
+            
+            logger.info(`SSO user created: ${user.username}`);
+            return res.status(201).json(user);
+        } catch (error) {
+            logger.error(`SSO user creation failed: ${error.message}`);
+            return res.status(400).json({ message: 'Failed to create SSO user' });
+        }
+    }
+    
+    syncSSOUser = async (req, res) => {
+        try {
+            const user = await User.findByPk(req.params.id);
+            if (!user || !user.host) {
+                return res.status(404).json({ message: 'SSO user not found' });
+            }
+    
+            // TODO: Add OIDC provider sync logic here
+            await user.update({
+                ...req.body,
+                lastSynced: new Date()
+            });
+    
+            logger.info(`SSO user synced: ${user.username}`);
+            return res.json(user);
+        } catch (error) {
+            logger.error(`SSO user sync failed: ${error.message}`);
+            return res.status(500).json({ message: 'Failed to sync SSO user' });
+        }
+    }
+
     deactivateUser = async (req, res) => {
         try {
             const user = await User.findByPk(req.params.id);
@@ -106,10 +145,10 @@ class UserController {
                 process.env.OIDC_REDIRECT_URI,
                 params
             );
-    
+
             const userInfo = await this.client.userinfo(tokenSet.access_token);
             let user = await User.findOne({ where: { email: userInfo.email } });
-    
+
             if (!user) {
                 // Create new user from OIDC profile
                 user = await User.create({
@@ -125,7 +164,7 @@ class UserController {
                     // Map OIDC groups/roles if available
                     isAdmin: userInfo.groups?.includes('admin') || false
                 });
-                
+
                 logger.info(`New SSO user created: ${user.username}`);
             } else {
                 // Update existing user with latest OIDC info
@@ -134,15 +173,15 @@ class UserController {
                     lastName: userInfo.family_name,
                     isAdmin: userInfo.groups?.includes('admin') || user.isAdmin
                 });
-                
+
                 logger.info(`Existing SSO user updated: ${user.username}`);
             }
-    
+
             const accessToken = this.generateAccessToken(user);
             const refreshToken = this.generateRefreshToken(user);
-    
+
             res.json({ accessToken, refreshToken });
-    
+
         } catch (error) {
             logger.error(`SSO callback failed: ${error.message}`);
             res.status(500).json({ message: 'SSO authentication failed' });
@@ -173,7 +212,7 @@ class UserController {
 
     requestPasswordReset = async (req, res) => {
         try {
-            const user = await User.findOne({ 
+            const user = await User.findOne({
                 where: { email: req.body.email }
             });
             if (!user) {
@@ -242,14 +281,14 @@ class UserController {
         try {
             const user = await User.findByPk(req.user.id);
             const validPassword = await argon2.verify(user.password, req.body.currentPassword);
-            
+
             if (!validPassword) {
                 return res.status(400).json({ message: 'Current password is incorrect' });
             }
 
             const hashedPassword = await argon2.hash(req.body.newPassword);
             await user.update({ password: hashedPassword });
-            
+
             logger.info(`Password updated for: ${user.username}`);
             return res.json({ message: 'Password updated successfully' });
         } catch (error) {

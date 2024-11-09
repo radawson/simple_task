@@ -9,16 +9,6 @@ const loginSchema = Joi.object({
     password: Joi.string().required()
 });
 
-const taskSchema = Joi.object({
-    name: Joi.string().required().max(200),
-    description: Joi.string(),
-    completed: Joi.boolean(),
-    priority: Joi.number().min(0).max(5),
-    date: Joi.date(),
-    template: Joi.boolean(),
-    addedBy: Joi.string()
-});
-
 const eventSchema = Joi.object({
     summary: Joi.string().required().max(200),
     description: Joi.string(),
@@ -67,12 +57,74 @@ const passwordSchema = Joi.object({
     confirmPassword: Joi.ref('newPassword')
 });
 
+
+const taskSchema = Joi.object({
+    name: Joi.string().required().max(200),
+    description: Joi.string(),
+    completed: Joi.boolean(),
+    priority: Joi.number().min(0).max(5),
+    date: Joi.date(),
+    template: Joi.boolean(),
+    addedBy: Joi.string()
+});
+
 const templateSchema = Joi.object({
     name: Joi.string().required().max(200),
     description: Joi.string(),
     schedule: Joi.string().valid('daily', 'weekly', 'monthly', 'custom'),
     active: Joi.boolean().default(true),
     addedBy: Joi.string()
+});
+
+const timecardSchema = Joi.object({
+    timeIn: Joi.date()
+        .required()
+        .messages({
+            'date.base': 'Time in must be a valid date',
+            'any.required': 'Time in is required'
+        }),
+    timeOut: Joi.date()
+        .min(Joi.ref('timeIn'))
+        .messages({
+            'date.base': 'Time out must be a valid date',
+            'date.min': 'Time out must be after time in'
+        }),
+    breakStart: Joi.date()
+        .min(Joi.ref('timeIn'))
+        .messages({
+            'date.base': 'Break start must be a valid date',
+            'date.min': 'Break start must be after time in'
+        }),
+    breakEnd: Joi.when('breakStart', {
+        is: Joi.exist(),
+        then: Joi.date()
+            .min(Joi.ref('breakStart'))
+            .messages({
+                'date.base': 'Break end must be a valid date',
+                'date.min': 'Break end must be after break start'
+            })
+    }),
+    notes: Joi.string()
+        .allow('', null),
+    employeeId: Joi.number()
+        .required()
+        .messages({
+            'any.required': 'Employee ID is required'
+        }),
+    approved: Joi.boolean()
+        .default(false),
+    approvedBy: Joi.string()
+        .when('approved', {
+            is: true,
+            then: Joi.required(),
+            otherwise: Joi.allow(null)
+        }),
+    approvedAt: Joi.date()
+        .when('approved', {
+            is: true,
+            then: Joi.required(),
+            otherwise: Joi.allow(null)
+        })
 });
 
 const userSchema = Joi.object({
@@ -150,6 +202,7 @@ module.exports = {
     },
     validateTask: validate(taskSchema),
     validateTemplate: validate(templateSchema),
+    validateTimecard: validate(timecardSchema),
     validateUser: validate(userSchema),
 
 };

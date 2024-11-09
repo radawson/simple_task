@@ -34,7 +34,7 @@ class TimecardController {
         try {
             const existingOpen = await Timecard.findOne({
                 where: {
-                    employeeId: req.user.id,
+                    employeeId: req.user.id, 
                     timeOut: null
                 }
             });
@@ -134,17 +134,17 @@ class TimecardController {
         }
     }
 
-    async getByEmployee(req, res) {
+    getByEmployee = async (req, res) => {
         try {
             if (!req.user.isAdmin && req.params.employeeId !== req.user.id) {
                 return res.status(403).json({ message: 'Not authorized to view these timecards' });
             }
-
+    
             const timecards = await Timecard.findAll({
                 where: { employeeId: req.params.employeeId },
                 order: [['timeIn', 'DESC']]
             });
-
+    
             return res.json(timecards);
         } catch (error) {
             logger.error(`Employee timecard retrieval failed: ${error.message}`);
