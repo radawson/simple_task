@@ -9,40 +9,41 @@ class Server {
         this.config = config;
         this.app = express();
         this.logger = require('./Logger').getInstance();
-        // Debug config structure
-    this.logger.debug('Full config:', JSON.stringify({
-        security: this.config.security,
-        cors: this.config.cors
-    }, null, 2));
 
-    if (!this.config.security || !this.config.security.helmet) {
-        this.logger.warn('Missing security.helmet configuration, using defaults');
-        this.config.security = {
-            ...this.config.security,
-            helmet: {
-                contentSecurityPolicy: {
-                    directives: {
-                        defaultSrc: ["'self'"],
-                        scriptSrc: ["'self'", "'unsafe-inline'"],
-                        styleSrc: ["'self'", "'unsafe-inline'"],
-                        imgSrc: ["'self'", "data:", "https:"],
+        // Debug config structure
+        this.logger.debug('Full config:', JSON.stringify({
+            security: this.config.security,
+            cors: this.config.cors
+        }, null, 2));
+
+        if (!this.config.security || !this.config.security.helmet) {
+            this.logger.warn('Missing security.helmet configuration, using defaults');
+            this.config.security = {
+                ...this.config.security,
+                helmet: {
+                    contentSecurityPolicy: {
+                        directives: {
+                            defaultSrc: ["'self'"],
+                            scriptSrc: ["'self'", "'unsafe-inline'"],
+                            styleSrc: ["'self'", "'unsafe-inline'"],
+                            imgSrc: ["'self'", "data:", "https:"],
+                        }
                     }
                 }
-            }
-        };
+            };
+        }
     }
-}
 
-// Update setupMiddleware:
-async setupMiddleware() {
-    this.logger.debug('Configuring middleware stack...');
+    // Update setupMiddleware:
+    async setupMiddleware() {
+        this.logger.debug('Configuring middleware stack...');
 
-    // Security middleware with fallback
-    const helmetConfig = this.config.security?.helmet || {};
-    this.logger.debug('Using helmet config:', JSON.stringify(helmetConfig));
-    
-    this.app.use(helmet(helmetConfig));
-    this.logger.debug('Helmet security headers configured');
+        // Security middleware with fallback
+        const helmetConfig = this.config.security?.helmet || {};
+        this.logger.debug('Using helmet config:', JSON.stringify(helmetConfig));
+
+        this.app.use(helmet(helmetConfig));
+        this.logger.debug('Helmet security headers configured');
 
         const limiter = rateLimit(this.config.security.rateLimiting);
         this.app.use('/api', limiter);
@@ -91,13 +92,13 @@ async setupMiddleware() {
 
     async setupErrorHandling() {
         const { errorHandler, notFound } = require('../middleware/error.middleware');
-        
+
         // Handle 404s
         this.app.use(notFound);
-    
+
         // Central error handler
         this.app.use(errorHandler);
-        
+
         this.logger.debug('Error handlers configured');
     }
 
@@ -121,18 +122,26 @@ async setupMiddleware() {
 
     async start() {
         this.logger.info('Starting server...');
-        
+    
         try {
             const { createServers } = require('../config/server.config');
             this.servers = await createServers(this.app, this.config);
-            
+    
             if (this.servers.https) {
                 const SocketService = require('../services/socket.service');
+                const ChatService = require('../services/chat.service');  // Add import
+                
                 this.socketService = new SocketService(this.servers.https, this.config);
-                this.chatService = new ChatService(this.servers.https, this.config);
+                
+                // Only initialize chat if configured
+                if (this.config.chat?.enabled) {
+                    this.chatService = new ChatService(this.servers.https, this.config);
+                    this.logger.info('Chat service initialized');
+                }
+                
                 this.logger.info(`HTTPS/WSS server listening on port ${this.config.sslPort}`);
             }
-            
+    
             return this.servers;
         } catch (error) {
             this.logger.error(`Failed to start server: ${error.message}`);

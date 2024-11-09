@@ -3,22 +3,34 @@ const Joi = require('joi');
 const configSchema = Joi.object({
     env: Joi.string().valid('development', 'test', 'production').required(),
     serverUid: Joi.string().required(),
-    security: Joi.object({
-        rateLimiting: Joi.object({
-            windowMs: Joi.number().default(900000),
-            max: Joi.number().default(100)
+    chat: Joi.object({
+        enabled: Joi.boolean().default(false),
+        redis: Joi.object({
+            host: Joi.string().default('localhost'),
+            port: Joi.number().default(6379),
+            password: Joi.string().allow(null, ''),
+            db: Joi.number().default(0)
         }).required(),
-        helmet: Joi.object({
-            contentSecurityPolicy: Joi.object({
-                directives: Joi.object({
-                    defaultSrc: Joi.array().items(Joi.string()),
-                    scriptSrc: Joi.array().items(Joi.string()),
-                    styleSrc: Joi.array().items(Joi.string()),
-                    imgSrc: Joi.array().items(Joi.string())
-                })
+        fcm: Joi.object({
+            serviceAccount: Joi.string().when('enabled', {
+                is: true,
+                then: Joi.required()
+            }),
+            projectId: Joi.string().when('enabled', {
+                is: true,
+                then: Joi.required()
             })
         }).required()
-    }).required(),
+    }).default({
+        enabled: false,
+        redis: {
+            host: 'localhost',
+            port: 6379,
+            password: null,
+            db: 0
+        },
+        fcm: {}
+    }),
     database: Joi.object({
         type: Joi.string().valid('sqlite', 'postgres').required(),
         host: Joi.string().when('type', { is: 'postgres', then: Joi.required() }),
@@ -57,6 +69,22 @@ const configSchema = Joi.object({
         responseType: Joi.string().valid('code').default('code'),
         pkce: Joi.boolean().default(true),
         timeout: Joi.number().default(5000)
+    }).required(),
+    security: Joi.object({
+        rateLimiting: Joi.object({
+            windowMs: Joi.number().default(900000),
+            max: Joi.number().default(100)
+        }).required(),
+        helmet: Joi.object({
+            contentSecurityPolicy: Joi.object({
+                directives: Joi.object({
+                    defaultSrc: Joi.array().items(Joi.string()),
+                    scriptSrc: Joi.array().items(Joi.string()),
+                    styleSrc: Joi.array().items(Joi.string()),
+                    imgSrc: Joi.array().items(Joi.string())
+                })
+            })
+        }).required()
     }).required(),
     server: Joi.object({
         port: Joi.number().required(),

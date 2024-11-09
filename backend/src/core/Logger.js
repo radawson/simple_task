@@ -7,6 +7,21 @@ class Logger {
 
     constructor(config) {
         if (Logger.#instance) return Logger.#instance;
+    
+        // Special handling for test environment
+        if (process.env.NODE_ENV === 'test') {
+            this.#logger = winston.createLogger({
+                level: 'error',
+                format: winston.format.simple(),
+                transports: [
+                    new winston.transports.Console({
+                        format: winston.format.simple()
+                    })
+                ]
+            });
+            Logger.#instance = this;
+            return this;
+        }
         
         const customFormat = winston.format.printf(({ timestamp, level, message, metadata = {} }) => {
             // Format timestamp for better readability

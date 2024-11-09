@@ -22,6 +22,18 @@ class Config {
     const config = {
       env: process.env.NODE_ENV || 'development',
       serverUid: process.env.SERVER_UID || crypto.randomBytes(4).toString('hex'),
+      chat: {
+        enabled: process.env.ENABLE_CHAT === 'true',
+        redis: {
+          host: process.env.REDIS_HOST || 'localhost',
+          port: parseInt(process.env.REDIS_PORT) || 6379,
+          password: process.env.REDIS_PASSWORD
+        },
+        fcm: {
+          serviceAccount: process.env.FCM_SERVICE_ACCOUNT,
+          projectId: process.env.FCM_PROJECT_ID
+        }
+      },
       database: {
         type: process.env.DB_TYPE || 'sqlite',
         database: process.env.DB_NAME || 'stasks',

@@ -17,7 +17,7 @@ router.post('/clock-out',
 // Admin/supervisor routes
 router.post('/timecards/:id/approve',
     authenticate,
-    authorize(['admin']),
+    authorize(['admin']), 
     timecardController.approve
 );
 
