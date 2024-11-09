@@ -84,8 +84,15 @@ class Event extends BaseModel {
                 field: 'recurrence_rule'
             },
             categories: {
-                type: DataTypes.ARRAY(DataTypes.STRING),
-                defaultValue: []
+                type: DataTypes.JSON,
+                defaultValue: [],
+                get() {
+                    const rawValue = this.getDataValue('categories');
+                    return rawValue ? JSON.parse(rawValue) : [];
+                },
+                set(value) {
+                    this.setDataValue('categories', JSON.stringify(value));
+                }
             },
             priority: {
                 type: DataTypes.INTEGER,
@@ -113,21 +120,7 @@ class Event extends BaseModel {
             sequelize,
             modelName: 'Event',
             tableName: 'events',
-            timestamps: true,
-            validate: {
-                timeEndAfterTimeStart() {
-                    if (this.timeStart && this.timeEnd &&
-                        this.dtstart === this.dtend &&
-                        this.timeEnd <= this.timeStart) {
-                        throw new Error('End time must be after start time');
-                    }
-                },
-                dateEndAfterDateStart() {
-                    if (this.dtend && this.dtend < this.dtstart) {
-                        throw new Error('End date must be after or equal to start date');
-                    }
-                }
-            }
+            timestamps: true
         });
     }
 
@@ -179,10 +172,10 @@ class Event extends BaseModel {
             targetKey: 'username'
         });
         this.belongsTo(models.Person, {
-            foreignKey: 'organizer',
+            foreignKey: 'person',
             targetKey: 'id'
         });
-
+        this.belongsTo(models.Calendar);
     }
 
     getParticipantNames() {

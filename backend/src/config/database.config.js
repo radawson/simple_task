@@ -44,13 +44,27 @@ const createConnection = async (config) => {
         );
     }
 
-    // Test connection
     try {
         await sequelize.authenticate();
-        logger.info('Database connection established successfully');
+        logger.info('Database connection established');
+
+        // Only force sync in development when explicitly requested
+        const shouldForceSync = process.env.FORCE_DB_SYNC === 'true' && 
+                              process.env.NODE_ENV !== 'production';
+
+        if (shouldForceSync) {
+            logger.warn('Forcing database sync - all data will be lost');
+            await sequelize.sync({ force: true });
+            logger.info('Database tables recreated');
+        } else {
+            // In production, only alter tables if needed
+            await sequelize.sync({ alter: process.env.NODE_ENV !== 'production' });
+            logger.info('Database tables synced');
+        }
+
         return sequelize;
     } catch (error) {
-        logger.error(`Unable to connect to database: ${error.message}`);
+        logger.error(`Database initialization failed: ${error.message}`);
         throw error;
     }
 };
@@ -62,22 +76,24 @@ const initializeModels = async (sequelize) => {
     Object.values(models).forEach(model => {
         if (typeof model.init === 'function') {
             model.init(sequelize);
+            logger.debug(`Initialized model: ${model.name}`);
         }
     });
 
-    // Then set up associations after all models are initialized
-    setTimeout(() => {
-        Object.values(models).forEach(model => {
-            if (typeof model.associate === 'function') {
-                model.associate(models);
-            }
-        });
-    }, 0);
+    // Then set up associations
+    Object.values(models).forEach(model => {
+        if (typeof model.associate === 'function') {
+            model.associate(models);
+            logger.debug(`Associated model: ${model.name}`);
+        }
+    });
+
+    // Finally sync database with force in development
+    logger.info('Syncing database schema...');
+    await sequelize.sync({ force: process.env.NODE_ENV !== 'production' });
+    logger.info('Database schema synchronized');
 
     return models;
 };
 
-module.exports = {
-    createConnection,
-    initializeModels
-};
+module.exports = { createConnection, initializeModels };

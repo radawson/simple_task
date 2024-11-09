@@ -4,18 +4,17 @@
   "description": "Node.js API Backend",
   "main": "server.js",
   "scripts": {
-    "test": "cross-env NODE_ENV=test jest --detectOpenHandles --setupFiles ./src/tests/setup.js"
+    "test": "cross-env NODE_ENV=test jest --detectOpenHandles --forceExit --runInBand"
   },
   "jest": {
     "testEnvironment": "node",
-    "setupFilesAfterEnv": [
-      "./src/tests/setup.js"
-    ],
+    "globalSetup": "./src/tests/setup.js",
     "testMatch": [
       "**/__tests__/**/*.js",
       "**/?(*.)+(spec|test).js"
     ],
-    "verbose": true
+    "verbose": true,
+    "forceExit": true
   },
   "repository": {
     "type": "git",

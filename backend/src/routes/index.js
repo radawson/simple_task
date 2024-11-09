@@ -12,20 +12,17 @@ const noteRoutes = require('./note.routes');
 const userRoutes = require('./user.routes');
 const timecardRoutes = require('./timecard.routes');
 
-// Auth routes (no auth required)
+// Public routes
 router.use('/auth', authRoutes);
 
-// Protected API routes
-router.use('/api', authenticate, (req, res, next) => {
-    // Authenticated routes
-    router.use('/files', fileRoutes);
-    router.use('/tasks', taskRoutes);
-    router.use('/templates', templateRoutes);
-    router.use('/events', eventRoutes);
-    router.use('/notes', noteRoutes);
-    router.use('/users', userRoutes);
-    router.use('/timecards', timecardRoutes);
-    next();
-});
+// Protected routes with auth middleware
+router.use(authenticate);
+router.use('/api/files', fileRoutes);
+router.use('/api/tasks', taskRoutes);
+router.use('/api/templates', templateRoutes);
+router.use('/api/events', eventRoutes);
+router.use('/api/notes', noteRoutes);
+router.use('/api/users', userRoutes);
+router.use('/api/timecards', timecardRoutes);
 
 module.exports = router;

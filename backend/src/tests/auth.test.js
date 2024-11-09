@@ -1,28 +1,81 @@
+// Initialize logger first
+const Logger = require('../core/Logger');
+new Logger({
+    level: 'error',
+    directory: 'logs/test',
+    maxFiles: '1d',
+    format: 'simple'
+});
+
 const request = require('supertest');
 const { beforeAll, beforeEach, afterAll, describe, it, expect } = require('@jest/globals');
-const { Server } = require('../core/Server');
+const { Server } = require('../core');
 const { User } = require('../models');
-const config = require('../config');
-const Logger = require('../core/Logger');
+
+// Test configuration
+const testConfig = {
+    port: 9179,
+    sslPort: 9180,
+    sslKey: "certs/cert.key",
+    sslCert: "certs/cert.crt",
+    cors: {
+        origins: ["http://localhost:3000"],
+        credentials: true
+    },
+    logger: {
+        level: 'error',
+        directory: 'logs/test',
+        maxFiles: '1d'
+    },
+    security: {
+        helmet: {
+            contentSecurityPolicy: {
+                directives: {
+                    defaultSrc: ["'self'"],
+                    scriptSrc: ["'self'"],
+                    styleSrc: ["'self'"]
+                }
+            }
+        },
+        rateLimiting: {
+            windowMs: 900000,
+            max: 100
+        }
+    }
+};
 
 describe('Auth Endpoints', () => {
     let server;
     let app;
 
     beforeAll(async () => {
-        // Initialize test server
-        server = new Server(config);
-        await server.initialize();
-        app = server.app;
+        try {
+            server = new Server(testConfig);
+            await server.initialize();
+            app = server.app;
+            
+            // Create test database tables
+            await User.sync({ force: true });
+            
+            console.log('Test environment ready');
+        } catch (error) {
+            console.error('Setup failed:', error);
+            throw error;
+        }
     });
 
     beforeEach(async () => {
-        // Clear users before each test
-        await User.destroy({ where: {}, force: true });
+        await User.destroy({ 
+            where: {}, 
+            force: true,
+            truncate: true 
+        });
     });
 
     afterAll(async () => {
-        await server.stop();
+        if (server?.stop) {
+            await server.stop();
+        }
     });
 
     describe('POST /auth/register', () => {

@@ -59,18 +59,17 @@ class Server {
         // CORS setup
         const corsOptions = {
             origin: (origin, callback) => {
-                if (!origin || this.config.cors.origins.includes(origin)) {
-                    this.logger.debug(`CORS request accepted from: ${origin || 'Same-Origin'}`);
+                if (!origin || (this.config.cors?.origins || []).includes(origin)) {
                     callback(null, true);
                 } else {
-                    this.logger.warn(`CORS request rejected from: ${origin}`);
-                    callback(new Error(`CORS rejected for origin: ${origin}`));
+                    callback(new Error('Not allowed by CORS'));
                 }
             },
-            credentials: this.config.cors.credentials
+            credentials: this.config.cors?.credentials || false
         };
+
         this.app.use(cors(corsOptions));
-        this.logger.debug(`CORS configured with origins: ${JSON.stringify(this.config.cors.origins)}`);
+        this.logger.debug(`CORS configured with origins: ${JSON.stringify(this.config.cors?.origins || [])}`);
 
         // Request parsing
         this.app.use(express.json({
@@ -86,7 +85,10 @@ class Server {
     async setupRoutes() {
         this.logger.debug('Loading API routes...');
         const routes = require('../routes');
-        this.app.use('/api', routes);
+        
+        // Mount all routes at root level
+        this.app.use('/', routes);
+        
         this.logger.info('API routes mounted successfully');
     }
 
@@ -122,26 +124,26 @@ class Server {
 
     async start() {
         this.logger.info('Starting server...');
-    
+
         try {
             const { createServers } = require('../config/server.config');
             this.servers = await createServers(this.app, this.config);
-    
+
             if (this.servers.https) {
                 const SocketService = require('../services/socket.service');
                 const ChatService = require('../services/chat.service');  // Add import
-                
+
                 this.socketService = new SocketService(this.servers.https, this.config);
-                
+
                 // Only initialize chat if configured
                 if (this.config.chat?.enabled) {
                     this.chatService = new ChatService(this.servers.https, this.config);
                     this.logger.info('Chat service initialized');
                 }
-                
+
                 this.logger.info(`HTTPS/WSS server listening on port ${this.config.sslPort}`);
             }
-    
+
             return this.servers;
         } catch (error) {
             this.logger.error(`Failed to start server: ${error.message}`);
@@ -150,25 +152,28 @@ class Server {
     }
 
     async stop() {
-        this.logger.info('Initiating server shutdown...');
-
+        if (!this.servers) {
+            this.logger.warn('No servers to stop');
+            return;
+        }
+    
         try {
             await Promise.all(
                 Object.entries(this.servers).map(([type, server]) => {
                     return new Promise((resolve) => {
-                        server.close(() => {
-                            this.logger.info(`${type.toUpperCase()} server closed`);
+                        if (server && server.close) {
+                            server.close(() => {
+                                this.logger.info(`${type.toUpperCase()} server closed`);
+                                resolve();
+                            });
+                        } else {
                             resolve();
-                        });
+                        }
                     });
                 })
             );
-            this.logger.info('Server shutdown completed');
         } catch (error) {
-            this.logger.error(`Error during server shutdown: ${error.message}`, {
-                stack: error.stack
-            });
-            throw error;
+            this.logger.error(`Error during server shutdown: ${error.message}`);
         }
     }
 }

@@ -1,12 +1,9 @@
-// src/tests/setup.js
 const Logger = require('../core/Logger');
 const winston = require('winston');
 require('winston-daily-rotate-file');
+const { Sequelize } = require('sequelize');
 
-// Add Jest globals
-const { beforeAll, afterAll } = require('@jest/globals');
-
-// Initialize logger before any other imports
+// Initialize logger first
 new Logger({
     level: 'error',
     directory: 'logs/test',
@@ -14,31 +11,36 @@ new Logger({
     format: 'simple'
 });
 
-const { config } = require('../config');
-const { db } = require('../models');
+// Initialize test database
+const testDb = new Sequelize({
+    dialect: 'sqlite',
+    storage: ':memory:',
+    logging: false
+});
 
-beforeAll(async () => {
+module.exports = async () => {
     // Set test environment
     process.env.NODE_ENV = 'test';
     
-    // Ensure test database
-    process.env.DB_NAME = 'stasks_test';
-    
     try {
-        await db.sync({ force: true });
+        // Load models with test database
+        const models = require('../models');
+        await testDb.authenticate();
+        await testDb.sync({ force: true });
         console.log('Test database synchronized');
     } catch (error) {
         console.error('Database sync failed:', error);
         throw error;
     }
-});
 
-afterAll(async () => {
-    try {
-        await db.close();
-        console.log('Database connection closed');
-    } catch (error) {
-        console.error('Error closing database:', error);
-        throw error;
-    }
-});
+    // Cleanup function
+    return async () => {
+        try {
+            await testDb.close();
+            console.log('Database connection closed');
+        } catch (error) {
+            console.error('Error closing database:', error);
+            throw error;
+        }
+    };
+};

@@ -48,22 +48,33 @@ class User extends BaseModel {
             },
             firstName: {
                 type: DataTypes.STRING(20),
-                allowNull: false,
+                allowNull: true,
                 field: 'first_name'
             },
             lastName: {
                 type: DataTypes.STRING(20),
                 field: 'last_name'
             },
-            email: DataTypes.STRING,
+            email: {
+                type: DataTypes.STRING,
+                allowNull: true,
+                unique: true,  
+                validate: {
+                    isEmail: true
+                }
+            },
             isAdmin: {
                 type: DataTypes.BOOLEAN,
                 defaultValue: false,
                 field: 'is_admin'
             },
             username: {
-                type: DataTypes.STRING,
+                type: DataTypes.STRING(30),
                 allowNull: false,
+                unique: true,  
+                validate: {
+                    notEmpty: true
+                }
             },
             password: {
                 type: DataTypes.STRING,

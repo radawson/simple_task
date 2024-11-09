@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken');
 const argon2 = require('argon2');
 const crypto = require('crypto');
 const config = require('../config');
+const JWTMiddleware = require('../middleware/jwt.middleware');
 
 const logger = Logger.getInstance();
 
@@ -39,24 +40,18 @@ class AuthController {
     async login(req, res) {
         try {
             const { username, password } = req.body;
-
             const user = await User.findOne({ where: { username } });
-            if (!user) {
-                logger.warn(`Login attempt failed for non-existent user: ${username}`);
+            
+            if (!user || !(await argon2.verify(user.password, password))) {
+                logger.warn(`Login failed for user: ${username}`);
                 return res.status(401).json({ message: 'Invalid credentials' });
             }
-
-            const validPassword = await argon2.verify(user.password, password);
-            if (!validPassword) {
-                logger.warn(`Invalid password attempt for user: ${username}`);
-                return res.status(401).json({ message: 'Invalid credentials' });
-            }
-
-            const accessToken = this.generateAccessToken(user);
-            const refreshToken = this.generateRefreshToken(user);
-
+    
+            const accessToken = JWTMiddleware.generateAccessToken(user);
+            const refreshToken = JWTMiddleware.generateRefreshToken(user);
+    
             await this.saveSession(user.id, refreshToken);
-
+    
             logger.info(`User logged in successfully: ${username}`);
             res.json({
                 accessToken,
@@ -67,7 +62,7 @@ class AuthController {
                     isAdmin: user.isAdmin
                 }
             });
-
+    
         } catch (error) {
             logger.error(`Login error: ${error.message}`);
             res.status(500).json({ message: 'Internal server error' });

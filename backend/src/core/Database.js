@@ -18,8 +18,11 @@ class Database {
 
     async connect() {
         try {
+            // Pass database config correctly
             this.#connection = await createConnection(this.#config);
+            await this.#connection.sync({ alter: true });
             await initializeModels(this.#connection);
+            this.#logger.info('Database connected and synced');
             return this;
         } catch (error) {
             this.#logger.error(`Database connection failed: ${error.message}`);

@@ -1,6 +1,4 @@
 const path = require('path');
-
-// Load environment early to ensure all configs are available
 require('dotenv').config();
 
 // Load config and initialize logger
@@ -9,17 +7,20 @@ const Logger = require('./src/core/Logger');
 const logger = new Logger(config.logger);  // Initialize first
 logger.info(`Server process starting with pid: ${process.pid}`);
 
+let server = null;
+
 // Process lifecycle handling
 const shutdown = async (signal) => {
   logger.info(`Received ${signal}. Starting graceful shutdown...`);
-  
+
   try {
-    const app = require('./src');
-    await app.stop();
-    logger.info('Graceful shutdown completed');
+    if (server?.stop) {
+      await server.stop();
+      logger.info('Graceful shutdown completed');
+    }
     process.exit(0);
   } catch (error) {
-    logger.error(`Error during shutdown: ${error.message}`, { stack: error.stack });
+    logger.error(`Error during shutdown: ${error.message}`);
     process.exit(1);
   }
 };
@@ -42,7 +43,9 @@ process.on('unhandledRejection', (reason, promise) => {
 
 // Start application
 const startServer = require('./src');
-startServer().catch(error => {
-  logger.error(`Fatal error during startup: ${error.message}`, { stack: error.stack });
+startServer().then(app => {
+  server = app;  // Store server instance
+}).catch(error => {
+  logger.error(`Fatal error during startup: ${error.message}`);
   process.exit(1);
 });
