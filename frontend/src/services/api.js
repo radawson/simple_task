@@ -1,8 +1,10 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: process.env.REACT_APP_API_URL
+  baseURL: '/api'
 });
 
-export const getTasks = () => api.get('/tasks');
-export const createTask = (task) => api.post('/tasks', task);
+export const getTodayData = () => api.get('/');
+export const getDateData = (date) => api.get(`/date/${date}`);
+export const updateTask = (id, data) => api.patch(`/tasks/${id}`, data);
+export const updateEvent = (id, data) => api.patch(`/events/${id}`, data);

@@ -81,11 +81,35 @@ project/
 │   ├── package.json
 │   └── server.js
 └── frontend/
-    |── public/
+    ├── public/
+    │   ├── favicon.ico
+    │   └── index.html
     ├── src/
     │   ├── components/
-    │   ├── pages/
+    │   │   ├── auth/
+    │   │   │   ├── Login.jsx
+    │   │   │   └── Register.jsx
+    │   │   ├── common/
+    │   │   │   └── Toast.jsx
+    │   │   ├── dashboard/
+    │   │   │   ├── Dashboard.jsx
+    │   │   │   ├── TaskList.jsx
+    │   │   │   ├── EventList.jsx
+    │   │   │   └── NoteList.jsx
+    │   │   └── layout/
+    │   │       ├── Layout.jsx
+    │   │       └── Navbar.jsx
     │   ├── services/
-    │   └── store/
+    │   │   ├── api.js
+    │   │   └── auth.service.js
+    │   ├── utils/
+    │   │   ├── date.utils.js
+    │   │   └── toast.utils.js
+    │   ├── hooks/
+    │   │   └── useAuth.js
+    │   ├── styles/
+    │   │   └── App.css
+    │   ├── App.jsx
+    │   └── index.jsx
     ├── package.json
-    └── index.html
+    └── vite.config.js
