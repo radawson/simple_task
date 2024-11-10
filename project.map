@@ -6,7 +6,7 @@ project/
 │   │   │   ├── logger.config.js    
 │   │   │   ├── server.config.js
                 socket.config.js
-│   │   │   ├── storage.config.js    # New: File storage config
+│   │   │   ├── storage.config.js    # Needed: File storage config
                 types.ts
                 validation.js
 │   │   │   └── index.js
@@ -14,7 +14,7 @@ project/
 │   │   │   ├── Database.js
 │   │   │   ├── Logger.js
 │   │   │   ├── Server.js
-│   │   │   └── Storage.js           # New: Storage management
+│   │   │   └── Storage.js           # Needed: Storage management
 │   │   ├── models/
 │               audit.model.js      
 │   │   │   ├── base.model.js
@@ -42,11 +42,11 @@ project/
 │   │   │   └── index.js
 │   │   ├── middleware/
 │   │   │   ├── auth.middleware.js  
-│   │   │   ├── cors.middleware.js  # New
+│   │   │   ├── cors.middleware.js  
 │   │   │   ├── error.middleware.js 
 │   │   │   ├── jwt.middleware.js
-│   │   │   ├── logger.middleware.js   # New
-│   │   │   ├── rate.middleware.js     # New
+│   │   │   ├── logger.middleware.js   # Needed
+│   │   │   ├── rate.middleware.js     # Needed
 │   │   │   ├── scram.middleware.js
 │   │   │   ├── store.middleware.js
 │   │   │   ├── validation.middleware.js
@@ -66,10 +66,11 @@ project/
 │   │   │   ├── chat.service.js
 │   │   │   └── socket.service.js      
 │   │   └── utils/
-│   │       ├── date.util.js          # New
-│   │       ├── model.util.js         # New: Model conversion helpers
-│   │       ├── ssl.util.js
-│   │       └── validation.util.js
+│   │       ├── date.util.js          # Needed
+│   │       ├── file.util.js        
+│   │       ├── secret.util.js
+│   │       ├── secretsManager.util.js
+│   │       └── seed.util.js
 │   ├── tests/
 │   │   ├── unit/
 │   │   ├── integration/

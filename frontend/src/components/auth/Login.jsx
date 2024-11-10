@@ -1,25 +1,35 @@
 import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { MDBInput, MDBBtn, MDBCard, MDBCardBody } from 'mdb-react-ui-kit';
+import { 
+  MDBInput, 
+  MDBBtn, 
+  MDBCard, 
+  MDBCardBody,
+  MDBIcon 
+} from 'mdb-react-ui-kit';
 
 export default function Login() {
-  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
   const location = useLocation();
-  const { login } = useAuth();
+  const { login, loginWithSSO } = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await login(email, password);
+      await login(username, password);
       const from = location.state?.from?.pathname || '/';
       navigate(from, { replace: true });
     } catch (err) {
       setError('Invalid credentials');
     }
+  };
+
+  const handleSSOLogin = () => {
+    loginWithSSO();
   };
 
   return (
@@ -28,12 +38,13 @@ export default function Login() {
         <MDBCardBody className="p-5">
           <h2 className="text-center mb-5">Login</h2>
           {error && <div className="alert alert-danger">{error}</div>}
+          
           <form onSubmit={handleSubmit}>
             <MDBInput
-              type="email"
-              label="Email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              type="text"
+              label="Username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
               className="mb-4"
               required
             />
@@ -45,10 +56,22 @@ export default function Login() {
               className="mb-4"
               required
             />
-            <MDBBtn type="submit" block>
+            <MDBBtn type="submit" block className="mb-4">
               Login
             </MDBBtn>
           </form>
+
+          <div className="text-center">
+            <p className="text-muted mb-4">- OR -</p>
+            <MDBBtn 
+              color="danger" 
+              onClick={handleSSOLogin} 
+              block
+            >
+              <MDBIcon fab icon="windows" className="me-2" /> 
+              PTX SSO
+            </MDBBtn>
+          </div>
         </MDBCardBody>
       </MDBCard>
     </div>

@@ -1,10 +1,11 @@
-import { useState, useEffect } from 'react';
+// src/components/dashboard/Dashboard.jsx
+import React, { useState, useEffect } from 'react';
 import { ApiService } from '../../services/api';
 import TaskList from './TaskList';
 import EventList from './EventList';
 import NoteList from './NoteList';
 
-export default function Dashboard() {
+const Dashboard = () => {
   const [tasks, setTasks] = useState([]);
   const [events, setEvents] = useState([]);
   const [notes, setNotes] = useState([]);
@@ -50,4 +51,6 @@ export default function Dashboard() {
       </div>
     </div>
   );
-}
+};
+
+export default Dashboard;

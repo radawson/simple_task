@@ -1,6 +1,6 @@
-// components/dashboard/TaskList.jsx
+// src/components/dashboard/TaskList.jsx
 import React from 'react';
-import { MDBAccordion, MDBAccordionItem } from 'mdb-react-ui-kit';
+import { MDBAccordion, MDBAccordionItem, MDBCheckbox } from 'mdb-react-ui-kit';
 
 const TaskList = ({ tasks }) => {
   const handleCompletedChange = async (taskId, completed) => {
@@ -35,17 +35,11 @@ const TaskList = ({ tasks }) => {
                 />
               </div>
               {!task.no_check && (
-                <div className="form-check me-2">
-                  <input
-                    className="form-check-input"
-                    type="checkbox"
-                    checked={task.completed}
-                    onChange={(e) => handleCompletedChange(task.id, e.target.checked)}
-                  />
-                  <label className="form-check-label">
-                    Completed
-                  </label>
-                </div>
+                <MDBCheckbox
+                  checked={task.completed}
+                  onChange={(e) => handleCompletedChange(task.id, e.target.checked)}
+                  label="Completed"
+                />
               )}
             </div>
           </MDBAccordionItem>

@@ -1,4 +1,3 @@
-// src/config/logger.config.js
 const path = require('path');
 
 const logLevels = {
