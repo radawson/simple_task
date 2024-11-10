@@ -6,6 +6,7 @@ const config = require('../config');
 
 // Local auth routes - ensure controller methods exist
 router.post('/login', validateLogin, authController.login);
+router.post('/refresh', authController.refreshToken);
 router.post('/register', validateRegistration, authController.register);
 router.post('/logout', authenticate, authController.logout);
 

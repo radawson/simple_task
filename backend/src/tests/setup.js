@@ -1,15 +1,16 @@
 const Logger = require('../core/Logger');
-const winston = require('winston');
-require('winston-daily-rotate-file');
-const { Sequelize } = require('sequelize');
 
-// Initialize logger first
-new Logger({
+// Initialize logger before any imports
+const logger = new Logger({
     level: 'error',
     directory: 'logs/test',
     maxFiles: '1d',
     format: 'simple'
 });
+
+const winston = require('winston');
+require('winston-daily-rotate-file');
+const { Sequelize } = require('sequelize');
 
 // Initialize test database
 const testDb = new Sequelize({

@@ -1,4 +1,3 @@
-// Initialize logger first
 const Logger = require('../core/Logger');
 new Logger({
     level: 'error',
@@ -10,113 +9,110 @@ new Logger({
 const request = require('supertest');
 const { beforeAll, beforeEach, afterAll, describe, it, expect } = require('@jest/globals');
 const { Server } = require('../core');
-const { User } = require('../models');
-
-// Test configuration
-const testConfig = {
-    port: 9179,
-    sslPort: 9180,
-    sslKey: "certs/cert.key",
-    sslCert: "certs/cert.crt",
-    cors: {
-        origins: ["http://localhost:3000"],
-        credentials: true
-    },
-    logger: {
-        level: 'error',
-        directory: 'logs/test',
-        maxFiles: '1d'
-    },
-    security: {
-        helmet: {
-            contentSecurityPolicy: {
-                directives: {
-                    defaultSrc: ["'self'"],
-                    scriptSrc: ["'self'"],
-                    styleSrc: ["'self'"]
-                }
-            }
-        },
-        rateLimiting: {
-            windowMs: 900000,
-            max: 100
-        }
-    }
-};
+const { Sequelize } = require('sequelize');
+const config = require('../config');
 
 describe('Auth Endpoints', () => {
     let server;
     let app;
+    let sequelize;
+    let User;
+    let Session;
 
     beforeAll(async () => {
-        try {
-            server = new Server(testConfig);
-            await server.initialize();
-            app = server.app;
-            
-            // Create test database tables
-            await User.sync({ force: true });
-            
-            console.log('Test environment ready');
-        } catch (error) {
-            console.error('Setup failed:', error);
-            throw error;
-        }
+        // Setup test database
+        sequelize = new Sequelize({
+            dialect: 'sqlite',
+            storage: ':memory:',
+            logging: false
+        });
+
+        // Import models after database initialization
+        const models = require('../models');
+        User = models.User;
+        Session = models.Session;
+
+        // Initialize models with test database
+        Object.values(models).forEach(model => {
+            if (model.init) {
+                model.init(sequelize);
+            }
+        });
+
+        // Set up associations
+        Object.values(models).forEach(model => {
+            if (model.associate) {
+                model.associate(models);
+            }
+        });
+
+        // Sync database
+        await sequelize.sync({ force: true });
+
+        // Initialize server
+        server = new Server(config);
+        await server.initialize();
+        app = server.app;
     });
 
     beforeEach(async () => {
-        await User.destroy({ 
-            where: {}, 
-            force: true,
-            truncate: true 
-        });
+        await User.destroy({ where: {}, force: true });
+        await Session.destroy({ where: {}, force: true });
     });
 
     afterAll(async () => {
+        // Clear interval from AuthController
+        const authController = require('../controllers/auth.controller');
+        clearInterval(authController.cleanupInterval);
+
         if (server?.stop) {
             await server.stop();
         }
+        await sequelize.close();
     });
 
     describe('POST /auth/register', () => {
-        it('should register a new user', async () => {
+        const validUser = {
+            username: 'testuser',
+            password: 'Test123!',
+            email: 'test@example.com',
+            firstName: 'Test',
+            lastName: 'User'
+        };
+
+        it('should register valid user', async () => {
             const res = await request(app)
                 .post('/auth/register')
-                .send({
-                    username: 'testuser',
-                    password: 'Test123!',
-                    email: 'test@example.com'
-                });
+                .send(validUser);
             
             expect(res.statusCode).toBe(201);
             expect(res.body).toHaveProperty('userId');
         });
 
-        it('should fail with invalid data', async () => {
-            const res = await request(app)
-                .post('/auth/register')
-                .send({
-                    username: 'test',
-                    password: '123'
-                });
+        it('should reject duplicate username', async () => {
+            await request(app).post('/auth/register').send(validUser);
+            const res = await request(app).post('/auth/register').send(validUser);
             
             expect(res.statusCode).toBe(400);
+            expect(res.body.message).toContain('already exists');
         });
     });
 
     describe('POST /auth/login', () => {
         beforeEach(async () => {
-            // Create test user
-            await request(app)
+            const res = await request(app)
                 .post('/auth/register')
                 .send({
                     username: 'testuser',
                     password: 'Test123!',
-                    email: 'test@example.com'
+                    email: 'test@example.com',
+                    firstName: 'Test',
+                    lastName: 'User'
                 });
+            testUser = res.body;
         });
 
-        it('should login with valid credentials', async () => {
+        it('should login valid user', async () => {
             const res = await request(app)
                 .post('/auth/login')
                 .send({
@@ -125,18 +121,150 @@ describe('Auth Endpoints', () => {
                 });
 
             expect(res.statusCode).toBe(200);
-            expect(res.body).toHaveProperty('token');
+            expect(res.body).toHaveProperty('accessToken');
+            expect(res.body).toHaveProperty('refreshToken');
+            
+            accessToken = res.body.accessToken;
+            refreshToken = res.body.refreshToken;
         });
 
-        it('should fail with invalid credentials', async () => {
-            const res = await request(app)
+        it('should create session on login', async () => {
+            await request(app)
                 .post('/auth/login')
                 .send({
                     username: 'testuser',
-                    password: 'wrongpass'
+                    password: 'Test123!'
                 });
 
+            const sessions = await Session.findAll();
+            expect(sessions.length).toBe(1);
+            expect(sessions[0].isValid).toBe(true);
+        });
+    });
+
+    describe('POST /auth/refresh', () => {
+        let refreshToken;
+        let testUser;
+        
+        beforeEach(async () => {
+            // Create test user
+            const registerRes = await request(app)
+                .post('/auth/register')
+                .send({
+                    username: 'testuser',
+                    password: 'Test123!',
+                    email: 'test@example.com',
+                    firstName: 'Test',
+                    lastName: 'User'
+                });
+    
+            testUser = registerRes.body;
+            
+            // Login to get tokens
+            const loginRes = await request(app)
+                .post('/auth/login')
+                .send({
+                    username: 'testuser',
+                    password: 'Test123!'
+                });
+                
+            refreshToken = loginRes.body.refreshToken;
+            
+            // Ensure session is saved
+            await new Promise(resolve => setTimeout(resolve, 500));
+        });
+    
+        it('should reject request with wrong content type', async () => {
+            const res = await request(app)
+                .post('/auth/refresh')
+                .set('Content-Type', 'text/plain')
+                .send(refreshToken);
+    
+            expect(res.statusCode).toBe(400);
+            expect(res.body.message).toContain('Content-Type must be application/json');
+        });
+    
+        it('should reject request without refresh token', async () => {
+            const res = await request(app)
+                .post('/auth/refresh')
+                .send({});
+    
+            expect(res.statusCode).toBe(400);
+            expect(res.body.message).toContain('refresh_token is required');
+        });
+    
+        it('should reject invalid refresh token', async () => {
+            const res = await request(app)
+                .post('/auth/refresh')
+                .send({ refreshToken: 'invalid-token' });
+    
             expect(res.statusCode).toBe(401);
+            expect(res.body.message).toContain('Invalid refresh token');
+        });
+    
+        it('should refresh token with valid request', async () => {
+            const res = await request(app)
+                .post('/auth/refresh')
+                .set('Content-Type', 'application/json')
+                .send({ refreshToken });
+    
+            expect(res.statusCode).toBe(200);
+            expect(res.body).toHaveProperty('accessToken');
+            expect(res.body).toHaveProperty('refreshToken');
+            expect(res.body.refreshToken).not.toBe(refreshToken);
+        });
+    
+        it('should reject expired refresh token', async () => {
+            // Update session to be expired
+            await Session.update(
+                { expiresAt: new Date(Date.now() - 1000) },
+                { where: { refreshToken } }
+            );
+    
+            const res = await request(app)
+                .post('/auth/refresh')
+                .send({ refreshToken });
+    
+            expect(res.statusCode).toBe(401);
+            expect(res.body.message).toContain('Invalid refresh token');
+        });
+    });
+
+    describe('POST /auth/logout', () => {
+        let accessToken;
+    
+        beforeEach(async () => {
+            // Register and login to get fresh token
+            await request(app)
+                .post('/auth/register')
+                .send({
+                    username: 'testuser',
+                    password: 'Test123!',
+                    email: 'test@example.com',
+                    firstName: 'Test',
+                    lastName: 'User'
+                });
+    
+            const loginRes = await request(app)
+                .post('/auth/login')
+                .send({
+                    username: 'testuser',
+                    password: 'Test123!'
+                });
+            accessToken = loginRes.body.accessToken;
+        });
+    
+        it('should invalidate session', async () => {
+            const res = await request(app)
+                .post('/auth/logout')
+                .set('Authorization', `Bearer ${accessToken}`);
+    
+            expect(res.statusCode).toBe(200);
+            
+            const sessions = await Session.findAll({ 
+                where: { isValid: true }
+            });
+            expect(sessions.length).toBe(0);
         });
     });
 });

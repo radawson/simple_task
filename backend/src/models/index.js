@@ -45,6 +45,7 @@ module.exports.Note = require('./note.model');
 module.exports.Template = require('./template.model');
 module.exports.Timecard = require('./timecard.model');
 module.exports.Message = require('./message.model');
+module.exports.Session = require('./session.model');
 module.exports.Setting = require('./setting.model');
 module.exports.Audit = require('./audit.model');
 module.exports.Notification = require('./notification.model');
