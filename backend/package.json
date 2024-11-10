@@ -4,7 +4,8 @@
   "description": "Node.js API Backend",
   "main": "server.js",
   "scripts": {
-    "test": "cross-env NODE_ENV=test jest --detectOpenHandles --forceExit --runInBand"
+    "test": "cross-env NODE_ENV=test jest --detectOpenHandles --forceExit --runInBand",
+    "seed": "cross-env NODE_ENV=development node scripts/seed.js"
   },
   "jest": {
     "testEnvironment": "node",
