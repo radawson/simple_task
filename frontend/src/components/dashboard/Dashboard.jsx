@@ -1,38 +1,53 @@
-// components/dashboard/Dashboard.jsx
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
+import { ApiService } from '../../services/api';
 import TaskList from './TaskList';
 import EventList from './EventList';
 import NoteList from './NoteList';
 
-const Dashboard = () => {
+export default function Dashboard() {
   const [tasks, setTasks] = useState([]);
   const [events, setEvents] = useState([]);
   const [notes, setNotes] = useState([]);
-  const [date, setDate] = useState(new Date());
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Fetch data from your API
     const fetchData = async () => {
-      const dateStr = date.toISOString().split('T')[0];
-      const response = await fetch(`/api/date/${dateStr}`);
-      const data = await response.json();
-      setTasks(data.tasks);
-      setEvents(data.events);
-      setNotes(data.notes);
+      try {
+        const date = new Date().toISOString().split('T')[0];
+        const [tasksRes, eventsRes, notesRes] = await Promise.all([
+          ApiService.getTasks(date),
+          ApiService.getEvents(date),
+          ApiService.getNotes(date)
+        ]);
+
+        setTasks(tasksRes.data);
+        setEvents(eventsRes.data);
+        setNotes(notesRes.data);
+      } catch (error) {
+        console.error('Error fetching dashboard data:', error);
+      } finally {
+        setLoading(false);
+      }
     };
 
     fetchData();
-  }, [date]);
+  }, []);
+
+  if (loading) return <div>Loading...</div>;
 
   return (
-    <div id="main_container" className="container py-5">
-      <div className="card">
-        <TaskList tasks={tasks} />
-        <EventList events={events} />
-        <NoteList notes={notes} />
+    <div className="container py-5">
+      <div className="row">
+        <div className="col-md-4">
+          <TaskList tasks={tasks} />
+        </div>
+        <div className="col-md-4">
+          <EventList events={events} />
+        </div>
+        <div className="col-md-4">
+          <NoteList notes={notes} />
+        </div>
       </div>
     </div>
   );
-};
-
-export default Dashboard;
+}
