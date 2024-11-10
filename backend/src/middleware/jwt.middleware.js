@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 const Logger = require('../core/Logger');
+const config = require('../config');
 const logger = Logger.getInstance();
 
 class JWTMiddleware {
@@ -10,16 +11,16 @@ class JWTMiddleware {
                 username: user.username,
                 isAdmin: user.isAdmin
             },
-            process.env.JWT_SECRET,
-            { expiresIn: '1h' }
+            config.jwt.secret,
+            { expiresIn: config.jwt.accessTokenExpiry }
         );
     }
 
     static generateRefreshToken(user) {
         return jwt.sign(
             { id: user.id },
-            process.env.JWT_REFRESH_SECRET,
-            { expiresIn: '7d' }
+            config.jwt.refreshSecret,
+            { expiresIn: config.jwt.refreshTokenExpiry }
         );
     }
 

@@ -40,6 +40,20 @@ const configSchema = Joi.object({
         password: Joi.string().when('type', { is: 'postgres', then: Joi.required() }),
         ssl: Joi.boolean()
     }).required(),
+    jwt: Joi.object({
+        secret: Joi.string()
+            .required()
+            .error(new Error('JWT_SECRET environment variable is required')),
+        refreshSecret: Joi.string()
+            .required()
+            .error(new Error('JWT_REFRESH_SECRET environment variable is required')),
+        accessTokenExpiry: Joi.string()
+            .pattern(/^\d+[hdm]$/)  // e.g. 1h, 30m, 2d
+            .default('1h'),
+        refreshTokenExpiry: Joi.string()
+            .pattern(/^\d+[hdm]$/)
+            .default('7d')
+    }).required(),
     logger: Joi.object({
         level: Joi.string().valid('error', 'warn', 'info', 'debug').required(),
         directory: Joi.string().required(),

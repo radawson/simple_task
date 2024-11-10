@@ -18,6 +18,8 @@ class Config {
 
   #loadConfig() {
     require('dotenv').config();
+    const SecretsManager = require('../utils/secrets.manager');
+    const secretsManager = SecretsManager.getInstance();
 
     const config = {
       env: process.env.NODE_ENV || 'development',
@@ -44,6 +46,12 @@ class Config {
           password: process.env.DB_PASSWORD,
           ssl: process.env.DB_SSL === 'true'
         }
+      },
+      jwt: {
+        secret: process.env.JWT_SECRET || secretsManager.getSecret('JWT_SECRET'),
+        refreshSecret: process.env.JWT_REFRESH_SECRET || secretsManager.getSecret('JWT_REFRESH_SECRET'),
+        accessTokenExpiry: process.env.JWT_ACCESS_EXPIRY || '1h',
+        refreshTokenExpiry: process.env.JWT_REFRESH_EXPIRY || '7d'
       },
       logger: {
         level: process.env.LOG_LEVEL || 'info',
