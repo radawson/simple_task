@@ -1,30 +1,53 @@
-# Virtual Environment
-# -------------------
-.venv
-venv
+# Python
+# ------
+__pycache__/
+*.py[cod]
+*.egg-info/
+instance/
+migrations/
 
-# Pycache
-# --------
-__pycache__
+# Node/React
+# ----------
+node_modules/
+dist/
+build/
+coverage/
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 
-# Python egg metadata
-# -------------------
-*.egg-info
+# Build outputs
+# ------------
+/frontend/dist/
+/frontend/build/
+
+# Environment
+# ----------
+.env
+.env.*
+!.env.example
+
+# IDE
+# ---
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+# --
+.DS_Store
+Thumbs.db
 
 # Logs
 # ----
-logs
+logs/
 *.log
 
-# Instance folder
-# ---------------
-instance/
-
-# Database migrations
-# -------------------
-migrations/
-
-# Configuration files
-# -------------------
-.env
+# Config files
+# -----------
 client_secrets.json

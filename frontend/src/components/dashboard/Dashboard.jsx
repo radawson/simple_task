@@ -1,7 +1,6 @@
-// src/components/dashboard/Dashboard.jsx
 import React, { useState, useEffect } from 'react';
 import { ApiService } from '../../services/api';
-import EditRoute from '../auth/EditRoute';
+import EditRoute from '../auth/EditRoute';  // Import matches export
 import TaskList from './TaskList';
 import EventList from './EventList';
 import NoteList from './NoteList';

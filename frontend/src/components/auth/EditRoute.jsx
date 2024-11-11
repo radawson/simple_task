@@ -1,7 +1,7 @@
 import { Navigate, useLocation } from 'react-router-dom';
 import { AuthService } from '../../services/auth.service';
 
-export const EditRoute = ({ children }) => {
+const EditRoute = ({ children }) => {
   const location = useLocation();
   const token = AuthService.getCurrentToken();
   const user = AuthService.getCurrentUser();
@@ -12,3 +12,5 @@ export const EditRoute = ({ children }) => {
 
   return children({ canEdit: true });
 };
+
+export default EditRoute;
