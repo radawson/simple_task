@@ -1,66 +1,74 @@
-const router = require('express').Router();
-const userController = require('../controllers/user.controller');
-const { 
+// src/routes/user.routes.js
+import { Router } from 'express';
+import { 
     validateUser, 
     validatePassword,
-    validateUpdatePassword  
-} = require('../middleware/validation.middleware');
-const { authenticate, authorize } = require('../middleware/auth.middleware');
+    validateUpdatePassword 
+} from '../middleware/validation.middleware';
+import { authenticate, authorize } from '../middleware/auth.middleware';
+import UserController from '../controllers/user.controller';
 
-// Admin routes
-router.get('/users', 
-    authenticate, 
-    authorize(['admin']), 
-    userController.list
-);
+const createUserRoutes = (socketService) => {
+    const router = Router();
+    const userController = new UserController(socketService);
 
-router.post('/users', 
-    authenticate, 
-    authorize(['admin']), 
-    validateUser, 
-    userController.create
-);
+    // Admin routes
+    router.get('/', 
+        authenticate, 
+        authorize(['admin']), 
+        userController.list
+    );
 
-// Profile routes
-router.get('/profile', 
-    authenticate, 
-    userController.getProfile
-);
+    router.post('/', 
+        authenticate, 
+        authorize(['admin']), 
+        validateUser, 
+        userController.create
+    );
 
-router.put('/profile', 
-    authenticate, 
-    validateUser, 
-    userController.updateProfile
-);
+    // Profile routes
+    router.get('/profile', 
+        authenticate, 
+        userController.getProfile
+    );
 
-router.put('/profile/password', 
-    authenticate, 
-    validateUpdatePassword,  
-    userController.updatePassword
-);
+    router.put('/profile', 
+        authenticate, 
+        validateUser, 
+        userController.updateProfile
+    );
 
-// Password reset flow
-router.post('/password/reset-request', 
-    userController.requestPasswordReset
-);
+    router.put('/profile/password', 
+        authenticate, 
+        validateUpdatePassword, 
+        userController.updatePassword
+    );
 
-router.post('/password/reset/:token', 
-    validatePassword, 
-    userController.resetPassword
-);
+    // Password reset flow
+    router.post('/password/reset-request', 
+        userController.requestPasswordReset
+    );
 
-// SSO specific routes
-router.post('/users/sso', 
-    authenticate, 
-    authorize(['admin']), 
-    validateUser, 
-    userController.createSSOUser
-);
+    router.post('/password/reset/:token', 
+        validatePassword, 
+        userController.resetPassword
+    );
 
-router.put('/users/sso/:id/sync', 
-    authenticate, 
-    authorize(['admin']), 
-    userController.syncSSOUser
-);
+    // SSO specific routes
+    router.post('/sso', 
+        authenticate, 
+        authorize(['admin']), 
+        validateUser, 
+        userController.createSSOUser
+    );
 
-module.exports = router;
+    router.put('/sso/:id/sync', 
+        authenticate, 
+        authorize(['admin']), 
+        userController.syncSSOUser
+    );
+
+    return router;
+};
+
+export default createUserRoutes;

@@ -84,12 +84,29 @@ class Server {
 
     async setupRoutes() {
         this.logger.debug('Loading API routes...');
-        const routes = require('../routes');
         
-        // Mount all routes at root level
-        this.app.use('/', routes);
-        
-        this.logger.info('API routes mounted successfully');
+        try {
+            // Only create socketService if we have HTTPS server
+            if (this.servers?.https) {
+                const { default: SocketService } = await import('../services/socket.service.js');
+                this.socketService = new SocketService(this.servers.https, this.config);
+                this.logger.info('WebSocket service initialized');
+            } else {
+                this.logger.warn('HTTPS server not available, WebSocket service disabled');
+            }
+    
+            // Initialize routes with socket service
+            const { default: createRouter } = await import('../routes/index.js');
+            const router = createRouter(this.socketService);
+            
+            // Mount routes
+            this.app.use('/', router);
+            
+            this.logger.info('API routes mounted successfully');
+        } catch (error) {
+            this.logger.error('Failed to setup routes:', error);
+            throw error;
+        }
     }
 
     async setupErrorHandling() {

@@ -1,59 +1,67 @@
-const router = require('express').Router();
-const timecardController = require('../controllers/timecard.controller');
-const { validateTimecard } = require('../middleware/validation.middleware');
-const { authenticate, authorize } = require('../middleware/auth.middleware');
+// src/routes/timecard.routes.js
+import { Router } from 'express';
+import { validateTimecard } from '../middleware/validation.middleware';
+import { authenticate, authorize } from '../middleware/auth.middleware';
+import TimecardController from '../controllers/timecard.controller';
 
-// Clock in/out routes
-router.post('/clock-in',
-    authenticate,
-    timecardController.clockIn
-);
+const createTimecardRoutes = (socketService) => {
+    const router = Router();
+    const timecardController = new TimecardController(socketService);
 
-router.post('/clock-out',
-    authenticate,
-    timecardController.clockOut
-);
+    // Clock in/out routes
+    router.post('/clock-in',
+        authenticate,
+        timecardController.clockIn
+    );
 
-// Admin/supervisor routes
-router.post('/timecards/:id/approve',
-    authenticate,
-    authorize(['admin']), 
-    timecardController.approve
-);
+    router.post('/clock-out',
+        authenticate,
+        timecardController.clockOut
+    );
 
-// Standard CRUD with permission checks
-router.get('/timecards',
-    authenticate,
-    timecardController.list
-);
+    // Employee specific routes
+    router.get('/employees/:employeeId/timecards',
+        authenticate,
+        timecardController.getByEmployee
+    );
 
-router.post('/timecards',
-    authenticate,
-    validateTimecard,
-    timecardController.create
-);
+    // Admin/supervisor routes
+    router.post('/:id/approve',
+        authenticate,
+        authorize(['admin']),
+        timecardController.approve
+    );
 
-router.get('/timecards/:id',
-    authenticate,
-    timecardController.get
-);
+    // Standard CRUD with permission checks
+    router.get('/',
+        authenticate,
+        timecardController.list
+    );
 
-router.put('/timecards/:id',
-    authenticate,
-    validateTimecard,
-    timecardController.update
-);
+    router.post('/',
+        authenticate,
+        validateTimecard,
+        timecardController.create
+    );
 
-router.delete('/timecards/:id',
-    authenticate,
-    authorize(['admin']),
-    timecardController.delete
-);
+    router.get('/:id',
+        authenticate,
+        timecardController.get
+    );
 
-// Employee specific routes
-router.get('/employees/:employeeId/timecards',
-    authenticate,
-    timecardController.getByEmployee
-);
+    router.put('/:id',
+        authenticate,
+        validateTimecard,
+        timecardController.update
+    );
 
-module.exports = router;
+    router.delete('/:id',
+        authenticate,
+        authorize(['admin']),
+        timecardController.delete
+    );
+
+    return router;
+};
+
+export default createTimecardRoutes;

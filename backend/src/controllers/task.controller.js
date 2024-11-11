@@ -1,10 +1,182 @@
-const { Task, Template, User } = require('../models');
+const { Task, Template } = require('../models');
+const { Op } = require('sequelize');
 const Logger = require('../core/Logger');
 const logger = Logger.getInstance();
 
+/**
+ * Controller handling task-related operations
+ */
 class TaskController {
-    async list(req, res) {
+    /**
+     * Create a new task
+     * @param {Request} req - Express request object
+     * @param {Response} res - Express response object
+     */
+    create = async (req, res) => {
         try {
+            logger.info('Creating new task', { 
+                user: req.user.username,
+                taskData: req.body 
+            });
+
+            const task = await Task.create({
+                ...req.body,
+                addedBy: req.user.username
+            });
+
+            if (req.body.templateIds) {
+                const templates = await Template.findAll({
+                    where: { id: req.body.templateIds }
+                });
+                await task.setTemplates(templates);
+            }
+
+            logger.info('Task created successfully', { taskId: task.id });
+            return res.status(201).json(task);
+
+        } catch (error) {
+            logger.error('Task creation failed', {
+                error: error.message,
+                stack: error.stack,
+                userData: req.body
+            });
+            return res.status(400).json({ 
+                message: 'Failed to create task',
+                error: error.message 
+            });
+        }
+    };
+
+    /**
+     * Delete a task
+     * @param {Request} req - Express request object
+     * @param {Response} res - Express response object
+     */
+    delete = async (req, res) => {
+        try {
+            logger.info('Attempting to delete task', { taskId: req.params.id });
+
+            const task = await Task.findByPk(req.params.id);
+            if (!task) {
+                logger.warn('Task not found for deletion', { taskId: req.params.id });
+                return res.status(404).json({ message: 'Task not found' });
+            }
+
+            await task.destroy();
+            logger.info('Task deleted successfully', { taskId: req.params.id });
+            return res.status(204).send();
+
+        } catch (error) {
+            logger.error('Task deletion failed', {
+                error: error.message,
+                stack: error.stack,
+                taskId: req.params.id
+            });
+            return res.status(500).json({ 
+                message: 'Failed to delete task',
+                error: error.message 
+            });
+        }
+    };
+
+    /**
+     * Get a single task by ID
+     * @param {Request} req - Express request object
+     * @param {Response} res - Express response object
+     */
+    get = async (req, res) => {
+        try {
+            logger.info('Retrieving task', { taskId: req.params.id });
+
+            const task = await Task.findByPk(req.params.id, {
+                include: [{
+                    model: Template,
+                    through: { attributes: [] }
+                }]
+            });
+
+            if (!task) {
+                logger.warn('Task not found', { taskId: req.params.id });
+                return res.status(404).json({ message: 'Task not found' });
+            }
+
+            logger.info('Task retrieved successfully', { taskId: task.id });
+            return res.json(task);
+
+        } catch (error) {
+            logger.error('Task retrieval failed', {
+                error: error.message,
+                stack: error.stack,
+                taskId: req.params.id
+            });
+            return res.status(500).json({ 
+                message: 'Failed to get task',
+                error: error.message 
+            });
+        }
+    };
+
+    /**
+     * Get tasks by specific date
+     * @param {Request} req - Express request object
+     * @param {Response} res - Express response object
+     */
+    getByDate = async (req, res) => {
+        try {
+            const { date } = req.params;
+            logger.info('Retrieving tasks by date', { date });
+
+            if (!date || isNaN(new Date(date).getTime())) {
+                logger.warn('Invalid date provided', { date });
+                return res.status(400).json({ 
+                    message: 'Invalid date format' 
+                });
+            }
+
+            const tasks = await Task.findAll({
+                where: {
+                    date: {
+                        [Op.eq]: new Date(date)
+                    }
+                },
+                order: [
+                    ['priority', 'DESC'],
+                    ['createdAt', 'ASC']
+                ],
+                include: [{
+                    model: Template,
+                    through: { attributes: [] }
+                }]
+            });
+
+            logger.info('Tasks retrieved by date successfully', { 
+                date, 
+                count: tasks.length 
+            });
+            return res.json(tasks);
+
+        } catch (error) {
+            logger.error('Failed to get tasks by date', {
+                error: error.message,
+                stack: error.stack,
+                date: req.params.date
+            });
+            return res.status(500).json({ 
+                message: 'Failed to retrieve tasks',
+                error: error.message 
+            });
+        }
+    };
+
+    /**
+     * List tasks with pagination and filtering
+     * @param {Request} req - Express request object
+     * @param {Response} res - Express response object
+     */
+    list = async (req, res) => {
+        try {
+            logger.info('Listing tasks with filters', { query: req.query });
+            
             const { 
                 page = 1, 
                 limit = 10, 
@@ -34,7 +206,12 @@ class TaskController {
                 }]
             });
 
-            logger.info(`Retrieved ${tasks.count} tasks`);
+            logger.info('Tasks retrieved successfully', { 
+                count: tasks.count,
+                page,
+                limit
+            });
+
             return res.json({
                 tasks: tasks.rows,
                 total: tasks.count,
@@ -43,70 +220,32 @@ class TaskController {
             });
 
         } catch (error) {
-            logger.error(`Task listing failed: ${error.message}`);
+            logger.error('Task listing failed', {
+                error: error.message,
+                stack: error.stack
+            });
             return res.status(500).json({ 
                 message: 'Failed to list tasks',
                 error: error.message 
             });
         }
-    }
+    };
 
-    async create(req, res) {
+    /**
+     * Update an existing task
+     * @param {Request} req - Express request object
+     * @param {Response} res - Express response object
+     */
+    update = async (req, res) => {
         try {
-            const task = await Task.create({
-                ...req.body,
-                addedBy: req.user.username
+            logger.info('Attempting to update task', { 
+                taskId: req.params.id,
+                updates: req.body 
             });
 
-            if (req.body.templateIds) {
-                const templates = await Template.findAll({
-                    where: { id: req.body.templateIds }
-                });
-                await task.setTemplates(templates);
-            }
-
-            logger.info(`Task created: ${task.id}`);
-            return res.status(201).json(task);
-
-        } catch (error) {
-            logger.error(`Task creation failed: ${error.message}`);
-            return res.status(400).json({ 
-                message: 'Failed to create task',
-                error: error.message 
-            });
-        }
-    }
-
-    async get(req, res) {
-        try {
-            const task = await Task.findByPk(req.params.id, {
-                include: [{
-                    model: Template,
-                    through: { attributes: [] }
-                }]
-            });
-
-            if (!task) {
-                logger.warn(`Task not found: ${req.params.id}`);
-                return res.status(404).json({ message: 'Task not found' });
-            }
-
-            return res.json(task);
-
-        } catch (error) {
-            logger.error(`Task retrieval failed: ${error.message}`);
-            return res.status(500).json({ 
-                message: 'Failed to get task',
-                error: error.message 
-            });
-        }
-    }
-
-    async update(req, res) {
-        try {
             const task = await Task.findByPk(req.params.id);
             if (!task) {
-                logger.warn(`Task not found for update: ${req.params.id}`);
+                logger.warn('Task not found for update', { taskId: req.params.id });
                 return res.status(404).json({ message: 'Task not found' });
             }
 
@@ -119,38 +258,22 @@ class TaskController {
                 await task.setTemplates(templates);
             }
 
-            logger.info(`Task updated: ${task.id}`);
+            logger.info('Task updated successfully', { taskId: task.id });
             return res.json(task);
 
         } catch (error) {
-            logger.error(`Task update failed: ${error.message}`);
+            logger.error('Task update failed', {
+                error: error.message,
+                stack: error.stack,
+                taskId: req.params.id,
+                updates: req.body
+            });
             return res.status(400).json({ 
                 message: 'Failed to update task',
                 error: error.message 
             });
         }
-    }
-
-    async delete(req, res) {
-        try {
-            const task = await Task.findByPk(req.params.id);
-            if (!task) {
-                logger.warn(`Task not found for deletion: ${req.params.id}`);
-                return res.status(404).json({ message: 'Task not found' });
-            }
-
-            await task.destroy();
-            logger.info(`Task deleted: ${task.id}`);
-            return res.status(204).send();
-
-        } catch (error) {
-            logger.error(`Task deletion failed: ${error.message}`);
-            return res.status(500).json({ 
-                message: 'Failed to delete task',
-                error: error.message 
-            });
-        }
-    }
+    };
 }
 
 module.exports = new TaskController();

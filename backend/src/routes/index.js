@@ -1,28 +1,43 @@
-const express = require('express');
-const router = express.Router();
-const { authenticate } = require('../middleware/auth.middleware');
+import express from 'express';
+import { authenticate } from '../middleware/auth.middleware';
 
-// Import route modules
-const authRoutes = require('./auth.routes');
-const fileRoutes = require('./file.routes');
-const taskRoutes = require('./task.routes');
-const templateRoutes = require('./template.routes');
-const eventRoutes = require('./event.routes');
-const noteRoutes = require('./note.routes');
-const userRoutes = require('./user.routes');
-const timecardRoutes = require('./timecard.routes');
 
-// Public routes
-router.use('/auth', authRoutes);
+const createRouter = (socketService) => {
+    const router = express.Router();
 
-// Protected routes with auth middleware
-router.use(authenticate);
-router.use('/api/files', fileRoutes);
-router.use('/api/tasks', taskRoutes);
-router.use('/api/templates', templateRoutes);
-router.use('/api/events', eventRoutes);
-router.use('/api/notes', noteRoutes);
-router.use('/api/users', userRoutes);
-router.use('/api/timecards', timecardRoutes);
+    // Import route modules with socket service injection
+    const createAuthRoutes = require('./auth.routes');
+    const createFileRoutes = require('./file.routes');
+    const createTaskRoutes = require('./task.routes');
+    const createTemplateRoutes = require('./template.routes');
+    const createEventRoutes = require('./event.routes');
+    const createNoteRoutes = require('./note.routes');
+    const createUserRoutes = require('./user.routes');
+    const createTimecardRoutes = require('./timecard.routes');
 
-module.exports = router;
+    // Initialize routes with socket service
+    const authRoutes = createAuthRoutes(socketService);
+    const fileRoutes = createFileRoutes(socketService);
+    const taskRoutes = createTaskRoutes(socketService);
+    const templateRoutes = createTemplateRoutes(socketService);
+    const eventRoutes = createEventRoutes(socketService);
+    const noteRoutes = createNoteRoutes(socketService);
+    const userRoutes = createUserRoutes(socketService);
+    const timecardRoutes = createTimecardRoutes(socketService);
+
+    // Public routes
+    router.use('/auth', authRoutes);
+    router.use('/api/tasks', taskRoutes);
+    router.use('/api/events', eventRoutes);
+    router.use('/api/notes', noteRoutes);
+
+    // Protected routes
+    router.use('/api/files', authenticate, fileRoutes);
+    router.use('/api/templates', authenticate, templateRoutes);
+    router.use('/api/users', authenticate, userRoutes);
+    router.use('/api/timecards', authenticate, timecardRoutes);
+
+    return router;
+};
+
+export default createRouter;

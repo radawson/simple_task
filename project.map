@@ -3,94 +3,118 @@ project/
 │   ├── src/
 │   │   ├── config/
 │   │   │   ├── database.config.js
-│   │   │   ├── logger.config.js    
+│   │   │   ├── logger.config.js
 │   │   │   ├── server.config.js
-│   │   │   ├── socket.config.js    
-│   │   │   ├── storage.config.js   # Needed: Storage configuration 
-│   │   │   ├── types.ts            
-│   │   │   ├── validation.js       
+│   │   │   ├── socket.config.js
+│   │   │   ├── storage.config.js
+│   │   │   ├── types.ts
+│   │   │   ├── validation.js
+│   │   │   └── index.js
+│   │   ├── controllers/
+│   │   │   ├── auth.controller.js
+│   │   │   ├── event.controller.js
+│   │   │   ├── file.controller.js
+│   │   │   ├── note.controller.js
+│   │   │   ├── person.controller.js
+│   │   │   ├── task.controller.js
+│   │   │   ├── template.controller.js
+│   │   │   ├── timecard.controller.js
+│   │   │   ├── user.controller.js
 │   │   │   └── index.js
 │   │   ├── core/
 │   │   │   ├── Database.js
 │   │   │   ├── Logger.js
 │   │   │   ├── Server.js
-│   │   │   └── Storage.js           # Needed: Storage management
-│   │   ├── models/
-│               audit.model.js      
-│   │   │   ├── base.model.js
-│   │   │   ├── calendar.model.js
-│   │   │   ├── event.model.js       
-│   │   │   ├── filedata.model.js
-│   │   │   ├── message.model.js
-│   │   │   ├── note.model.js 
-│   │   │   ├── notification.model.js      
-│   │   │   ├── person.model.js      
-│   │   │   ├── setting.model.js    
-│   │   │   ├── task.model.js
-│   │   │   ├── template.model.js    
-│   │   │   ├── timecard.model.js    
-│   │   │   └── index.js
-│   │   ├── controllers/
-│   │   │   ├── auth.controller.js
-│   │   │   ├── event.controller.js   
-│   │   │   ├── file.controller.js
-│   │   │   ├── note.controller.js    
-│   │   │   ├── person.controller.js  
-│   │   │   ├── task.controller.js
-│   │   │   ├── template.controller.js 
-│   │   │   ├── timecard.controller.js 
-│   │   │   └── index.js
+│   │   │   └── Storage.js
 │   │   ├── middleware/
-│   │   │   ├── auth.middleware.js  
-│   │   │   ├── cors.middleware.js  
-│   │   │   ├── error.middleware.js 
+│   │   │   ├── auth.middleware.js
+│   │   │   ├── cors.middleware.js
+│   │   │   ├── error.middleware.js
 │   │   │   ├── jwt.middleware.js
-│   │   │   ├── logger.middleware.js   # Needed
-│   │   │   ├── rate.middleware.js     # Needed
+│   │   │   ├── logger.middleware.js
+│   │   │   ├── rate.middleware.js
 │   │   │   ├── scram.middleware.js
 │   │   │   ├── store.middleware.js
 │   │   │   ├── validation.middleware.js
 │   │   │   └── index.js
+│   │   ├── models/
+│   │   │   ├── audit.model.js
+│   │   │   ├── base.model.js
+│   │   │   ├── calendar.model.js
+│   │   │   ├── event.model.js
+│   │   │   ├── filedata.model.js
+│   │   │   ├── message.model.js
+│   │   │   ├── note.model.js
+│   │   │   ├── notification.model.js
+│   │   │   ├── person.model.js
+│   │   │   ├── setting.model.js
+│   │   │   ├── task.model.js
+│   │   │   ├── template.model.js
+│   │   │   ├── timecard.model.js
+│   │   │   ├── user.model.js
+│   │   │   └── index.js
 │   │   ├── routes/
 │   │   │   ├── auth.routes.js
-│   │   │   ├── event.routes.js      
+│   │   │   ├── event.routes.js
 │   │   │   ├── file.routes.js
-│   │   │   ├── note.routes.js       
-│   │   │   ├── person.routes.js     
+│   │   │   ├── note.routes.js
+│   │   │   ├── person.routes.js
 │   │   │   ├── task.routes.js
-│   │   │   ├── template.routes.js    
+│   │   │   ├── template.routes.js
 │   │   │   ├── timecard.routes.js
-│   │   │   ├── user.routes.js    
+│   │   │   ├── user.routes.js
 │   │   │   └── index.js
 │   │   ├── services/
+│   │   │   ├── auth.service.js
 │   │   │   ├── chat.service.js
-│   │   │   └── socket.service.js      
+│   │   │   ├── mail.service.js
+│   │   │   └── socket.service.js
 │   │   └── utils/
-│   │       ├── date.util.js          # Needed
-│   │       ├── file.util.js        
+│   │       ├── date.util.js
+│   │       ├── esm-helpers.util.js
+│   │       ├── file.util.js
 │   │       ├── secret.util.js
 │   │       ├── secretsManager.util.js
 │   │       └── seed.util.js
 │   ├── tests/
-│   │   ├── unit/
 │   │   ├── integration/
-│   │   └── fixtures/
+│   │   │   └── routes/
+│   │   ├── unit/
+│   │   │   ├── controllers/
+│   │   │   ├── middleware/
+│   │   │   └── services/
+│   │   ├── fixtures/
+│   │   │   ├── tasks.json
+│   │   │   └── users.json
+│   │   └── setup.js
 │   ├── scripts/
+│   │   ├── seed.js
+│   │   └── setup.js
 │   ├── docs/
+│   │   ├── api/
+│   │   └── setup/
 │   ├── logs/
 │   ├── certs/
+│   ├── .env
+│   ├── .env.example
+│   ├── .gitignore
+│   ├── jest.config.js
 │   ├── package.json
 │   └── server.js
 └── frontend/
     ├── public/
+    │   ├── assets/
     │   ├── favicon.ico
     │   └── index.html
     ├── src/
     │   ├── components/
     │   │   ├── auth/
     │   │   │   ├── Login.jsx
-    │   │   │   └── Register.jsx
+    │   │   │   ├── Register.jsx
+    │   │   │   └── ProtectedRoute.jsx
     │   │   ├── common/
+    │   │   │   ├── Button.jsx
+    │   │   │   ├── Input.jsx
     │   │   │   └── Toast.jsx
     │   │   ├── dashboard/
     │   │   │   ├── Dashboard.jsx
@@ -99,27 +123,36 @@ project/
     │   │   │   └── NoteList.jsx
     │   │   └── layout/
     │   │       ├── Layout.jsx
-    │   │       └── Navbar.jsx
+    │   │       ├── Navbar.jsx
+    │   │       └── Sidebar.jsx
     │   ├── config/
+    │   │   ├── api.config.js
     │   │   ├── auth.config.js
     │   │   └── index.js
     │   ├── constants/
-    │   │   └── index.js 
+    │   │   └── index.js
     │   ├── context/
-    │   │   └── AuthContext.jsx   
+    │   │   ├── AuthContext.jsx
+    │   │   └── ThemeContext.jsx
     │   ├── hooks/
-    │   │   └── useAuth.js     
+    │   │   ├── useAuth.js
+    │   │   └── useTheme.js
     │   ├── services/
     │   │   ├── api.js
     │   │   └── auth.service.js
     │   ├── styles/
+    │   │   ├── components/
     │   │   └── App.css
     │   ├── types/
-    │   │   └── index.ts  
+    │   │   └── index.ts
     │   ├── utils/
     │   │   ├── date.utils.js
     │   │   └── toast.utils.js
     │   ├── App.jsx
-    │   └── main.jsx 
+    │   └── main.jsx
+    ├── .env
+    ├── .env.development
+    ├── .env.production
+    ├── .gitignore
     ├── package.json
     └── vite.config.js

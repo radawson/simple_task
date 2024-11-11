@@ -1,19 +1,28 @@
-// src/routes/event.routes.js
-const router = require('express').Router();
-const eventController = require('../controllers/event.controller');
-const { validateEvent } = require('../middleware/validation.middleware');
-const { authenticate } = require('../middleware/auth.middleware');
+import express from 'express';
+import { validateEvent } from '../middleware/validation.middleware';
+import { authenticate } from '../middleware/auth.middleware';
+import EventController from '../controllers/event.controller';
 
-router.get('/events', authenticate, eventController.list);
-router.get('/events/:id', authenticate, eventController.get);
-router.post('/events', authenticate, validateEvent, eventController.create);
-router.put('/events/:id', authenticate, validateEvent, eventController.update);
-router.delete('/events/:id', authenticate, eventController.delete);
+const createEventRoutes = (socketService) => {
+    const router = express.Router();
+    const eventController = new EventController(socketService);
 
-// Calendar specific routes
-router.post('/events/import', authenticate, eventController.importICal);
-router.get('/events/export/:id', authenticate, eventController.exportICal);
-router.get('/events/date/:date', authenticate, eventController.getByDate);
-router.get('/events/range/:start/:end', authenticate, eventController.getByDateRange);
+    // Public routes (GET only)
+    router.get('/range/:start/:end', eventController.getByDateRange);
+    router.get('/date/:date', eventController.getByDate);
+    router.get('/:id', eventController.get);
+    router.get('/', eventController.list);
 
-module.exports = router;
+    // Protected routes require authentication
+    router.post('/', authenticate, validateEvent, eventController.create);
+    router.put('/:id', authenticate, validateEvent, eventController.update);
+    router.delete('/:id', authenticate, eventController.delete);
+
+    // Calendar routes require authentication
+    router.post('/import', authenticate, eventController.importICal);
+    router.get('/export/:id', authenticate, eventController.exportICal);
+
+    return router;
+};
+
+export default createEventRoutes;

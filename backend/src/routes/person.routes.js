@@ -1,72 +1,47 @@
 // src/routes/person.routes.js
-const router = require('express').Router();
-const personController = require('../controllers/person.controller');
-const { validatePerson } = require('../middleware/validation.middleware');
-const { authenticate, authorize } = require('../middleware/auth.middleware');
+import { Router } from 'express';
+import { validatePerson } from '../middleware/validation.middleware';
+import { authenticate, authorize } from '../middleware/auth.middleware';
+import PersonController from '../controllers/person.controller';
 
-// Basic CRUD with admin/manager authorization
-router.get('/persons', 
-    authenticate, 
-    personController.list
-);
+const createPersonRoutes = (socketService) => {
+    const router = Router();
+    const personController = new PersonController(socketService);
 
-router.post('/persons', 
-    authenticate, 
-    authorize(['admin', 'manager']),
-    validatePerson, 
-    personController.create
-);
+    // Specialized endpoints (order matters - put specific routes before parameterized ones)
+    router.get('/search', authenticate, personController.search);
+    router.post('/bulk', authenticate, authorize(['admin']), personController.bulkCreate);
+    router.put('/bulk', authenticate, authorize(['admin']), personController.bulkUpdate);
 
-router.get('/persons/:id', 
-    authenticate, 
-    personController.get
-);
+    // Basic CRUD with admin/manager authorization
+    router.get('/', authenticate, personController.list);
+    router.post('/', 
+        authenticate, 
+        authorize(['admin', 'manager']),
+        validatePerson, 
+        personController.create
+    );
 
-router.put('/persons/:id', 
-    authenticate, 
-    authorize(['admin', 'manager']),
-    validatePerson, 
-    personController.update
-);
+    // Routes with :id parameter
+    router.get('/:id', authenticate, personController.get);
+    router.put('/:id',
+        authenticate,
+        authorize(['admin', 'manager']),
+        validatePerson,
+        personController.update
+    );
+    router.delete('/:id',
+        authenticate,
+        authorize(['admin']),
+        personController.delete
+    );
 
-router.delete('/persons/:id', 
-    authenticate, 
-    authorize(['admin']),
-    personController.delete
-);
+    // Schedule-related endpoints
+    router.get('/:id/schedule', authenticate, personController.getSchedule);
+    router.get('/:id/events', authenticate, personController.getEvents);
+    router.get('/:id/availability', authenticate, personController.getAvailability);
 
-// Specialized endpoints
-router.get('/persons/search', 
-    authenticate,
-    personController.search
-);
+    return router;
+};
 
-router.get('/persons/:id/schedule', 
-    authenticate,
-    personController.getSchedule
-);
-
-router.get('/persons/:id/events', 
-    authenticate,
-    personController.getEvents
-);
-
-router.get('/persons/:id/availability', 
-    authenticate,
-    personController.getAvailability
-);
-
-// Bulk operations
-router.post('/persons/bulk', 
-    authenticate, 
-    authorize(['admin']),
-    personController.bulkCreate
-);
-
-router.put('/persons/bulk', 
-    authenticate, 
-    authorize(['admin']),
-    personController.bulkUpdate
-);
-
-module.exports = router;
+export default createPersonRoutes;

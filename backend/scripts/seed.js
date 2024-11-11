@@ -1,6 +1,3 @@
-// scripts/seed.js
-require('dotenv').config();
-const Seeder = require('../src/utils/seed.util');
 const Logger = require('../src/core/Logger');
 
 const logger = new Logger({
@@ -9,6 +6,9 @@ const logger = new Logger({
     maxFiles: '14d',
     format: 'simple'
 });
+
+require('dotenv').config();
+const Seeder = require('../src/utils/seed.util');
 
 async function seed() {
     try {

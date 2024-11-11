@@ -1,4 +1,3 @@
-// src/utils/seed.util.js
 const { Task, Template, User } = require('../models');
 const Logger = require('../core/Logger');
 const argon2 = require('argon2');
@@ -9,25 +8,15 @@ class Seeder {
         let message = "Database seeded with:\n";
 
         try {
-            // Add default users if none exist
-            const userCount = await User.count();
-            if (userCount === 0) {
-                const users = await this.seedUsers();
-                message += `${users.length} users added.\n`;
-            } else {
-                message += `Users exist in database.\n`;
-            }
+            // Always seed users first
+            const users = await this.seedUsers();
+            message += `${users.length} users added.\n`;
 
-            // Add templates if none exist
-            const templateCount = await Template.count();
-            if (templateCount === 0) {
-                const templates = await this.seedTemplates();
-                message += `${templates.length} templates added.\n`;
-            } else {
-                message += `Templates exist in database.\n`;
-            }
+            // Then seed templates
+            const templates = await this.seedTemplates();
+            message += `${templates.length} templates added.\n`;
 
-            // Add default tasks
+            // Finally seed tasks
             const tasks = await this.seedTasks();
             message += `${tasks.length} tasks added.\n`;
 
@@ -35,7 +24,7 @@ class Seeder {
             return { success: true, message };
         } catch (error) {
             logger.error(`Seed failed: ${error.message}`);
-            return { success: false, message: error.message };
+            throw error;
         }
     }
 
@@ -63,11 +52,11 @@ class Seeder {
         const templateNames = [
             "Daily Tasks",
             "Monday Tasks",
-            "Tuesday Tasks", 
+            "Tuesday Tasks",
             "Wednesday Tasks",
             "Thursday Tasks",
             "Friday Tasks",
-            "Saturday Tasks", 
+            "Saturday Tasks",
             "Sunday Tasks",
             "Weekly Tasks",
             "Monthly Tasks",
@@ -80,123 +69,146 @@ class Seeder {
     }
 
     static async seedTasks() {
-        // Get templates
-        const dailyTemplate = await Template.findOne({ where: { name: 'Daily Tasks' } });
-        const weeklyTemplate = await Template.findOne({ where: { name: 'Weekly Tasks' } });
-        const monthlyTemplate = await Template.findOne({ where: { name: 'Monthly Tasks' } });
-        const morningTemplate = await Template.findOne({ where: { name: 'Morning Tasks' } });
-        const afternoonTemplate = await Template.findOne({ where: { name: 'Afternoon Tasks' } });
-    
-        const tasks = [
-            // Daily Tasks
-            {
-                name: "Clean Cat Litter",
-                description: "Clean the cat litter box and refill with 1 inch of fresh litter.",
-                template: true,
-                priority: 1,
-                addedBy: "admin",
-                Templates: [dailyTemplate]
-            },
-            {
-                name: "Pick Up Dishes",
-                description: "Periodically check the house (especially bedrooms) for dirty dishes and bring them to the kitchen.",
-                template: true,
-                priority: 1,
-                addedBy: "admin",
-                Templates: [dailyTemplate]
-            },
-            {
-                name: "Take Out Trash",
-                description: "Remove trash from upstairs bathrooms and bedrooms, downstairs bathroom, kitchen, and powder room.\n" +
-                           "* replace trash bags in each garbage can\n" +
-                           "* replace box of garbage bags if empty\n" +
-                           "* take trash out to the porch and stack neatly",
-                template: true,
-                priority: 1,
-                addedBy: "admin",
-                Templates: [dailyTemplate]
-            },
-            // Weekly Tasks
-            {
-                name: "Vacuum Entire House",
-                description: "Vacuum all carpets and rugs throughout the house",
-                template: true,
-                priority: 2,
-                addedBy: "admin",
-                Templates: [weeklyTemplate]
-            },
-            {
-                name: "Clean Bathrooms",
-                description: "Clean all bathrooms including toilets, sinks, showers, and floors",
-                template: true,
-                priority: 2,
-                addedBy: "admin",
-                Templates: [weeklyTemplate]
-            },
-            {
-                name: "Change Bed Linens",
-                description: "Change sheets and pillowcases on all beds",
-                template: true,
-                priority: 2,
-                addedBy: "admin",
-                Templates: [weeklyTemplate]
-            },
-            // Monthly Tasks
-            {
-                name: "Check Smoke Detectors",
-                description: "Test all smoke detectors and replace batteries if needed",
-                template: true,
-                priority: 3,
-                addedBy: "admin",
-                Templates: [monthlyTemplate]
-            },
-            {
-                name: "Deep Clean Kitchen",
-                description: "Clean all appliances, cabinets, and pantry thoroughly",
-                template: true,
-                priority: 3,
-                addedBy: "admin",
-                Templates: [monthlyTemplate]
-            },
-            // Morning Tasks
-            {
-                name: "Make Beds",
-                description: "Make all beds in the house",
-                template: true,
-                priority: 1,
-                addedBy: "admin",
-                Templates: [morningTemplate]
-            },
-            {
-                name: "Empty Dishwasher",
-                description: "Empty clean dishes from dishwasher",
-                template: true,
-                priority: 1,
-                addedBy: "admin",
-                Templates: [morningTemplate]
-            },
-            // Afternoon Tasks
-            {
-                name: "Load Dishwasher",
-                description: "Load dirty dishes into dishwasher and run if full",
-                template: true,
-                priority: 1,
-                addedBy: "admin",
-                Templates: [afternoonTemplate]
-            },
-            {
-                name: "Wipe Counters",
-                description: "Clean and sanitize kitchen counters",
-                template: true,
-                priority: 1,
-                addedBy: "admin",
-                Templates: [afternoonTemplate]
+        try {
+            // Get templates with error checking
+            const templates = await Promise.all([
+                Template.findOne({ where: { name: 'Daily Tasks' } }),
+                Template.findOne({ where: { name: 'Weekly Tasks' } }),
+                Template.findOne({ where: { name: 'Monthly Tasks' } }),
+                Template.findOne({ where: { name: 'Morning Tasks' } }),
+                Template.findOne({ where: { name: 'Afternoon Tasks' } })
+            ]);
+
+            // Verify all templates exist
+            const [dailyTemplate, weeklyTemplate, monthlyTemplate, morningTemplate, afternoonTemplate] = templates;
+
+            if (!dailyTemplate || !weeklyTemplate || !monthlyTemplate || !morningTemplate || !afternoonTemplate) {
+                throw new Error('Required templates not found. Please ensure templates are seeded first.');
             }
-        ];
-    
-        return await Task.bulkCreate(tasks, {
-            include: [Template]
-        });
+
+            const tasks = [
+                // Daily Tasks
+                {
+                    name: "Clean Cat Litter",
+                    description: "Clean the cat litter box and refill with 1 inch of fresh litter.",
+                    template: true,
+                    priority: 1,
+                    addedBy: "admin",
+                    TemplateId: dailyTemplate.id  // Use TemplateId instead of Templates array
+                },
+                {
+                    name: "Pick Up Dishes",
+                    description: "Periodically check the house (especially bedrooms) for dirty dishes and bring them to the kitchen.",
+                    template: true,
+                    priority: 1,
+                    addedBy: "admin",
+                    Templates: [dailyTemplate]
+                },
+                {
+                    name: "Take Out Trash",
+                    description: "Remove trash from upstairs bathrooms and bedrooms, downstairs bathroom, kitchen, and powder room.\n" +
+                        "* replace trash bags in each garbage can\n" +
+                        "* replace box of garbage bags if empty\n" +
+                        "* take trash out to the porch and stack neatly",
+                    template: true,
+                    priority: 1,
+                    addedBy: "admin",
+                    Templates: [dailyTemplate]
+                },
+                // Weekly Tasks
+                {
+                    name: "Vacuum Entire House",
+                    description: "Vacuum all carpets and rugs throughout the house",
+                    template: true,
+                    priority: 2,
+                    addedBy: "admin",
+                    Templates: [weeklyTemplate]
+                },
+                {
+                    name: "Clean Bathrooms",
+                    description: "Clean all bathrooms including toilets, sinks, showers, and floors",
+                    template: true,
+                    priority: 2,
+                    addedBy: "admin",
+                    Templates: [weeklyTemplate]
+                },
+                {
+                    name: "Change Bed Linens",
+                    description: "Change sheets and pillowcases on all beds",
+                    template: true,
+                    priority: 2,
+                    addedBy: "admin",
+                    Templates: [weeklyTemplate]
+                },
+                // Monthly Tasks
+                {
+                    name: "Check Smoke Detectors",
+                    description: "Test all smoke detectors and replace batteries if needed",
+                    template: true,
+                    priority: 3,
+                    addedBy: "admin",
+                    Templates: [monthlyTemplate]
+                },
+                {
+                    name: "Deep Clean Kitchen",
+                    description: "Clean all appliances, cabinets, and pantry thoroughly",
+                    template: true,
+                    priority: 3,
+                    addedBy: "admin",
+                    Templates: [monthlyTemplate]
+                },
+                // Morning Tasks
+                {
+                    name: "Make Beds",
+                    description: "Make all beds in the house",
+                    template: true,
+                    priority: 1,
+                    addedBy: "admin",
+                    Templates: [morningTemplate]
+                },
+                {
+                    name: "Empty Dishwasher",
+                    description: "Empty clean dishes from dishwasher",
+                    template: true,
+                    priority: 1,
+                    addedBy: "admin",
+                    Templates: [morningTemplate]
+                },
+                // Afternoon Tasks
+                {
+                    name: "Load Dishwasher",
+                    description: "Load dirty dishes into dishwasher and run if full",
+                    template: true,
+                    priority: 1,
+                    addedBy: "admin",
+                    Templates: [afternoonTemplate]
+                },
+                {
+                    name: "Wipe Counters",
+                    description: "Clean and sanitize kitchen counters",
+                    template: true,
+                    priority: 1,
+                    addedBy: "admin",
+                    Templates: [afternoonTemplate]
+                }
+            ];
+
+            // Create tasks without including Template association
+            const createdTasks = await Task.bulkCreate(tasks);
+
+            // Add template associations separately
+            for (const task of createdTasks) {
+                const template = templates.find(t => t.id === task.TemplateId);
+                if (template) {
+                    await task.addTemplate(template);
+                }
+            }
+
+            return createdTasks;
+        } catch (error) {
+            logger.error(`Failed to seed tasks: ${error.message}`);
+            throw error;
+        }
     }
 }
 

@@ -1,18 +1,26 @@
 // src/routes/template.routes.js
-const router = require('express').Router();
-const templateController = require('../controllers/template.controller');
-const { validateTemplate } = require('../middleware/validation.middleware');
-const { authenticate, authorize } = require('../middleware/auth.middleware');
+import { Router } from 'express';
+import { validateTemplate } from '../middleware/validation.middleware';
+import { authenticate, authorize } from '../middleware/auth.middleware';
+import TemplateController from '../controllers/template.controller';
 
-router.get('/templates', authenticate, templateController.list);
-router.get('/templates/:id', authenticate, templateController.get);
-router.post('/templates', authenticate, validateTemplate, templateController.create);
-router.put('/templates/:id', authenticate, validateTemplate, templateController.update);
-router.delete('/templates/:id', authenticate, templateController.delete);
+const createTemplateRoutes = (socketService) => {
+    const router = Router();
+    const templateController = new TemplateController(socketService);
 
-// Template-specific routes
-router.post('/templates/:id/tasks', authenticate, templateController.addTask);
-router.delete('/templates/:id/tasks/:taskId', authenticate, templateController.removeTask);
-router.post('/templates/:id/generate', authenticate, templateController.generateTasks);
+    // Basic CRUD operations
+    router.get('/', authenticate, templateController.list);
+    router.get('/:id', authenticate, templateController.get);
+    router.post('/', authenticate, validateTemplate, templateController.create);
+    router.put('/:id', authenticate, validateTemplate, templateController.update);
+    router.delete('/:id', authenticate, templateController.delete);
 
-module.exports = router;
+    // Template-specific routes
+    router.post('/:id/tasks', authenticate, templateController.addTask);
+    router.delete('/:id/tasks/:taskId', authenticate, templateController.removeTask);
+    router.post('/:id/generate', authenticate, templateController.generateTasks);
+
+    return router;
+};
+
+export default createTemplateRoutes;

@@ -1,15 +1,25 @@
-const router = require('express').Router();
-const noteController = require('../controllers/note.controller');
-const { validateNote } = require('../middleware/validation.middleware');
-const { authenticate } = require('../middleware/auth.middleware');
+// src/routes/note.routes.js
+import { Router } from 'express';
+import { validateNote } from '../middleware/validation.middleware';
+import { authenticate } from '../middleware/auth.middleware';
+import NoteController from '../controllers/note.controller';
 
-router.get('/notes', authenticate, noteController.list);
-router.post('/notes', authenticate, validateNote, noteController.create);
-router.get('/notes/:id', authenticate, noteController.get);
-router.put('/notes/:id', authenticate, validateNote, noteController.update);
-router.delete('/notes/:id', authenticate, noteController.delete);
+const createNoteRoutes = (socketService) => {
+    const router = Router();
+    const noteController = new NoteController(socketService);
 
-router.get('/notes/date/:date', authenticate, noteController.getByDate);
-router.get('/notes/search', authenticate, noteController.search);
+    // Public routes (GET only)
+    router.get('/date/:date', noteController.getByDate);
+    router.get('/search', noteController.search);
+    router.get('/:id', noteController.get);
+    router.get('/', noteController.list);
 
-module.exports = router;
+    // Protected routes require authentication
+    router.post('/', authenticate, validateNote, noteController.create);
+    router.put('/:id', authenticate, validateNote, noteController.update);
+    router.delete('/:id', authenticate, noteController.delete);
+
+    return router;
+};
+
+export default createNoteRoutes;

@@ -1,8 +1,20 @@
 import axios from 'axios';
 import { AuthService } from './auth.service';
 
+// For development environment only
+const isDev = import.meta.env.DEV;
+
 const api = axios.create({
-  baseURL: '/api'
+  baseURL: '/api',
+  timeout: 10000,
+  headers: {
+    'Content-Type': 'application/json'
+  },
+  // Handle SSL verification only in development
+  ...(isDev && {
+    proxy: false,
+    httpsAgent: false
+  })
 });
 
 // Request interceptor for API calls
@@ -12,9 +24,33 @@ api.interceptors.request.use(
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
+    // Log in development
+    if (isDev) {
+      console.log('Making request to:', config.baseURL + config.url);
+    }
     return config;
   },
   (error) => {
+    console.error('Request Error:', error);
+    return Promise.reject(error);
+  }
+);
+
+// Response interceptor for API calls
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    const errorDetails = {
+      url: error.config?.url,
+      baseURL: error.config?.baseURL,
+      status: error.response?.status,
+      message: error.message
+    };
+    
+    // In development, log more details
+    if (isDev) {
+      console.error('API Error:', errorDetails);
+    }
     return Promise.reject(error);
   }
 );

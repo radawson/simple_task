@@ -1,36 +1,41 @@
-const router = require('express').Router();
-const authController = require('../controllers/auth.controller');
-const { validateLogin, validateRegistration } = require('../middleware/validation.middleware');
-const { authenticate } = require('../middleware/auth.middleware');
-const config = require('../config');
-const Logger = require('../core/Logger');
+// src/routes/auth.routes.js
+import { Router } from 'express';
+import { validateLogin, validateRegistration } from '../middleware/validation.middleware';
+import { authenticate } from '../middleware/auth.middleware';
+import AuthController from '../controllers/auth.controller';
+import config from '../config';
+import Logger from '../core/Logger';
 
-// backend/src/routes/auth.routes.js
+const createAuthRoutes = (socketService) => {
+    const router = Router();
+    const logger = Logger.getInstance();
+    const authController = new AuthController(socketService);
 
-const logger = Logger.getInstance();
+    const logRequest = (req, res, next) => {
+        logger.debug(`Auth Request: ${req.method} ${req.path}`, {
+            body: req.body,
+            headers: {
+                contentType: req.headers['content-type'],
+                origin: req.headers.origin
+            }
+        });
+        next();
+    };
 
-const logRequest = (req, res, next) => {
-    logger.debug(`Auth Request: ${req.method} ${req.path}`, {
-        body: req.body,
-        headers: {
-            contentType: req.headers['content-type'],
-            origin: req.headers.origin
-        }
-    });
-    next();
+    // Auth routes
+    router.post('/login', logRequest, validateLogin, authController.login);
+    router.post('/refresh', logRequest, authController.refreshToken);
+    router.post('/register', logRequest, validateRegistration, authController.register);
+    router.post('/logout', logRequest, authenticate, authController.logout);
+
+    // SSO routes conditionally enabled
+    if (config.oidc.enabled) {
+        router.get('/sso/login', authController.initiateSSO);
+        router.get('/sso/callback', authController.handleSSOCallback);
+        router.get('/sso/logout', authenticate, authController.handleSSOLogout);
+    }
+
+    return router;
 };
 
-// Auth routes
-router.post('/login', validateLogin, authController.login);
-router.post('/refresh', authController.refreshToken);
-router.post('/register', validateRegistration, authController.register);
-router.post('/logout', authenticate, authController.logout);
-
-// SSO routes conditionally enabled
-if (config.oidc.enabled) {
-    router.get('/sso/login', authController.initiateSSO);
-    router.get('/sso/callback', authController.handleSSOCallback); 
-    router.get('/sso/logout', authenticate, authController.handleSSOLogout);
-}
-
-module.exports = router;
+export default createAuthRoutes;

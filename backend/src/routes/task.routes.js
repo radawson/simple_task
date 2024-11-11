@@ -1,13 +1,24 @@
 // src/routes/task.routes.js
-const router = require('express').Router();
-const taskController = require('../controllers/task.controller');
-const { validateTask } = require('../middleware/validation.middleware');
-const { authenticate } = require('../middleware/auth.middleware');
+import { Router } from 'express';
+import { validateTask } from '../middleware/validation.middleware';
+import { authenticate } from '../middleware/auth.middleware';
+import TaskController from '../controllers/task.controller';
 
-router.get('/tasks', authenticate, taskController.list);
-router.post('/tasks', authenticate, validateTask, taskController.create);
-router.get('/tasks/:id', authenticate, taskController.get);
-router.put('/tasks/:id', authenticate, validateTask, taskController.update);
-router.delete('/tasks/:id', authenticate, taskController.delete);
+const createTaskRoutes = (socketService) => {
+    const router = Router();
+    const taskController = new TaskController(socketService);
 
-module.exports = router;
+    // Public routes (GET only)
+    router.get('/date/:date', taskController.getByDate);
+    router.get('/:id', taskController.get);
+    router.get('/', taskController.list);
+
+    // Protected routes require authentication
+    router.post('/', authenticate, validateTask, taskController.create);
+    router.put('/:id', authenticate, validateTask, taskController.update);
+    router.delete('/:id', authenticate, taskController.delete);
+
+    return router;
+};
+
+export default createTaskRoutes;
