@@ -1,13 +1,13 @@
-const { Model } = require('sequelize');
+import { Model } from 'sequelize';
 
 class BaseModel extends Model {
-  static init(attributes, options) {
-    return super.init(attributes, {
-      ...options,
-      underscored: true,
-      timestamps: true
-    });
-  }
+    static init(attributes, options) {
+        return super.init(attributes, {
+            ...options,
+            underscored: true,
+            timestamps: true
+        });
+    }
 }
 
-module.exports = BaseModel;
+export default BaseModel;

@@ -1,6 +1,5 @@
-// src/models/event.model.js
-const BaseModel = require('./base.model');
-const { DataTypes } = require('sequelize');
+import BaseModel from './base.model.js';
+import { DataTypes } from 'sequelize';
 
 class Event extends BaseModel {
     static init(sequelize) {
@@ -213,4 +212,4 @@ class Event extends BaseModel {
     }
 }
 
-module.exports = Event;
+export default Event;

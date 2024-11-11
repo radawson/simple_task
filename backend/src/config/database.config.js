@@ -1,8 +1,10 @@
-const { Sequelize } = require('sequelize');
-const Logger = require('../core/Logger');
+import { Sequelize } from 'sequelize';
+import Logger from '../core/Logger.js';
+import { importModels } from '../models/index.js';
+
 const logger = Logger.getInstance();
 
-const createConnection = async (config) => {
+export const createConnection = async (config) => {
     let sequelize;
 
     if (config.type === 'sqlite') {
@@ -49,8 +51,8 @@ const createConnection = async (config) => {
         logger.info('Database connection established');
 
         // Only force sync in development when explicitly requested
-        const shouldForceSync = process.env.FORCE_DB_SYNC === 'true' && 
-                              process.env.NODE_ENV !== 'production';
+        const shouldForceSync = process.env.FORCE_DB_SYNC === 'true' &&
+            process.env.NODE_ENV !== 'production';
 
         if (shouldForceSync) {
             logger.warn('Forcing database sync - all data will be lost');
@@ -69,9 +71,9 @@ const createConnection = async (config) => {
     }
 };
 
-const initializeModels = async (sequelize) => {
-    const models = require('../models');
-    
+export const initializeModels = async (sequelize) => {
+    const models = await importModels();
+
     // First initialize all models
     Object.values(models).forEach(model => {
         if (typeof model.init === 'function') {
@@ -88,12 +90,9 @@ const initializeModels = async (sequelize) => {
         }
     });
 
-    // Finally sync database with force in development
     logger.info('Syncing database schema...');
-    await sequelize.sync({ force: process.env.NODE_ENV !== 'production' });
+    await sequelize.sync({ alter: process.env.NODE_ENV !== 'production' });
     logger.info('Database schema synchronized');
 
     return models;
 };
-
-module.exports = { createConnection, initializeModels };

@@ -1,6 +1,5 @@
-// src/models/timecard.model.js
-const BaseModel = require('./base.model');
-const { DataTypes } = require('sequelize');
+import BaseModel from './base.model.js';
+import { DataTypes } from 'sequelize';
 
 class Timecard extends BaseModel {
     static init(sequelize) {
@@ -107,4 +106,4 @@ class Timecard extends BaseModel {
     }
 }
 
-module.exports = Timecard;
+export default Timecard;

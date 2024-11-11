@@ -1,6 +1,6 @@
-const Joi = require('joi');
+import Joi from 'joi';
 
-const configSchema = Joi.object({
+export const configSchema = Joi.object({
     env: Joi.string().valid('development', 'test', 'production').required(),
     serverUid: Joi.string().required(),
     chat: Joi.object({
@@ -116,5 +116,3 @@ const configSchema = Joi.object({
         maxFileSize: Joi.number().min(0).required()
     }).required(),
 });
-
-module.exports = configSchema;

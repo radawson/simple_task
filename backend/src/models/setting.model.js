@@ -1,6 +1,5 @@
-// src/models/setting.model.js
-const BaseModel = require('./base.model');
-const { DataTypes } = require('sequelize');
+import BaseModel from './base.model.js';
+import { DataTypes } from 'sequelize';
 
 class Setting extends BaseModel {
     static init(sequelize) {
@@ -36,4 +35,4 @@ class Setting extends BaseModel {
     }
 }
 
-module.exports = Setting;
+export default Setting;

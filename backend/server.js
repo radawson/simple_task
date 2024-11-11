@@ -1,10 +1,16 @@
-const path = require('path');
-require('dotenv').config();
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+import dotenv from 'dotenv';
+import config from './src/config/index.js';
+import Logger from './src/core/Logger.js';
 
-// Load config and initialize logger
-const config = require('./src/config');
-const Logger = require('./src/core/Logger');
-const logger = new Logger(config.logger);  // Initialize first
+// ESM __dirname equivalent
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+dotenv.config();
+
+const logger = Logger.initialize(config.logger);
 logger.info(`Server process starting with pid: ${process.pid}`);
 
 let server = null;
@@ -25,12 +31,11 @@ const shutdown = async (signal) => {
   }
 };
 
-// PM2 specific signals
+// Process handlers remain the same
 process.on('SIGINT', () => shutdown('SIGINT'));
 process.on('SIGTERM', () => shutdown('SIGTERM'));
-process.on('SIGUSR2', () => shutdown('SIGUSR2')); // PM2 restart
+process.on('SIGUSR2', () => shutdown('SIGUSR2'));
 
-// Handle uncaught errors
 process.on('uncaughtException', (error) => {
   logger.error(`Uncaught Exception: ${error.message}`, { stack: error.stack });
   process.exit(1);
@@ -41,10 +46,10 @@ process.on('unhandledRejection', (reason, promise) => {
   process.exit(1);
 });
 
-// Start application
-const startServer = require('./src');
-startServer().then(app => {
-  server = app;  // Store server instance
+// Import and start application
+import bootstrap from './src/index.js';
+bootstrap().then(app => {
+  server = app;
 }).catch(error => {
   logger.error(`Fatal error during startup: ${error.message}`);
   process.exit(1);

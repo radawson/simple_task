@@ -1,14 +1,15 @@
-const express = require('express');
-const cors = require('cors');
-const morgan = require('morgan');
-const helmet = require('helmet');
-const rateLimit = require('express-rate-limit');
+import express from 'express';
+import cors from 'cors';
+import morgan from 'morgan';
+import helmet from 'helmet';
+import rateLimit from 'express-rate-limit';
+import Logger from './Logger.js';
 
 class Server {
     constructor(config) {
         this.config = config;
         this.app = express();
-        this.logger = require('./Logger').getInstance();
+        this.logger = Logger.getInstance();
 
         // Debug config structure
         this.logger.debug('Full config:', JSON.stringify({
@@ -84,7 +85,7 @@ class Server {
 
     async setupRoutes() {
         this.logger.debug('Loading API routes...');
-        
+
         try {
             // Only create socketService if we have HTTPS server
             if (this.servers?.https) {
@@ -94,14 +95,14 @@ class Server {
             } else {
                 this.logger.warn('HTTPS server not available, WebSocket service disabled');
             }
-    
+
             // Initialize routes with socket service
             const { default: createRouter } = await import('../routes/index.js');
             const router = createRouter(this.socketService);
-            
+
             // Mount routes
             this.app.use('/', router);
-            
+
             this.logger.info('API routes mounted successfully');
         } catch (error) {
             this.logger.error('Failed to setup routes:', error);
@@ -173,7 +174,7 @@ class Server {
             this.logger.warn('No servers to stop');
             return;
         }
-    
+
         try {
             await Promise.all(
                 Object.entries(this.servers).map(([type, server]) => {
@@ -195,4 +196,5 @@ class Server {
     }
 }
 
-module.exports = Server;
+export { Server };  // Named export for the class itself
+export default Server;  // Default export for consistency with existing code

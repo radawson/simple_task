@@ -1,6 +1,5 @@
-// src/models/person.model.js
-const BaseModel = require('./base.model');
-const { DataTypes } = require('sequelize');
+import BaseModel from './base.model.js';
+import { DataTypes } from 'sequelize';
 
 class Person extends BaseModel {
     static init(sequelize) {
@@ -117,4 +116,4 @@ class User extends BaseModel {
     }
 }
 
-module.exports = { Person, User };
+export { Person, User };

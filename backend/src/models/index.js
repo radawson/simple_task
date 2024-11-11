@@ -1,52 +1,73 @@
-const fs = require('fs');
-const path = require('path');
-const Logger = require('../core/Logger');
+import { readdir } from 'fs/promises';
+import { join, resolve } from 'path';
+import Logger from '../core/Logger.js';
+import { getDirname, pathToFileURL } from '../utils/path.util.js';
+
+const __dirname = getDirname(import.meta.url);
 const logger = Logger.getInstance();
 
-const models = {};
+async function importModels() {
+    const models = {};
+    
+    try {
+        const files = await readdir(__dirname);
+        const modelFiles = files.filter(file => 
+            file.indexOf('.') !== 0 && 
+            file !== 'index.js' &&
+            file !== 'base.model.js' &&
+            file.endsWith('.model.js')
+        );
 
-// Load all model files
-fs.readdirSync(__dirname)
-    .filter(file => 
-        file.indexOf('.') !== 0 && 
-        file !== 'index.js' &&
-        file !== 'base.model.js' &&
-        file.endsWith('.model.js')
-    )
-    .forEach(file => {
-        try {
-            const model = require(path.join(__dirname, file));
-            const modelName = file.split('.')[0].split('-').map(
-                part => part.charAt(0).toUpperCase() + part.slice(1)
-            ).join('');
-            
-            // Handle both class and function exports
-            if (typeof model === 'function' && model.prototype && model.prototype.constructor) {
-                models[modelName] = model;
-            } else if (typeof model === 'object') {
-                Object.assign(models, model);
+        for (const file of modelFiles) {
+            try {
+                // Get absolute path and convert to URL
+                const modelPath = resolve(__dirname, file);
+                const modelUrl = pathToFileURL(modelPath);
+                
+                logger.debug(`Loading model from: ${modelUrl}`);
+                
+                const modelModule = await import(modelUrl);
+                const modelName = file.split('.')[0].split('-').map(
+                    part => part.charAt(0).toUpperCase() + part.slice(1)
+                ).join('');
+                
+                if (modelModule.default) {
+                    models[modelName] = modelModule.default;
+                } else {
+                    Object.assign(models, modelModule);
+                }
+                
+                logger.debug(`Loaded model: ${modelName}`);
+            } catch (error) {
+                logger.error(`Failed to load model ${file}: ${error.message}`, { 
+                    file,
+                    stack: error.stack 
+                });
             }
-            
-            logger.debug(`Loaded model: ${modelName}`);
-        } catch (error) {
-            logger.error(`Failed to load model ${file}: ${error.message}`);
         }
-    });
+    } catch (error) {
+        logger.error(`Failed to read models directory: ${error.message}`, { 
+            stack: error.stack 
+        });
+    }
+
+    return models;
+}
+
+// Export both the function and static model imports
+export { importModels };
+export default importModels;
 
 // Export loaded models
-module.exports = models;
-
-// Export individual models for direct imports
-module.exports.Task = require('./task.model');
-module.exports.Event = require('./event.model');
-module.exports.User = require('./person.model').User;
-module.exports.Person = require('./person.model').Person;
-module.exports.Note = require('./note.model');
-module.exports.Template = require('./template.model');
-module.exports.Timecard = require('./timecard.model');
-module.exports.Message = require('./message.model');
-module.exports.Session = require('./session.model');
-module.exports.Setting = require('./setting.model');
-module.exports.Audit = require('./audit.model');
-module.exports.Notification = require('./notification.model');
-module.exports.Calendar = require('./calendar.model');
+export { default as Task } from './task.model.js';
+export { default as Event } from './event.model.js';
+export { User, Person } from './person.model.js';
+export { default as Note } from './note.model.js';
+export { default as Template } from './template.model.js';
+export { default as Timecard } from './timecard.model.js';
+export { default as Message } from './message.model.js';
+export { default as Session } from './session.model.js';
+export { default as Setting } from './setting.model.js';
+export { default as Audit } from './audit.model.js';
+export { default as Notification } from './notification.model.js';
+export { default as Calendar } from './calendar.model.js';

@@ -1,6 +1,5 @@
-// src/models/message.model.js
-const BaseModel = require('./base.model');
-const { DataTypes } = require('sequelize');
+import BaseModel from './base.model.js';
+import { DataTypes } from 'sequelize';
 
 class Message extends BaseModel {
     static init(sequelize) {
@@ -63,3 +62,5 @@ class Message extends BaseModel {
         });
     }
 }
+
+export default Message;

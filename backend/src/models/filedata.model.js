@@ -1,5 +1,5 @@
-const BaseModel = require('./base.model');
-const { DataTypes } = require('sequelize');
+import BaseModel from './base.model.js';
+import { DataTypes } from 'sequelize';
 
 class Filedata extends BaseModel {
     static init(sequelize) {
@@ -58,4 +58,4 @@ class Filedata extends BaseModel {
     }
 }
 
-module.exports = Filedata;
+export default Filedata;

@@ -1,8 +1,8 @@
-const Logger = require('./Logger');
-const Server = require('./Server');
-const Database = require('./Database');
+import Logger from './Logger.js';
+import Server from './Server.js';
+import Database from './Database.js';
 
-module.exports = {
+export {
     Logger,
     Server,
     Database

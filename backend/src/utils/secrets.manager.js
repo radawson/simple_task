@@ -1,4 +1,4 @@
-const crypto = require('crypto');
+import crypto from 'crypto';
 
 class SecretsManager {
     static #instance;
@@ -33,4 +33,4 @@ class SecretsManager {
     }
 }
 
-module.exports = SecretsManager;
+export default SecretsManager;

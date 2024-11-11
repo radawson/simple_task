@@ -1,5 +1,5 @@
-const BaseModel = require('./base.model');
-const { DataTypes } = require('sequelize');
+import BaseModel from './base.model.js';
+import { DataTypes } from 'sequelize';
 
 class Calendar extends BaseModel {
     static init(sequelize) {
@@ -47,4 +47,4 @@ class Calendar extends BaseModel {
     }
 }
 
-module.exports = Calendar;
+export default Calendar;

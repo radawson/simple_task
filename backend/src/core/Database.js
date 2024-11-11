@@ -1,5 +1,5 @@
-const { createConnection, initializeModels } = require('../config/database.config');
-const Logger = require('./Logger');
+import { createConnection, initializeModels } from '../config/database.config.js';
+import Logger from './Logger.js';
 
 class Database {
     static #instance;
@@ -18,7 +18,6 @@ class Database {
 
     async connect() {
         try {
-            // Pass database config correctly
             this.#connection = await createConnection(this.#config);
             await this.#connection.sync({ alter: true });
             await initializeModels(this.#connection);
@@ -52,4 +51,6 @@ class Database {
     }
 }
 
-module.exports = Database;
+// Export both the class and a default instance
+export { Database };  // Named export for the class itself
+export default Database;  // Default export for consistency with existing code

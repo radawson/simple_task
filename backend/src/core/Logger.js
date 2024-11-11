@@ -1,37 +1,50 @@
-const winston = require('winston');
-const DailyRotateFile = require('winston-daily-rotate-file');
+import winston from 'winston';
+import DailyRotateFile from 'winston-daily-rotate-file';
 
 class Logger {
     static #instance;
     #logger;
+    #config;
 
-    constructor(config) {
-        if (Logger.#instance) return Logger.#instance;
-    
-        // Special handling for test environment
-        if (process.env.NODE_ENV === 'test') {
-            this.#logger = winston.createLogger({
-                level: 'error',
-                format: winston.format.simple(),
-                transports: [
-                    new winston.transports.Console({
-                        format: winston.format.simple()
-                    })
-                ]
-            });
-            Logger.#instance = this;
-            return this;
+    constructor(config = null) {
+        if (Logger.#instance) {
+            return Logger.#instance;
+        }
+
+        // Start with test/basic configuration
+        this.#initializeBasicLogger();
+        
+        // If config is provided, set up production logger
+        if (config) {
+            this.configure(config);
         }
         
+        Logger.#instance = this;
+    }
+
+    #initializeBasicLogger() {
+        this.#logger = winston.createLogger({
+            level: 'error',
+            format: winston.format.simple(),
+            transports: [
+                new winston.transports.Console({
+                    format: winston.format.simple()
+                })
+            ]
+        });
+    }
+
+    configure(config) {
+        // Don't reconfigure if we're in test environment
+        if (process.env.NODE_ENV === 'test') {
+            return;
+        }
+
         const customFormat = winston.format.printf(({ timestamp, level, message, metadata = {} }) => {
-            // Format timestamp for better readability
             const ts = new Date(timestamp).toLocaleTimeString('en-US', { hour12: false });
-            
-            // Format metadata if present
             const meta = Object.keys(metadata).length ? 
                 `\n  ${JSON.stringify(metadata, null, 2).replace(/\n/g, '\n  ')}` : '';
             
-            // Format stack traces specially
             if (metadata.stack) {
                 return `${ts} [${level.toUpperCase()}] ${message}\n  ${metadata.stack.replace(/\n/g, '\n  ')}`;
             }
@@ -52,23 +65,36 @@ class Logger {
                         winston.format.colorize(),
                         customFormat
                     )
-                }),
-                new DailyRotateFile({
-                    dirname: config.directory,
-                    filename: 'app-%DATE%.log',
-                    datePattern: 'YYYY-MM-DD',
-                    maxFiles: config.maxFiles,
-                    format: winston.format.json()
                 })
             ]
         });
 
-        Logger.#instance = this;
+        // Only add file transport if directory is configured
+        if (config.directory) {
+            this.#logger.add(new DailyRotateFile({
+                dirname: config.directory,
+                filename: 'app-%DATE%.log',
+                datePattern: 'YYYY-MM-DD',
+                maxFiles: config.maxFiles,
+                format: winston.format.json()
+            }));
+        }
+
+        this.#config = config;
     }
 
     static getInstance() {
-        if (!Logger.#instance) throw new Error('Logger not initialized');
+        if (!Logger.#instance) {
+            // Create instance with basic/test logging
+            new Logger();
+        }
         return Logger.#instance;
+    }
+
+    static initialize(config) {
+        const instance = Logger.getInstance();
+        instance.configure(config);
+        return instance;
     }
 
     error = (message, meta = {}) => {
@@ -86,6 +112,16 @@ class Logger {
     debug = (message, meta = {}) => {
         this.#logger.debug(message, meta);
     }
+
+    get stream() {
+        return {
+            write: (message) => {
+                this.info(message.trim());
+            }
+        };
+    }
 }
 
-module.exports = Logger;
+// Export both the class and default instance
+export { Logger };
+export default Logger;
