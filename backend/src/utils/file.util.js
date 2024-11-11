@@ -1,7 +1,8 @@
-const crypto = require('crypto');
-const fs = require('fs').promises;
-const path = require('path');
-const Logger = require('../core/Logger');
+import { promises as fs } from 'fs';
+import crypto from 'crypto';
+import { join } from 'path';
+import Logger from '../core/Logger.js';
+import { Filedata } from '../models/index.js';
 
 const logger = Logger.getInstance();
 
@@ -39,16 +40,15 @@ class FileUtil {
     }
 
     static async createUserDirectory(username, basePath) {
-        const userDir = path.join(basePath, username);
+        const userDir = join(basePath, username);
         await fs.mkdir(userDir, { recursive: true });
         return userDir;
     }
 
-
     static generateStoragePath(hash, originalFilename) {
         // Create nested directory structure from hash
         const hashDirs = hash.match(/.{1,2}/g).slice(0, 3);
-        return path.join(...hashDirs, hash, originalFilename);
+        return join(...hashDirs, hash, originalFilename);
     }
 
     static async getMetadata(filePath) {
@@ -70,4 +70,5 @@ class FileUtil {
     }
 }
 
-module.exports = FileUtil;
+export { FileUtil };
+export default FileUtil;

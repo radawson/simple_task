@@ -1,8 +1,8 @@
 // src/routes/task.routes.js
 import { Router } from 'express';
-import { validateTask } from '../middleware/validation.middleware';
-import { authenticate } from '../middleware/auth.middleware';
-import TaskController from '../controllers/task.controller';
+import { validateTask } from '../middleware/validation.middleware.js';
+import { authenticate } from '../middleware/auth.middleware.js';
+import TaskController from '../controllers/task.controller.js';
 
 const createTaskRoutes = (socketService) => {
     const router = Router();

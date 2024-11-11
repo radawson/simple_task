@@ -59,15 +59,16 @@ export { importModels };
 export default importModels;
 
 // Export loaded models
-export { default as Task } from './task.model.js';
+export { default as Audit } from './audit.model.js';
+export { default as Calendar } from './calendar.model.js';
 export { default as Event } from './event.model.js';
-export { User, Person } from './person.model.js';
-export { default as Note } from './note.model.js';
-export { default as Template } from './template.model.js';
-export { default as Timecard } from './timecard.model.js';
+export { default as Filedata } from './filedata.model.js';
 export { default as Message } from './message.model.js';
+export { default as Note } from './note.model.js';
+export { default as Notification } from './notification.model.js';
 export { default as Session } from './session.model.js';
 export { default as Setting } from './setting.model.js';
-export { default as Audit } from './audit.model.js';
-export { default as Notification } from './notification.model.js';
-export { default as Calendar } from './calendar.model.js';
+export { default as Task } from './task.model.js';
+export { default as Template } from './template.model.js';
+export { default as Timecard } from './timecard.model.js';
+export { User, Person } from './person.model.js';

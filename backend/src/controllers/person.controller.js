@@ -1,6 +1,6 @@
-const { Person, Event, Timecard } = require('../models');
-const { Op } = require('sequelize');
-const Logger = require('../core/Logger');
+import { Person, Event, Timecard } from '../models/index.js';
+import { Op } from 'sequelize';
+import Logger from '../core/Logger,js';
 const logger = Logger.getInstance();
 
 /**
@@ -363,4 +363,5 @@ class PersonController {
     };
 }
 
-module.exports = new PersonController();
+export { PersonController };
+export default PersonController;

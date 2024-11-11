@@ -1,7 +1,7 @@
 import express from 'express';
-import { validateEvent } from '../middleware/validation.middleware';
-import { authenticate } from '../middleware/auth.middleware';
-import EventController from '../controllers/event.controller';
+import { validateEvent } from '../middleware/validation.middleware.js';
+import { authenticate } from '../middleware/auth.middleware.js';
+import EventController from '../controllers/event.controller.js';
 
 const createEventRoutes = (socketService) => {
     const router = express.Router();

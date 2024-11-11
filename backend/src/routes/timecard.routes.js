@@ -1,8 +1,8 @@
 // src/routes/timecard.routes.js
 import { Router } from 'express';
-import { validateTimecard } from '../middleware/validation.middleware';
-import { authenticate, authorize } from '../middleware/auth.middleware';
-import TimecardController from '../controllers/timecard.controller';
+import { validateTimecard } from '../middleware/validation.middleware.js';
+import { authenticate, authorize } from '../middleware/auth.middleware.js';
+import TimecardController from '../controllers/timecard.controller.js';
 
 const createTimecardRoutes = (socketService) => {
     const router = Router();

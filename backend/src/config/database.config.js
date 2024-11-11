@@ -1,3 +1,4 @@
+//src/config/database.config.js
 import { Sequelize } from 'sequelize';
 import Logger from '../core/Logger.js';
 import { importModels } from '../models/index.js';

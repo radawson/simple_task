@@ -1,6 +1,6 @@
-const jwt = require('jsonwebtoken');
-const Logger = require('../core/Logger');
-const config = require('../config');
+import jwt from 'jsonwebtoken';
+import Logger from '../core/Logger.js';
+import config from '../config/index.js';
 const logger = Logger.getInstance();
 
 class JWTMiddleware {
@@ -88,4 +88,5 @@ class JWTMiddleware {
     }
 }
 
-module.exports = JWTMiddleware;
+export { JWTMiddleware };
+export default JWTMiddleware;

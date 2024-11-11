@@ -1,11 +1,11 @@
-const { User, Session } = require('../models');
-const Logger = require('../core/Logger');
-const jwt = require('jsonwebtoken');
-const argon2 = require('argon2');
-const crypto = require('crypto');
-const config = require('../config');
-const JWTMiddleware = require('../middleware/jwt.middleware');
-const { Op } = require('sequelize');
+import { User, Session } from '../models/index.js';
+import Logger from '../core/Logger.js';
+import jwt  from 'jsonwebtoken';
+import argon2 from 'argon2';
+import crypto from 'crypto';
+import config from '../config/index.js';
+import JWTMiddleware from '../middleware/jwt.middleware.js';
+import { Op } from 'sequelize';
 
 const logger = Logger.getInstance();
 
@@ -315,4 +315,5 @@ class AuthController {
     }
 }
 
-module.exports = new AuthController();
+export { AuthController };
+export default AuthController;

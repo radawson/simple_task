@@ -1,8 +1,8 @@
 // src/routes/template.routes.js
 import { Router } from 'express';
-import { validateTemplate } from '../middleware/validation.middleware';
-import { authenticate, authorize } from '../middleware/auth.middleware';
-import TemplateController from '../controllers/template.controller';
+import { validateTemplate } from '../middleware/validation.middleware.js';
+import { authenticate, authorize } from '../middleware/auth.middleware.js';
+import TemplateController from '../controllers/template.controller.js';
 
 const createTemplateRoutes = (socketService) => {
     const router = Router();

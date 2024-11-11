@@ -1,22 +1,33 @@
+//src/core/Server.js
 import express from 'express';
 import cors from 'cors';
 import morgan from 'morgan';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import Logger from './Logger.js';
+import { errorHandler, notFound } from '../middleware/error.middleware.js';
 
 class Server {
     constructor(config) {
+        if (!config || !config.server) {
+            throw new Error('Server configuration is required');
+        }
+
         this.config = config;
         this.app = express();
         this.logger = Logger.getInstance();
 
         // Debug config structure
-        this.logger.debug('Full config:', JSON.stringify({
-            security: this.config.security,
-            cors: this.config.cors
-        }, null, 2));
+        this.logger.debug('Server initialized with config:', {
+            port: this.config.server.port,
+            sslPort: this.config.server.sslPort,
+            hasSSLKey: !!this.config.server.sslKey,
+            hasSSLCert: !!this.config.server.sslCert,
+            corsOrigins: this.config.server.cors?.origins || [],
+            hasSecurityConfig: !!this.config.security
+        });
 
+        // Set default security config if not provided
         if (!this.config.security || !this.config.security.helmet) {
             this.logger.warn('Missing security.helmet configuration, using defaults');
             this.config.security = {
@@ -32,6 +43,30 @@ class Server {
                     }
                 }
             };
+        }
+    }
+
+    async loadTrustedCertificates(trustPath) {
+        try {
+            const files = await fs.readdir(trustPath);
+            const certFiles = files.filter(file => 
+                file.endsWith('.crt') || 
+                file.endsWith('.pem') || 
+                file.endsWith('.cer')
+            );
+    
+            for (const certFile of certFiles) {
+                try {
+                    await certUtil.addTrustedRoot(join(trustPath, certFile));
+                    this.logger.info(`Loaded trusted certificate: ${certFile}`);
+                } catch (error) {
+                    this.logger.warn(`Failed to load trusted certificate ${certFile}: ${error.message}`);
+                }
+            }
+    
+            this.logger.info(`Loaded ${certFiles.length} trusted certificates`);
+        } catch (error) {
+            this.logger.warn(`Failed to load trusted certificates from ${trustPath}: ${error.message}`);
         }
     }
 
@@ -111,14 +146,9 @@ class Server {
     }
 
     async setupErrorHandling() {
-        const { errorHandler, notFound } = require('../middleware/error.middleware');
-
-        // Handle 404s
+        // Error handlers are already imported at the top
         this.app.use(notFound);
-
-        // Central error handler
         this.app.use(errorHandler);
-
         this.logger.debug('Error handlers configured');
     }
 
@@ -144,27 +174,39 @@ class Server {
         this.logger.info('Starting server...');
 
         try {
-            const { createServers } = require('../config/server.config');
-            this.servers = await createServers(this.app, this.config);
+            const { createServers } = await import('../config/server.config.js');
+            this.servers = await createServers(this.app, {
+                port: this.config.server.port,
+                sslPort: this.config.server.sslPort,
+                sslKey: this.config.server.sslKey,
+                sslCert: this.config.server.sslCert
+            });
 
             if (this.servers.https) {
-                const SocketService = require('../services/socket.service');
-                const ChatService = require('../services/chat.service');  // Add import
-
+                const { default: SocketService } = await import('../services/socket.service.js');
                 this.socketService = new SocketService(this.servers.https, this.config);
+                this.logger.info('WebSocket service initialized');
 
-                // Only initialize chat if configured
                 if (this.config.chat?.enabled) {
+                    const { default: ChatService } = await import('../services/chat.service.js');
                     this.chatService = new ChatService(this.servers.https, this.config);
                     this.logger.info('Chat service initialized');
                 }
 
-                this.logger.info(`HTTPS/WSS server listening on port ${this.config.sslPort}`);
+                this.logger.info(`HTTPS/WSS server listening on port ${this.config.server.sslPort}`);
             }
 
             return this.servers;
         } catch (error) {
-            this.logger.error(`Failed to start server: ${error.message}`);
+            this.logger.error('Failed to start server:', {
+                error: error.message,
+                config: {
+                    port: this.config.server?.port,
+                    sslPort: this.config.server?.sslPort,
+                    hasSSLKey: !!this.config.server?.sslKey,
+                    hasSSLCert: !!this.config.server?.sslCert
+                }
+            });
             throw error;
         }
     }

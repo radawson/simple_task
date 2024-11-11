@@ -1,6 +1,7 @@
-const jwt = require('jsonwebtoken');
-const { User } = require('../models');
-const Logger = require('../core/Logger');
+import jwt  from 'jsonwebtoken';
+import { User } from '../models/index.js';
+import Logger from '../core/Logger.js';
+
 const logger = Logger.getInstance();
 
 const authenticate = async (req, res, next) => {
@@ -78,4 +79,4 @@ const authorize = (roles = []) => {
     };
 };
 
-module.exports = { authenticate, authorize };
+export { authenticate, authorize };

@@ -1,6 +1,6 @@
-const { Event, Person } = require('../models');
-const { Op } = require('sequelize');
-const Logger = require('../core/Logger');
+import { Event, Person } from '../models/index.js';
+import { Op } from 'sequelize';
+import Logger from '../core/Logger.js';
 const logger = Logger.getInstance();
 
 /**
@@ -399,4 +399,4 @@ class EventController {
     };
 }
 
-module.exports = new EventController();
+export default EventController;

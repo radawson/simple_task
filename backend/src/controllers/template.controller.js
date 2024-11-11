@@ -1,5 +1,5 @@
-const { Template, Task } = require('../models');
-const Logger = require('../core/Logger');
+import { Template, Task } from '../models/index.js';
+import Logger from '../core/Logger.js';
 const logger = Logger.getInstance();
 
 class TemplateController {
@@ -164,4 +164,5 @@ class TemplateController {
     }
 }
 
-module.exports = new TemplateController();
+export { TemplateController };
+export default TemplateController;

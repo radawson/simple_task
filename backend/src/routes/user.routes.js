@@ -1,12 +1,11 @@
-// src/routes/user.routes.js
 import { Router } from 'express';
 import { 
     validateUser, 
     validatePassword,
     validateUpdatePassword 
-} from '../middleware/validation.middleware';
-import { authenticate, authorize } from '../middleware/auth.middleware';
-import UserController from '../controllers/user.controller';
+} from '../middleware/validation.middleware.js';
+import { authenticate, authorize } from '../middleware/auth.middleware.js';
+import UserController from '../controllers/user.controller.js';
 
 const createUserRoutes = (socketService) => {
     const router = Router();

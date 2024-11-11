@@ -1,3 +1,4 @@
+// src/index.js
 import dotenv from 'dotenv';
 import config from './config/index.js';
 import { Database, Logger, Server } from './core/index.js';
@@ -7,9 +8,20 @@ async function bootstrap() {
     logger.info('Beginning application bootstrap...');
 
     try {
+        logger.debug('Bootstrap config:', {
+            serverConfig: !!config.server,
+            dbConfig: !!config.database,
+            environment: config.env
+        });
+
         logger.debug('Initializing core services...');
         const db = new Database(config.database);
-        const server = new Server(config.server);
+        const server = new Server({
+            server: config.server,
+            security: config.security,
+            chat: config.chat,
+            cors: config.server.cors // Move cors config inside server config
+        });
 
         logger.debug('Connecting to database...');
         await db.connect();
@@ -32,8 +44,14 @@ async function bootstrap() {
         logger.info('Application bootstrap completed successfully');
         return server;
     } catch (error) {
-        logger.error(`Bootstrap failed: ${error.message}`, { stack: error.stack });
-        process.exit(1);
+        logger.error(`Bootstrap failed: ${error.message}`, {
+            config: {
+                hasServer: !!config.server,
+                hasSecurity: !!config.security,
+                hasDatabase: !!config.database
+            }
+        });
+        throw error;
     }
 }
 

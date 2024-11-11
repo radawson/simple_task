@@ -1,4 +1,4 @@
-const crypto = require('crypto');
+import crypto from 'crypto';
 
 /**
  * Middleware to generate SCRAM-SHA-1 keys for Prosody's authentication.
@@ -62,4 +62,4 @@ const formatSalt = (rawSalt) => {
   return rawSalt.replace(/^(.{8})(.{4})(.{4})(.{4})(.{12})$/, '$1-$2-$3-$4-$5');
 };
 
-module.exports = generateScramKeys;
+export default generateScramKeys;

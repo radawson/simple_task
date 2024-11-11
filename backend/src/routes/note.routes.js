@@ -1,8 +1,8 @@
 // src/routes/note.routes.js
 import { Router } from 'express';
-import { validateNote } from '../middleware/validation.middleware';
-import { authenticate } from '../middleware/auth.middleware';
-import NoteController from '../controllers/note.controller';
+import { validateNote } from '../middleware/validation.middleware.js';
+import { authenticate } from '../middleware/auth.middleware.js';
+import NoteController from '../controllers/note.controller.js';
 
 const createNoteRoutes = (socketService) => {
     const router = Router();

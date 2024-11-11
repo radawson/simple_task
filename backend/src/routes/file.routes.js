@@ -1,8 +1,8 @@
 // src/routes/file.routes.js
 import { Router } from 'express';
-import { authenticate } from '../middleware/auth.middleware';
-import { validateFile } from '../middleware/validation.middleware';
-import FileController from '../controllers/file.controller';
+import { authenticate } from '../middleware/auth.middleware.js';
+import { validateFile } from '../middleware/validation.middleware.js';
+import FileController from '../controllers/file.controller.js';
 
 const createFileRoutes = (socketService) => {
     const router = Router();

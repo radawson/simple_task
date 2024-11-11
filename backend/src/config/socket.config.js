@@ -1,3 +1,4 @@
+//src/config/socket.config.js
 module.exports = {
     redis: {
       host: process.env.REDIS_HOST || 'localhost',

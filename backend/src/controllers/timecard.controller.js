@@ -1,5 +1,5 @@
-const { Timecard, User, Person } = require('../models');
-const Logger = require('../core/Logger');
+import { Timecard, User, Person } from '../models/index.js';
+import Logger from '../core/Logger.js';
 const logger = Logger.getInstance();
 
 class TimecardController {
@@ -212,4 +212,5 @@ class TimecardController {
     }
 }
 
-module.exports = new TimecardController();
+export { TimecardController };
+export default TimecardController;

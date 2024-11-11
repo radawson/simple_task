@@ -1,5 +1,4 @@
-// Middleware to set the `store` type based on the path
-function setStoreType(req, res, next) {
+const setStoreType = (req, res, next) => {
   if (req.path.includes('/accounts')) {
     req.store = 'accounts';
   } else if (req.path.includes('/roster')) {
@@ -10,4 +9,4 @@ function setStoreType(req, res, next) {
   next();
 }
 
-module.exports = setStoreType;
+export default setStoreType;

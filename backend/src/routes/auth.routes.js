@@ -1,10 +1,10 @@
 // src/routes/auth.routes.js
 import { Router } from 'express';
-import { validateLogin, validateRegistration } from '../middleware/validation.middleware';
-import { authenticate } from '../middleware/auth.middleware';
-import AuthController from '../controllers/auth.controller';
-import config from '../config';
-import Logger from '../core/Logger';
+import { validateLogin, validateRegistration } from '../middleware/validation.middleware.js';
+import { authenticate } from '../middleware/auth.middleware.js';
+import AuthController from '../controllers/auth.controller.js';
+import config from '../config/index.js';
+import Logger from '../core/Logger.js';
 
 const createAuthRoutes = (socketService) => {
     const router = Router();

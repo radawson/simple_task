@@ -1,79 +1,119 @@
-const Logger = require('../core/Logger');
+import Logger from '../core/Logger.js';
+
 const logger = Logger.getInstance();
 
+/**
+ * Custom application error class with additional properties for error handling
+ */
 class AppError extends Error {
-    constructor(statusCode, message) {
+    constructor(statusCode, message, details = {}) {
         super(message);
         this.statusCode = statusCode;
         this.status = `${statusCode}`.startsWith('4') ? 'fail' : 'error';
         this.isOperational = true;
+        this.details = details;
         Error.captureStackTrace(this, this.constructor);
     }
 }
 
+/**
+ * Handles various Sequelize-specific errors
+ */
 const handleSequelizeError = (err) => {
-    if (err.name === 'SequelizeValidationError') {
-        return new AppError(400, err.errors.map(e => e.message).join(', '));
+    switch (err.name) {
+        case 'SequelizeValidationError':
+            return new AppError(400, 'Validation Error', {
+                errors: err.errors.map(e => ({
+                    field: e.path,
+                    message: e.message,
+                    value: e.value
+                }))
+            });
+        case 'SequelizeUniqueConstraintError':
+            return new AppError(409, 'Record already exists', {
+                field: err.errors[0]?.path,
+                value: err.errors[0]?.value
+            });
+        case 'SequelizeForeignKeyConstraintError':
+            return new AppError(400, 'Invalid reference', {
+                field: err.fields,
+                message: 'Referenced record does not exist'
+            });
+        case 'SequelizeConnectionError':
+            logger.error('Database connection error:', err);
+            return new AppError(503, 'Service temporarily unavailable');
+        default:
+            return err;
     }
-    if (err.name === 'SequelizeUniqueConstraintError') {
-        return new AppError(400, 'Record already exists');
-    }
-    return err;
 };
 
+/**
+ * Main error handling middleware
+ */
 const errorHandler = (err, req, res, next) => {
     err.statusCode = err.statusCode || 500;
     err.status = err.status || 'error';
 
-    if (process.env.NODE_ENV === 'development') {
-        logger.error('Error:', {
-            message: err.message,
-            stack: err.stack,
-            path: req.path,
-            method: req.method,
-            body: req.body,
-            user: req.user?.username
-        });
+    // Handle specific error types
+    if (err.name && err.name.startsWith('Sequelize')) {
+        err = handleSequelizeError(err);
+    }
 
-        res.status(err.statusCode).json({
-            status: err.status,
-            error: err,
-            message: err.message,
-            stack: err.stack
+    const errorResponse = {
+        status: err.status,
+        message: err.message,
+        ...(err.details && { details: err.details })
+    };
+
+    // Add additional information in development
+    if (process.env.NODE_ENV === 'development') {
+        errorResponse.stack = err.stack;
+        errorResponse.path = req.path;
+        errorResponse.method = req.method;
+
+        logger.error('Error Details:', {
+            ...errorResponse,
+            body: req.body,
+            user: req.user?.username,
+            ip: req.ip
         });
     } else {
-        // Production error response
-        if (err.isOperational) {
-            logger.error(`Operational error: ${err.message}`);
-            res.status(err.statusCode).json({
-                status: err.status,
-                message: err.message
-            });
-        } else {
-            // Programming or unknown error
-            logger.error('Unknown error:', err);
-            res.status(500).json({
-                status: 'error',
-                message: 'Something went wrong'
-            });
+        // Production logging
+        logger.error(`${err.status} ${err.statusCode}: ${err.message}`, {
+            path: req.path,
+            method: req.method,
+            user: req.user?.username,
+            ...(err.isOperational ? { details: err.details } : {})
+        });
+
+        // Hide internal error details in production
+        if (!err.isOperational) {
+            errorResponse.message = 'Internal Server Error';
+            delete errorResponse.details;
         }
     }
+
+    res.status(err.statusCode).json(errorResponse);
 };
 
-const asyncHandler = (fn) => {
-    return (req, res, next) => {
-        Promise.resolve(fn(req, res, next)).catch(next);
-    };
+/**
+ * Wraps async route handlers to catch errors
+ */
+const asyncHandler = (fn) => (req, res, next) => {
+    Promise.resolve(fn(req, res, next)).catch(next);
 };
 
+/**
+ * Handles 404 Not Found errors
+ */
 const notFound = (req, res, next) => {
-    const err = new AppError(404, `Route ${req.originalUrl} not found`);
-    next(err);
+    next(new AppError(404, `Route ${req.originalUrl} not found`));
 };
 
-module.exports = {
+export {
     AppError,
     errorHandler,
     asyncHandler,
+    handleSequelizeError,
     notFound
 };

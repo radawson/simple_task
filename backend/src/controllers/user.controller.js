@@ -1,8 +1,8 @@
-const { User } = require('../models');
-const { Op } = require('sequelize');
-const Logger = require('../core/Logger');
-const argon2 = require('argon2');
-const crypto = require('crypto');
+import { User } from '../models/index.js';
+import { Op } from 'sequelize';
+import Logger from '../core/Logger.js';
+import argon2 from 'argon2';
+import crypto from 'crypto';
 const logger = Logger.getInstance();
 
 /**
@@ -548,4 +548,5 @@ class UserController {
     };
 }
 
-module.exports = new UserController();
+export { UserController };
+export default UserController;

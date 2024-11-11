@@ -1,3 +1,4 @@
+//src/config/validation.js
 import Joi from 'joi';
 
 export const configSchema = Joi.object({
@@ -105,6 +106,8 @@ export const configSchema = Joi.object({
         sslPort: Joi.number().required(),
         sslKey: Joi.string().required(),
         sslCert: Joi.string().required(),
+        sslChain: Joi.string(),
+        sslTrustPath: Joi.string(),  // Added trust path
         cors: Joi.object({
             origins: Joi.array().items(Joi.string()).required(),
             credentials: Joi.boolean().required()

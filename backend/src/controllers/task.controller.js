@@ -1,6 +1,6 @@
-const { Task, Template } = require('../models');
-const { Op } = require('sequelize');
-const Logger = require('../core/Logger');
+import { Task, Template } from '../models/index.js';
+import { Op } from 'sequelize';
+import Logger from '../core/Logger.js';
 const logger = Logger.getInstance();
 
 /**
@@ -276,4 +276,5 @@ class TaskController {
     };
 }
 
-module.exports = new TaskController();
+export { TaskController };
+export default TaskController;

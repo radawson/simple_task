@@ -1,17 +1,18 @@
-const socketIO = require('socket.io');
-const Logger = require('../core/Logger');
+// src/services/socket.service.js
+import { Server } from 'socket.io';  
+import Logger from '../core/Logger.js';
 
 class SocketService {
     constructor(server, config) {
         this.logger = Logger.getInstance();
         
         // Ensure we're using secure WebSocket
-        this.io = socketIO(server, {
+        this.io = new Server(server, {  // Use the Server class directly
             path: '/socket',
             pingTimeout: 60000,
             pingInterval: 25000,
             cors: {
-                origin: config.cors.origins,
+                origin: config.server.cors.origins,  // Updated to use server.cors config
                 credentials: true
             },
             transports: ['websocket'],  // Prefer WebSocket only
@@ -104,4 +105,5 @@ class SocketService {
     }
 }
 
-module.exports = SocketService;
+export default SocketService;
+export { SocketService };

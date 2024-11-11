@@ -1,5 +1,5 @@
-const { Notification, User } = require('../models');
-const Logger = require('../core/Logger');
+import { Notification, User } from '../models/index.js';
+import Logger from '../core/Logger.js';
 const logger = Logger.getInstance();
 
 class NotificationController {
@@ -162,4 +162,5 @@ class NotificationController {
     }
 }
 
-module.exports = new NotificationController();
+export { NotificationController };
+export default NotificationController;

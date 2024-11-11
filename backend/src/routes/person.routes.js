@@ -1,8 +1,8 @@
 // src/routes/person.routes.js
 import { Router } from 'express';
-import { validatePerson } from '../middleware/validation.middleware';
-import { authenticate, authorize } from '../middleware/auth.middleware';
-import PersonController from '../controllers/person.controller';
+import { validatePerson } from '../middleware/validation.middleware.js';
+import { authenticate, authorize } from '../middleware/auth.middleware.js';
+import PersonController from '../controllers/person.controller.js';
 
 const createPersonRoutes = (socketService) => {
     const router = Router();

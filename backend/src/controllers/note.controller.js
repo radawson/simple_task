@@ -1,5 +1,5 @@
-const { Note } = require('../models');
-const Logger = require('../core/Logger');
+import { Note } from '../models/index.js';
+import Logger from '../core/Logger.js';
 const logger = Logger.getInstance();
 
 class NoteController {
@@ -165,4 +165,5 @@ class NoteController {
     }
 }
 
-module.exports = new NoteController();
+export { NoteController };
+export default NoteController;

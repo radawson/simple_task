@@ -1,30 +1,37 @@
-const fs = require('fs').promises;
-const path = require('path');
-const multer = require('multer');
-const { Filedata } = require('../models');
-const FileUtil = require('../utils/file.util');
-const Logger = require('../core/Logger');
-const config = require('../config');
+import { promises as fs } from 'fs';
+import path from 'path';
+import multer from 'multer';
+import { Filedata } from '../models/index.js';
+import FileUtil from '../utils/file.util.js';
+import Logger from '../core/Logger.js';
+import config from '../config/index.js';
 
 const logger = Logger.getInstance();
 
 class FileController {
-    constructor() {
+    constructor(socketService) {
         if (!config.storage?.path) {
             throw new Error('Storage path not configured');
         }
         this.storagePath = config.storage.path;
+        this.socketService = socketService;
+        
+        // Configure multer storage
         this.storage = multer.diskStorage({
-            destination: (req, file, cb) => {
-                const tempPath = path.join(this.storagePath, 'temp');
-                fs.mkdir(tempPath, { recursive: true })
-                    .then(() => cb(null, tempPath))
-                    .catch(err => cb(err));
+            destination: async (req, file, cb) => {
+                try {
+                    const tempPath = path.join(this.storagePath, 'temp');
+                    await fs.mkdir(tempPath, { recursive: true });
+                    cb(null, tempPath);
+                } catch (err) {
+                    cb(err);
+                }
             },
             filename: (req, file, cb) => {
                 cb(null, `${Date.now()}-${file.originalname}`);
             }
         });
+
         this.upload = multer({
             storage: this.storage,
             limits: {
@@ -32,8 +39,59 @@ class FileController {
             }
         }).single('file');
     }
+
+    handleUpload = async (req, res) => {
+        return new Promise((resolve, reject) => {
+            this.upload(req, res, (err) => {
+                if (err) reject(err);
+                else resolve(req.file);
+            });
+        });
+    };
+
     upload = async (req, res) => {
-        // ... existing upload logic
+        try {
+            const file = await this.handleUpload(req, res);
+            if (!file) {
+                return res.status(400).json({ message: 'No file uploaded' });
+            }
+
+            // Process the uploaded file
+            const hash = await FileUtil.calculateFileHash(file.path);
+            const storagePath = FileUtil.generateStoragePath(hash, file.originalname);
+            const finalPath = path.join(this.storagePath, storagePath);
+
+            // Ensure directory exists
+            await fs.mkdir(path.dirname(finalPath), { recursive: true });
+            
+            // Move file from temp to final location
+            await fs.rename(file.path, finalPath);
+
+            // Create file record
+            const filedata = await Filedata.create({
+                filename: file.originalname,
+                path: storagePath,
+                hash,
+                size: file.size,
+                sender: req.user.username,
+                receiver: req.params.username
+            });
+
+            // Notify via WebSocket if available
+            if (this.socketService) {
+                this.socketService.notifyUser(req.params.username, 'fileUploaded', {
+                    filename: file.originalname,
+                    sender: req.user.username
+                });
+            }
+
+            logger.info(`File uploaded: ${file.originalname}`);
+            res.status(201).json(filedata);
+
+        } catch (error) {
+            logger.error(`Upload failed: ${error.message}`);
+            res.status(500).json({ message: 'File upload failed' });
+        }
     }
 
     listFiles = async (req, res) => {
@@ -66,6 +124,9 @@ class FileController {
             }
 
             const filePath = path.join(this.storagePath, filedata.path);
+            
+            // Check if file exists before sending
+            await fs.access(filePath);
             res.download(filePath, filedata.filename);
 
             logger.info(`File downloaded: ${filedata.filename}`);
@@ -92,6 +153,13 @@ class FileController {
             await fs.unlink(filePath);
             await filedata.destroy();
 
+            // Notify via WebSocket if available
+            if (this.socketService) {
+                this.socketService.notifyUser(req.params.username, 'fileDeleted', {
+                    filename: filedata.filename
+                });
+            }
+
             logger.info(`File deleted: ${filedata.filename}`);
             res.status(204).send();
         } catch (error) {
@@ -99,8 +167,6 @@ class FileController {
             res.status(500).json({ message: 'File deletion failed' });
         }
     }
-
-
 
     verifyFile = async (req, res) => {
         try {
@@ -127,13 +193,12 @@ class FileController {
                     sender: filedata.sender
                 }
             });
-
         } catch (error) {
             logger.error(`Verification failed: ${error.message}`);
             res.status(500).json({ message: 'File verification failed' });
         }
     }
-
 }
 
-module.exports = new FileController();
+export { FileController };
+export default FileController;
