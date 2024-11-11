@@ -51,6 +51,11 @@ export const createConnection = async (config) => {
         await sequelize.authenticate();
         logger.info('Database connection established');
 
+        // Add this debug log
+        logger.debug('Current models:', {
+            models: Object.keys(sequelize.models)
+        });
+
         // Only force sync in development when explicitly requested
         const shouldForceSync = process.env.FORCE_DB_SYNC === 'true' &&
             process.env.NODE_ENV !== 'production';
@@ -67,7 +72,13 @@ export const createConnection = async (config) => {
 
         return sequelize;
     } catch (error) {
-        logger.error(`Database initialization failed: ${error.message}`);
+        // Enhanced error logging
+        logger.error('Database initialization failed:', {
+            error: error.message,
+            stack: error.stack,
+            models: Object.keys(sequelize.models),
+            dialect: sequelize.options.dialect
+        });
         throw error;
     }
 };

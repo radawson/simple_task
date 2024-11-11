@@ -25,7 +25,59 @@ const schemas = {
         priority: Joi.number().min(0).max(9)
     }),
 
-    // ... other schema definitions ...
+    note: Joi.object({
+        title: Joi.string()
+            .required()
+            .max(200),
+        content: Joi.string()
+            .allow('', null),
+        date: Joi.date()
+            .required()
+    }),
+
+    task: Joi.object({
+        name: Joi.string()
+            .required()
+            .max(200),
+        description: Joi.string()
+            .allow('', null),
+        completed: Joi.boolean()
+            .default(false),
+        priority: Joi.number()
+            .integer()
+            .min(0)
+            .default(0),
+        date: Joi.date()
+            .iso()
+            .required(),
+        template: Joi.boolean()
+            .default(false),
+        templateIds: Joi.array()
+            .items(Joi.number().integer())
+            .optional()
+    }),
+
+    template: Joi.object({
+        name: Joi.string()
+            .required()
+            .max(200),
+        description: Joi.string()
+            .allow('', null)
+    }),
+
+    timecard: Joi.object({
+        timeIn: Joi.date()
+            .required(),
+        timeOut: Joi.date()
+            .min(Joi.ref('timeIn')),
+        breakStart: Joi.date(),
+        breakEnd: Joi.date()
+            .min(Joi.ref('breakStart')),
+        notes: Joi.string()
+            .allow('', null),
+        approved: Joi.boolean()
+            .default(false)
+    }),
 
     user: Joi.object({
         username: Joi.string()

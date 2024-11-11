@@ -1,3 +1,4 @@
+//src/components/dashboard/Dashboard.jsx
 import React, { useState, useEffect } from 'react';
 import { ApiService } from '../../services/api';
 import { socketService } from '../../services/socket.service';
@@ -30,7 +31,6 @@ const Dashboard = () => {
       }
     };
 
-    // Set up WebSocket listeners
     socketService.connect();
     socketService.subscribeToDate(currentDate);
 
@@ -81,7 +81,6 @@ const Dashboard = () => {
 
     fetchInitialData();
 
-    // Cleanup
     return () => {
       socketService.unsubscribeFromDate(currentDate);
     };
@@ -90,13 +89,13 @@ const Dashboard = () => {
   return (
     <div className="container py-5">
       <div className="row">
-        <div className="col-md-4">
+        <div className="col-12 mb-4">
           <TaskList tasks={tasks} />
         </div>
-        <div className="col-md-4">
+        <div className="col-12 mb-4">
           <EventList events={events} />
         </div>
-        <div className="col-md-4">
+        <div className="col-12 mb-4">
           <NoteList notes={notes} />
         </div>
       </div>

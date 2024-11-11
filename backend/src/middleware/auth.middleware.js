@@ -1,6 +1,7 @@
-import jwt  from 'jsonwebtoken';
+// auth.middleware.js
 import { User } from '../models/index.js';
 import Logger from '../core/Logger.js';
+import { verifyTokenPayload } from './jwt.middleware.js';
 
 const logger = Logger.getInstance();
 
@@ -26,7 +27,7 @@ const authenticate = async (req, res, next) => {
 
         const token = authHeader.split(' ')[1];
         
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const decoded = verifyTokenPayload(token);
         const user = await User.findByPk(decoded.id);
 
         if (!user) {
@@ -37,6 +38,19 @@ const authenticate = async (req, res, next) => {
             });
         }
 
+        // Check token freshness for sensitive operations
+        if (req.requiresFreshToken) {
+            const tokenAge = (Date.now() / 1000) - decoded.iat;
+            if (tokenAge > 900) { // 15 minutes
+                logger.warn(`Fresh token required for user: ${decoded.username}`);
+                return res.status(401).json({
+                    success: false,
+                    message: 'Fresh token required',
+                    code: 'TOKEN_REFRESH_REQUIRED'
+                });
+            }
+        }
+
         req.user = user;
         next();
 
@@ -45,7 +59,8 @@ const authenticate = async (req, res, next) => {
             logger.warn('Token expired');
             return res.status(401).json({
                 success: false,
-                message: 'Token expired'
+                message: 'Token expired',
+                code: 'TOKEN_EXPIRED'
             });
         }
 
