@@ -3,6 +3,7 @@ import { promises as fs } from 'fs';
 import https from 'https';
 import http from 'http';
 import Logger from '../core/Logger.js';
+import certUtil from '../utils/cert.util.js';
 
 const logger = Logger.getInstance();
 
@@ -14,6 +15,18 @@ export const createServers = async (app, config) => {
         if (!config.sslKey || !config.sslCert) {
             throw new Error('SSL key and certificate paths are required');
         }
+
+        // Load and validate certificate
+        const cert = await certUtil.loadCertificate(config.sslCert);
+        certUtil.validateDateValidity(cert);
+
+        // Get and log certificate info
+        const certInfo = await certUtil.getCertificateInfo(config.sslCert);
+        logger.info('Using SSL certificate:', {
+            subject: certInfo.subject,
+            validTo: certInfo.validTo,
+            daysUntilExpiration: certInfo.daysUntilExpiration
+        });
 
         // Create HTTPS server
         const httpsOptions = {
@@ -42,13 +55,20 @@ export const createServers = async (app, config) => {
 
         return servers;
     } catch (error) {
-        logger.error('Failed to create servers:', {
-            error: error.message,
-            paths: {
-                sslKey: config.sslKey,
-                sslCert: config.sslCert
-            }
-        });
+        if (error.name === 'CertificateError') {
+            logger.error('Certificate validation failed:', {
+                message: error.message,
+                details: error.details
+            });
+        } else {
+            logger.error('Failed to create servers:', {
+                error: error.message,
+                paths: {
+                    sslKey: config.sslKey,
+                    sslCert: config.sslCert
+                }
+            });
+        }
         throw error;
     }
 };

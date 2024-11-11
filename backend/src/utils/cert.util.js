@@ -48,7 +48,7 @@ class CertificateUtil {
     }
 
     /**
-     * Validates a certificate's date validity
+     * Validates a certificate's validity period
      * @param {X509Certificate} cert - The certificate to validate
      * @throws {CertificateError} If certificate is expired or not yet valid
      */
@@ -56,25 +56,25 @@ class CertificateUtil {
         const now = new Date();
         const validFrom = new Date(cert.validFrom);
         const validTo = new Date(cert.validTo);
+        const thirtyDays = 30 * 24 * 60 * 60 * 1000;
 
         if (now < validFrom) {
             throw new CertificateError('Certificate is not yet valid', {
-                validFrom,
-                validTo,
-                currentTime: now
+                validFrom: validFrom.toISOString(),
+                validTo: validTo.toISOString(),
+                currentTime: now.toISOString()
             });
         }
 
         if (now > validTo) {
             throw new CertificateError('Certificate has expired', {
-                validFrom,
-                validTo,
-                currentTime: now
+                validFrom: validFrom.toISOString(),
+                validTo: validTo.toISOString(),
+                currentTime: now.toISOString()
             });
         }
 
         // Warn if certificate is close to expiration (30 days)
-        const thirtyDays = 30 * 24 * 60 * 60 * 1000;
         if (validTo.getTime() - now.getTime() < thirtyDays) {
             logger.warn('Certificate is approaching expiration', {
                 subject: cert.subject,
