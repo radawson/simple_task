@@ -5,10 +5,10 @@ project/
 │   │   │   ├── database.config.js
 │   │   │   ├── logger.config.js    
 │   │   │   ├── server.config.js
-                socket.config.js
-│   │   │   ├── storage.config.js    # Needed: File storage config
-                types.ts
-                validation.js
+│   │   │   ├── socket.config.js    
+│   │   │   ├── storage.config.js   # Needed: Storage configuration 
+│   │   │   ├── types.ts            
+│   │   │   ├── validation.js       
 │   │   │   └── index.js
 │   │   ├── core/
 │   │   │   ├── Database.js
@@ -23,9 +23,9 @@ project/
 │   │   │   ├── filedata.model.js
 │   │   │   ├── message.model.js
 │   │   │   ├── note.model.js 
-                notification.model.js      
+│   │   │   ├── notification.model.js      
 │   │   │   ├── person.model.js      
-                setting.model.js     
+│   │   │   ├── setting.model.js    
 │   │   │   ├── task.model.js
 │   │   │   ├── template.model.js    
 │   │   │   ├── timecard.model.js    
@@ -60,7 +60,7 @@ project/
 │   │   │   ├── task.routes.js
 │   │   │   ├── template.routes.js    
 │   │   │   ├── timecard.routes.js
-                user.routes.js    
+│   │   │   ├── user.routes.js    
 │   │   │   └── index.js
 │   │   ├── services/
 │   │   │   ├── chat.service.js
@@ -100,17 +100,26 @@ project/
     │   │   └── layout/
     │   │       ├── Layout.jsx
     │   │       └── Navbar.jsx
+    │   ├── config/
+    │   │   ├── auth.config.js
+    │   │   └── index.js
+    │   ├── constants/
+    │   │   └── index.js 
+    │   ├── context/
+    │   │   └── AuthContext.jsx   
+    │   ├── hooks/
+    │   │   └── useAuth.js     
     │   ├── services/
     │   │   ├── api.js
     │   │   └── auth.service.js
+    │   ├── styles/
+    │   │   └── App.css
+    │   ├── types/
+    │   │   └── index.ts  
     │   ├── utils/
     │   │   ├── date.utils.js
     │   │   └── toast.utils.js
-    │   ├── hooks/
-    │   │   └── useAuth.js
-    │   ├── styles/
-    │   │   └── App.css
     │   ├── App.jsx
-    │   └── index.jsx
+    │   └── main.jsx 
     ├── package.json
     └── vite.config.js

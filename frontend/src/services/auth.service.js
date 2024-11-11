@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { keycloakConfig } from '../config/keycloak.config';
+import authConfig from '../config/auth.config';
 
 const API_URL = '/auth';
 
@@ -11,7 +11,9 @@ export const AuthService = {
   },
 
   loginWithSSO() {
-    // Redirect to backend SSO initiation
+    if (!authConfig.enableSSO) {
+      throw new Error('SSO is not enabled');
+    }
     window.location.href = `${API_URL}/sso/login`;
   },
 
