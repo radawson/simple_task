@@ -1,14 +1,4 @@
-const Logger = require('../src/core/Logger');
-
-const logger = new Logger({
-    level: 'info',
-    directory: 'logs',
-    maxFiles: '14d',
-    format: 'simple'
-});
-
-require('dotenv').config();
-const Seeder = require('../src/utils/seed.util');
+import Seeder from '../src/utils/seed.util.js';
 
 async function seed() {
     try {
