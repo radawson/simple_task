@@ -33,7 +33,7 @@ module.exports = {
     time: true,
     // Add startup checks
     wait_ready: true,
-    listen_timeout: 10000,
+    listen_timeout: 3000,
     kill_timeout: 5000,
     node_args: [
       '--experimental-modules',
