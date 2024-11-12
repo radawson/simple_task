@@ -1,5 +1,4 @@
 // src/index.js
-import dotenv from 'dotenv';
 import config from './config/index.js';
 import { Database, Logger, Server } from './core/index.js';
 
@@ -16,19 +15,25 @@ async function bootstrap() {
 
         logger.debug('Initializing core services...');
         const db = new Database(config.database);
+        
+        // Set seed flag before connection
+        if (config.env === 'development') {
+            logger.debug('Development mode - enabling database seeding');
+            db.setSeedFlag(true);
+        }
+
+        logger.debug('Connecting to database...');
+        await db.connect();
+
+        logger.debug('Initializing server...');
         const server = new Server({
             server: config.server,
             security: config.security,
             chat: config.chat,
-            cors: config.server.cors // Move cors config inside server config
+            cors: config.server.cors
         });
-
-        logger.debug('Connecting to database...');
-        await db.connect();
-        
-        logger.debug('Initializing server...');
         await server.initialize();
-        
+
         logger.debug('Starting server...');
         await server.start();
 

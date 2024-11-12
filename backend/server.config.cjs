@@ -11,6 +11,14 @@ module.exports = {
     name: 'backend',
     script: './server.js',
     cwd: path.resolve(__dirname),
+    env_development: {
+      ...env,
+      NODE_ENV: 'development',
+      FORCE_DB_SYNC: 'true',
+      DB_TYPE: 'sqlite',
+      PORT: '9179',
+      SPORT: '9180'
+    },
     env_production: {
       ...env,  // Spread all environment variables from .env
       NODE_ENV: 'production',

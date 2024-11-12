@@ -22,10 +22,18 @@ class Task extends BaseModel {
                 type: DataTypes.INTEGER,
                 defaultValue: 0
             },
-            date: DataTypes.DATEONLY,
+            date: {
+                type: DataTypes.DATEONLY,
+                allowNull: true // Allow null for template tasks
+            },
             template: {
                 type: DataTypes.BOOLEAN,
                 defaultValue: false
+            },
+            templateId: {
+                type: DataTypes.INTEGER,
+                allowNull: true,
+                field: 'template_id'
             },
             addedBy: {
                 type: DataTypes.STRING(30),
@@ -39,13 +47,10 @@ class Task extends BaseModel {
     }
 
     static associate(models) {
-        if (models.Template) {
-            this.belongsToMany(models.Template, {
-                through: 'TaskTemplates',
-                foreignKey: 'taskId',
-                otherKey: 'templateId'
-            });
-        }
+        this.belongsTo(models.Template, {
+            foreignKey: 'templateId',
+            as: 'sourceTemplate'
+        });
     }
 }
 

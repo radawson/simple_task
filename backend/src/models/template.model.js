@@ -14,7 +14,14 @@ class Template extends BaseModel {
                 allowNull: false,
                 unique: true
             },
-            description: DataTypes.TEXT
+            description: {
+                type: DataTypes.TEXT,
+                allowNull: true
+            },
+            addedBy: {
+                type: DataTypes.STRING(30),
+                field: 'added_by'
+            }
         }, {
             sequelize,
             modelName: 'Template',
@@ -23,13 +30,10 @@ class Template extends BaseModel {
     }
 
     static associate(models) {
-        if (models.Task) {
-            this.belongsToMany(models.Task, {
-                through: 'TaskTemplates',
-                foreignKey: 'templateId',
-                otherKey: 'taskId'
-            });
-        }
+        this.hasMany(models.Task, {
+            foreignKey: 'templateId',
+            as: 'tasks'
+        });
     }
 }
 
