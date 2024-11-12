@@ -28,12 +28,12 @@ export default function Navbar() {
         <MDBNavbarToggler
           onClick={() => setShowBasic(!showBasic)}
           aria-controls='navbarExample01'
-          aria-expanded='false'
+          aria-expanded={showBasic ? 'true' : 'false'}
           aria-label='Toggle navigation'
         >
           <MDBIcon icon='bars' fas />
         </MDBNavbarToggler>
-        <MDBCollapse navbar show={showBasic}>
+        <MDBCollapse navbar show={showBasic.toString()}>
           <MDBNavbarNav className='mb-2 mb-lg-0'>
             <MDBNavbarItem>
               <MDBNavbarLink href='/tasks'>Tasks</MDBNavbarLink>
