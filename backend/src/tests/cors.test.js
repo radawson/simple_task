@@ -1,7 +1,10 @@
-const request = require('supertest');
-const express = require('express');
-const Logger = require('../core/Logger');
-const corsMiddleware = require('./cors.middleware');
+//src/tests/cors.test.js
+import { jest } from '@jest/globals';
+import request from 'supertest';
+import { Server } from '../core/Server.js';
+import Logger from '../core/Logger.js';
+import express from 'express';
+import corsMiddleware from '../middleware/cors.middleware.js';
 
 // Initialize logger for tests
 new Logger({

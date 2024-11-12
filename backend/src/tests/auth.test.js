@@ -1,16 +1,13 @@
-const Logger = require('../core/Logger');
-new Logger({
-    level: 'error',
-    directory: 'logs/test',
-    maxFiles: '1d',
-    format: 'simple'
-});
+// src/tests/auth.test.js
+import { jest } from '@jest/globals';
+import request from 'supertest';
+import { Server } from '../core/Server.js';
+import { User, Session } from '../models/index.js';
+import config from '../config/index.js';
+import models from '../models/index.js';
+import authController from '../controllers/auth.controller.js';
+import { Sequelize } from 'sequelize';
 
-const request = require('supertest');
-const { beforeAll, beforeEach, afterAll, describe, it, expect } = require('@jest/globals');
-const { Server } = require('../core');
-const { Sequelize } = require('sequelize');
-const config = require('../config');
 
 describe('Auth Endpoints', () => {
     let server;
@@ -27,8 +24,6 @@ describe('Auth Endpoints', () => {
             logging: false
         });
 
-        // Import models after database initialization
-        const models = require('../models');
         User = models.User;
         Session = models.Session;
 
@@ -62,7 +57,6 @@ describe('Auth Endpoints', () => {
 
     afterAll(async () => {
         // Clear interval from AuthController
-        const authController = require('../controllers/auth.controller');
         clearInterval(authController.cleanupInterval);
 
         if (server?.stop) {

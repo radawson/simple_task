@@ -1,8 +1,12 @@
-const request = require('supertest');
-const { Server } = require('../core');
-const { Event, User } = require('../models');
-const config = require('../config');
-const Logger = require('../core/Logger');
+//src/tests/event.routes.test.js
+import { jest } from '@jest/globals';
+import request from 'supertest';
+import { Server } from '../core/Server.js';
+import { User, Session } from '../models/index.js';
+import config from '../config/index.js';
+import models from '../models/index.js';
+import authController from '../controllers/auth.controller.js';
+import { Sequelize } from 'sequelize';
 
 describe('Event Routes', () => {
     let server, token;
