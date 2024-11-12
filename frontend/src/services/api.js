@@ -60,6 +60,9 @@ export const ApiService = {
   getTasks: (date) => api.get(`/tasks/date/${date}`),
   createTask: (task) => api.post('/tasks', task),
   updateTask: (id, task) => api.put(`/tasks/${id}`, task),
+
+  // Task Templates
+  getTemplates: () => api.get('/templates'),
   
   // Events
   getEvents: (date) => api.get(`/events/date/${date}`),

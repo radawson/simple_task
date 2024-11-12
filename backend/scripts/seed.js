@@ -1,6 +1,6 @@
 import Seeder from '../src/utils/seed.util.js';
 
-async function seed() {
+const seed = async () => {
     try {
         const result = await Seeder.seedDatabase();
         console.log(result.message);

@@ -34,14 +34,19 @@ export default function Navbar() {
           <MDBIcon icon='bars' fas />
         </MDBNavbarToggler>
         <MDBCollapse navbar show={showBasic}>
-          <MDBNavbarNav right className='mb-2 mb-lg-0'>
-            <MDBNavbarItem >
+          <MDBNavbarNav className='mb-2 mb-lg-0'>
+            <MDBNavbarItem>
               <MDBNavbarLink href='/tasks'>Tasks</MDBNavbarLink>
             </MDBNavbarItem>
-            <MDBNavbarItem >
-              <MDBNavbarLink href='/qr' >QR Code</MDBNavbarLink>
+            <MDBNavbarItem>
+              <MDBNavbarLink href='/templates'>Templates</MDBNavbarLink>
             </MDBNavbarItem>
-            <MDBNavbarItem >
+            <MDBNavbarItem>
+              <MDBNavbarLink href='/qr'>QR Code</MDBNavbarLink>
+            </MDBNavbarItem>
+          </MDBNavbarNav>
+          <MDBNavbarNav right>
+            <MDBNavbarItem>
               <MDBNavbarLink href='/login'>Login</MDBNavbarLink>
             </MDBNavbarItem>
           </MDBNavbarNav>
