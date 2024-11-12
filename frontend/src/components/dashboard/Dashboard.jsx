@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { ApiService } from '../../services/api';
 import { socketService } from '../../services/socket.service';
+import { formatLocalDate } from '../../utils/dateUtils';
 import TaskList from './TaskList';
 import EventList from './EventList';
 import NoteList from './NoteList';
@@ -13,7 +14,8 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const currentDate = new Date().toISOString().split('T')[0];
+    const currentDate = formatLocalDate(); // Use local timezone
+    console.log('Fetching data for date:', currentDate); // Debug log
     
     const fetchInitialData = async () => {
       try {
