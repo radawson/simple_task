@@ -66,28 +66,37 @@ export default function Navbar() {
 
       {/* Sidenav */}
       <MDBSideNav
-        isOpen={showSidenav}
-        setOpen={setShowSidenav}
+        open={showSidenav}
+        setOpen={showSidenav}
         position='end'
         closeOnEsc={true}
+        className='list-unstyled'
       >
         <div className='p-3'>
-          <MDBSideNavItem>
+          <MDBSideNavItem
+            onClick={toggleSidenav}
+          >
             <MDBSideNavLink href='/tasks'>
               <MDBIcon fas icon='tasks' className='me-2'/> Tasks
             </MDBSideNavLink>
           </MDBSideNavItem>
-          <MDBSideNavItem>
+          <MDBSideNavItem
+            onClick={toggleSidenav}
+          >
             <MDBSideNavLink href='/templates'>
               <MDBIcon fas icon='clipboard-list' className='me-2'/> Templates
             </MDBSideNavLink>
           </MDBSideNavItem>
-          <MDBSideNavItem>
+          <MDBSideNavItem
+            onClick={toggleSidenav}
+          >
             <MDBSideNavLink href='/qr'>
               <MDBIcon fas icon='qrcode' className='me-2'/> QR Code
             </MDBSideNavLink>
           </MDBSideNavItem>
-          <MDBSideNavItem>
+          <MDBSideNavItem
+            onClick={toggleSidenav}
+          >
             <MDBSideNavLink href='/login'>
               <MDBIcon fas icon='sign-in-alt' className='me-2'/> Login
             </MDBSideNavLink>
