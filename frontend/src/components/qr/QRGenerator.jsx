@@ -29,14 +29,30 @@ const QRGenerator = () => {
 
     const handleDownload = () => {
         if (!qrRef.current) return;
-        const canvas = qrRef.current.querySelector('canvas');
-        const image = canvas.toDataURL('image/png');
+        
+        // Get SVG element
+        const svg = qrRef.current.querySelector('svg');
+        if (!svg) return;
+        
+        // Convert SVG to string
+        const svgData = new XMLSerializer().serializeToString(svg);
+        
+        // Create blob from SVG
+        const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
+        
+        // Create URL from blob
+        const url = URL.createObjectURL(svgBlob);
+        
+        // Create temp link and trigger download
         const link = document.createElement('a');
-        link.href = image;
-        link.download = 'qrcode.png';
+        link.href = url;
+        link.download = 'qrcode.svg';
         document.body.appendChild(link);
         link.click();
+        
+        // Cleanup
         document.body.removeChild(link);
+        URL.revokeObjectURL(url);
     };
 
     const handlePrint = () => {
@@ -55,17 +71,21 @@ const QRGenerator = () => {
         document.body.removeChild(frame);
     };
 
-    const handleSelect = (value) => {
-        setFormat(value);
-        setQrData('');
-        setShowQR(false);
-        if (value === 'wifi') {
-            setWifiConfig({
-                ssid: '',
-                password: '',
-                authentication: 'WPA',
-                hidden: false
-            });
+    const handleSelect = (event) => {
+        // Only process if we have a valid value
+        if (event && typeof event === 'object' && 'value' in event) {
+            console.log('Format changed to:', event.value);
+            setFormat(event.value);
+            setQrData('');
+            setShowQR(false);
+            if (event.value === 'wifi') {
+                setWifiConfig({
+                    ssid: '',
+                    password: '',
+                    authentication: 'WPA',
+                    hidden: false
+                });
+            }
         }
     };
 
@@ -79,11 +99,11 @@ const QRGenerator = () => {
                         { text: 'WiFi Configuration', value: 'wifi' }
                     ]}
                     value={format}
-                    onChange={(value) => handleSelect(value)}
+                    onChange={handleSelect}
                     label="Format"
                 />
 
-                {format === 'text' ? (
+                {format === 'text' && (
                     <div className="form-outline mt-2">
                         <MDBTextArea
                             id='qr-data'
@@ -93,7 +113,9 @@ const QRGenerator = () => {
                             label='Message'
                         />
                     </div>
-                ) : (
+                )}
+
+                {format === 'wifi' && (
                     <div className="mt-2">
                         <MDBInput
                             label='SSID (Network Name)'
