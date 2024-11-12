@@ -3,10 +3,14 @@ import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import dotenv from 'dotenv';
 import crypto from 'crypto';
+import ConfigLoader from '../utils/config.util.js';
 import { configSchema } from './validation.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
+
+// Initialize environment configuration
+ConfigLoader.init();
 
 class Config {
     static #instance;
@@ -24,7 +28,7 @@ class Config {
 
     #loadConfig() {
         dotenv.config();
-        
+
         // Dynamic import for secrets manager
         const getSecrets = async () => {
             const { default: SecretsManager } = await import('../utils/secrets.manager.js');
@@ -98,16 +102,16 @@ class Config {
                 }
             },
             server: {
-              port: parseInt(process.env.PORT) || 3000,
-              sslPort: parseInt(process.env.SPORT) || 3003,
-              sslKey: process.env.SSL_KEY_PATH,
-              sslCert: process.env.SSL_CERT_PATH,
-              sslChain: process.env.SSL_CHAIN_PATH,
-              sslTrustPath: process.env.SSL_TRUST_PATH,
-              cors: {
-                  origins: (process.env.CORS_ALLOWED_ORIGINS || '*').split(','),
-                  credentials: true
-              }
+                port: parseInt(process.env.PORT) || 3000,
+                sslPort: parseInt(process.env.SPORT) || 3003,
+                sslKey: process.env.SSL_KEY_PATH,
+                sslCert: process.env.SSL_CERT_PATH,
+                sslChain: process.env.SSL_CHAIN_PATH,
+                sslTrustPath: process.env.SSL_TRUST_PATH,
+                cors: {
+                    origins: (process.env.CORS_ALLOWED_ORIGINS || '*').split(','),
+                    credentials: true
+                }
             },
             storage: {
                 path: process.env.STORAGE_PATH || join(__dirname, '../../storage'),
@@ -120,6 +124,15 @@ class Config {
         if (error) {
             throw new Error(`Config validation error: ${error.message}`);
         }
+
+        // Add debug logging for database config
+        this.logger?.debug('Database configuration:', {
+            type: config.database.type,
+            host: config.database.host,
+            port: config.database.port,
+            database: config.database.database,
+            ssl: config.database.ssl
+        });
 
         return config;
     }
