@@ -5,6 +5,7 @@ import Login from './components/auth/Login';
 import Register from './components/auth/Register';
 import { AuthProvider } from './context/AuthContext';
 import QRGenerator from './components/qr/QRGenerator';
+import Templates from './components/templates/Templates';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
 
 function App() {
