@@ -17,7 +17,14 @@ export default function Navbar() {
   return (
     <MDBNavbar expand='lg' light bgColor='light'>
       <MDBContainer>
-        <MDBNavbarBrand href='/'>STasks</MDBNavbarBrand>
+        <MDBNavbarBrand href='/' className='navbar-brand mt-2 mt-lg-0'>
+          <img
+            src='/img/ptx_logo2.png'  // Static image path in public folder
+            height='15'              // Image height
+            alt='PTX Logo'           // Alt text
+            loading='lazy'           // Loading attribute
+          />
+        </MDBNavbarBrand>
         <MDBNavbarToggler
           onClick={() => setShowBasic(!showBasic)}
           aria-controls='navbarExample01'
@@ -28,10 +35,13 @@ export default function Navbar() {
         </MDBNavbarToggler>
         <MDBCollapse navbar show={showBasic}>
           <MDBNavbarNav right className='mb-2 mb-lg-0'>
-            <MDBNavbarItem>
+            <MDBNavbarItem >
               <MDBNavbarLink href='/tasks'>Tasks</MDBNavbarLink>
             </MDBNavbarItem>
-            <MDBNavbarItem>
+            <MDBNavbarItem >
+              <MDBNavbarLink href='/qr' >QR Code</MDBNavbarLink>
+            </MDBNavbarItem>
+            <MDBNavbarItem >
               <MDBNavbarLink href='/login'>Login</MDBNavbarLink>
             </MDBNavbarItem>
           </MDBNavbarNav>
