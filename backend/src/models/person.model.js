@@ -23,7 +23,11 @@ class Person extends BaseModel {
                 type: DataTypes.BOOLEAN,
                 defaultValue: false,
                 field: 'is_admin'
-            }
+            },
+            birthdate: {
+                type: DataTypes.DATEONLY,
+                allowNull: true,
+            },
         }, {
             sequelize,
             modelName: 'Person',

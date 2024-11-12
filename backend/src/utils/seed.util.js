@@ -1,6 +1,6 @@
-const { Task, Template, User } = require('../models');
-const Logger = require('../core/Logger');
-const argon2 = require('argon2');
+import { Task, Template, User, Person } from '../models/index.js';
+import Logger from '../core/Logger.js';
+import argon2 from 'argon2';
 const logger = Logger.getInstance();
 
 class Seeder {
@@ -11,6 +11,9 @@ class Seeder {
             // Always seed users first
             const users = await this.seedUsers();
             message += `${users.length} users added.\n`;
+
+            const persons = await this.seedPersons();
+            message += `${persons.length} persons added.\n`;
 
             // Then seed templates
             const templates = await this.seedTemplates();
@@ -28,24 +31,26 @@ class Seeder {
         }
     }
 
-    static async seedUsers() {
-        const users = [
+    static async seedPersons() {
+        const persons = [
             {
-                firstName: "Rick",
-                lastName: "Dawson",
-                username: "admin",
-                isAdmin: true,
-                password: await argon2.hash("admin")
+                firstName: "George",
+                lastName: "Dirschel",
+                birthdate: "1938-05-27"
             },
             {
-                firstName: "Rose",
-                lastName: "Ponzio",
-                username: "ponzior",
-                password: await argon2.hash("password")
+                firstName: "Kathy",
+                lastName: "Dirschel",
+                birthdate: "1942-06-15"
+            },
+            {
+                firstName: "Pat",
+                lastName: "Dawson",
+                birthdate: "1945-02-21"
             }
         ];
 
-        return await User.bulkCreate(users);
+        return await Person.bulkCreate(persons);
     }
 
     static async seedTemplates() {
@@ -115,6 +120,44 @@ class Seeder {
                     addedBy: "admin",
                     Templates: [dailyTemplate]
                 },
+                {
+                    name: "Clean Kitchen",
+                    description: "Wipe down kitchen counters, clean stove top, and clean microwave.",
+                    priority: 1,
+                    template: true,
+                    added_by: "admin",
+                    Templates: [dailyTemplate]
+                },
+                {
+                    name: "Vacuum first floor carpets",
+                    description: "Vacuum first floor rugs in living room, dining room, foyer, and both bedrooms.",
+                    priority: 1,
+                    template: true,
+                    added_by: "admin",
+                    Templates: [dailyTemplate]
+                },
+                {
+                    name: "Refill toilet paper",
+                    description: "Make sure there are at least two (2) extra rolls in each bathroom.\n" +
+                        "Refill toilet paper in:\n" +
+                        " * upstairs bathrooms\n" +
+                        " * downstairs bathroom\n" +
+                        " * downstairs powder room",
+                    priority: 1,
+                    template: true,
+                    added_by: "admin",
+                    Templates: [dailyTemplate]
+                },
+                {
+                    name: "Collect dirty laundry",
+                    description: "Collect dirty laundry from each senior's room.\n" +
+                        " * All laundry with urine on it goes into white baskets, not blue baskets.\n" +
+                        " * Wash dirty laundry on Sanitary cycle with bleach.",
+                    priority: 1,
+                    template: true,
+                    added_by: "admin",
+                    Templates: [dailyTemplate]
+                },
                 // Weekly Tasks
                 {
                     name: "Vacuum Entire House",
@@ -155,6 +198,16 @@ class Seeder {
                     template: true,
                     priority: 3,
                     addedBy: "admin",
+                    Templates: [monthlyTemplate]
+                },
+                {
+                    name: "Replace HVAC filters",
+                    description: "Replace HVAC Filters in:\n" +
+                        " * upstairs unit\n" +
+                        " * downstairs unit",
+                    priority: 1,
+                    template: true,
+                    added_by: "admin",
                     Templates: [monthlyTemplate]
                 },
                 // Morning Tasks
@@ -210,6 +263,27 @@ class Seeder {
             throw error;
         }
     }
+
+    static async seedUsers() {
+        const users = [
+            {
+                firstName: "Rick",
+                lastName: "Dawson",
+                username: "admin",
+                isAdmin: true,
+                password: await argon2.hash("admin")
+            },
+            {
+                firstName: "Rose",
+                lastName: "Ponzio",
+                username: "ponzior",
+                password: await argon2.hash("password")
+            }
+        ];
+
+        return await User.bulkCreate(users);
+    }
 }
 
-module.exports = Seeder;
+export { Seeder };
+export default Seeder;
