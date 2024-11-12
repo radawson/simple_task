@@ -4,6 +4,7 @@ import Dashboard from './components/dashboard/Dashboard';
 import Login from './components/auth/Login';
 import Register from './components/auth/Register';
 import { AuthProvider } from './context/AuthContext';
+import QRGenerator from './components/qr/QRGenerator';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
 
 function App() {
