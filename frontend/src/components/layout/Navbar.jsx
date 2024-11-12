@@ -8,50 +8,92 @@ import {
   MDBNavbarItem,
   MDBNavbarLink,
   MDBCollapse,
-  MDBIcon
+  MDBIcon,
+  MDBSideNav,
+  MDBSideNavItem,
+  MDBSideNavLink
 } from 'mdb-react-ui-kit';
 
 export default function Navbar() {
-  const [showBasic, setShowBasic] = useState(false);
+  const [showSidenav, setShowSidenav] = useState(false);
+
+  const toggleSidenav = () => {
+    setShowSidenav(!showSidenav);
+  };
 
   return (
-    <MDBNavbar expand='lg' light bgColor='light'>
-      <MDBContainer>
-        <MDBNavbarBrand href='/' className='navbar-brand mt-2 mt-lg-0'>
-          <img
-            src='/img/ptx_logo2.png'  // Static image path in public folder
-            height='15'              // Image height
-            alt='PTX Logo'           // Alt text
-            loading='lazy'           // Loading attribute
-          />
-        </MDBNavbarBrand>
-        <MDBNavbarToggler
-          onClick={() => setShowBasic(!showBasic)}
-          aria-controls='navbarExample01'
-          aria-expanded={showBasic ? 'true' : 'false'}
-          aria-label='Toggle navigation'
-        >
-          <MDBIcon icon='bars' fas />
-        </MDBNavbarToggler>
-        <MDBCollapse navbar show={showBasic.toString()}>
-          <MDBNavbarNav className='mb-2 mb-lg-0'>
-            <MDBNavbarItem>
-              <MDBNavbarLink href='/tasks'>Tasks</MDBNavbarLink>
-            </MDBNavbarItem>
-            <MDBNavbarItem>
-              <MDBNavbarLink href='/templates'>Templates</MDBNavbarLink>
-            </MDBNavbarItem>
-            <MDBNavbarItem>
-              <MDBNavbarLink href='/qr'>QR Code</MDBNavbarLink>
-            </MDBNavbarItem>
-          </MDBNavbarNav>
-          <MDBNavbarNav right>
-            <MDBNavbarItem>
-              <MDBNavbarLink href='/login'>Login</MDBNavbarLink>
-            </MDBNavbarItem>
-          </MDBNavbarNav>
-        </MDBCollapse>
-      </MDBContainer>
-    </MDBNavbar>
+    <>
+      <MDBNavbar expand='lg' light bgColor='light'>
+        <MDBContainer>
+          <MDBNavbarBrand href='/' className='navbar-brand mt-2 mt-lg-0'>
+            <img
+              src='/img/ptx_logo2.png'
+              height='15'
+              alt='PTX Logo'
+              loading='lazy'
+            />
+          </MDBNavbarBrand>
+          <MDBNavbarToggler
+            type='button'
+            onClick={toggleSidenav}
+            aria-expanded='false'
+            aria-label='Toggle navigation'
+          >
+            <MDBIcon icon='bars' fas />
+          </MDBNavbarToggler>
+
+          {/* Desktop Navigation */}
+          <MDBCollapse navbar show={false}>
+            <MDBNavbarNav className='mb-2 mb-lg-0'>
+              <MDBNavbarItem>
+                <MDBNavbarLink href='/tasks'>Tasks</MDBNavbarLink>
+              </MDBNavbarItem>
+              <MDBNavbarItem>
+                <MDBNavbarLink href='/templates'>Templates</MDBNavbarLink>
+              </MDBNavbarItem>
+              <MDBNavbarItem>
+                <MDBNavbarLink href='/qr'>QR Code</MDBNavbarLink>
+              </MDBNavbarItem>
+            </MDBNavbarNav>
+            <MDBNavbarNav right>
+              <MDBNavbarItem>
+                <MDBNavbarLink href='/login'>Login</MDBNavbarLink>
+              </MDBNavbarItem>
+            </MDBNavbarNav>
+          </MDBCollapse>
+        </MDBContainer>
+      </MDBNavbar>
+
+      {/* Sidenav */}
+      <MDBSideNav
+        isOpen={showSidenav}
+        setOpen={setShowSidenav}
+        position='end'
+        closeOnEsc={true}
+      >
+        <div className='p-3'>
+          <MDBSideNavItem>
+            <MDBSideNavLink href='/tasks'>
+              <MDBIcon fas icon='tasks' className='me-2'/> Tasks
+            </MDBSideNavLink>
+          </MDBSideNavItem>
+          <MDBSideNavItem>
+            <MDBSideNavLink href='/templates'>
+              <MDBIcon fas icon='clipboard-list' className='me-2'/> Templates
+            </MDBSideNavLink>
+          </MDBSideNavItem>
+          <MDBSideNavItem>
+            <MDBSideNavLink href='/qr'>
+              <MDBIcon fas icon='qrcode' className='me-2'/> QR Code
+            </MDBSideNavLink>
+          </MDBSideNavItem>
+          <MDBSideNavItem>
+            <MDBSideNavLink href='/login'>
+              <MDBIcon fas icon='sign-in-alt' className='me-2'/> Login
+            </MDBSideNavLink>
+          </MDBSideNavItem>
+        </div>
+      </MDBSideNav>
+    </>
   );
 }
