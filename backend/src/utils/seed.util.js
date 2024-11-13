@@ -5,33 +5,33 @@ const logger = Logger.getInstance();
 
 class Seeder {
     static async seedDatabase() {
-        let message = "Database seeded with:\n";
+        let stats = {
+            users: { added: 0, existing: 0 },
+            persons: { added: 0, existing: 0 },
+            templates: { added: 0, existing: 0 },
+            tasks: { added: 0, existing: 0 }
+        };
 
         try {
-            // Always seed users first
-            const users = await this.seedUsers();
-            message += `${users.length} users added.\n`;
+            await this.seedUsers(stats.users);
+            await this.seedPersons(stats.persons);
+            await this.seedTemplates(stats.templates);
+            await this.seedTasks(stats.tasks);
 
-            const persons = await this.seedPersons();
-            message += `${persons.length} persons added.\n`;
+            const message = Object.entries(stats)
+                .map(([type, count]) =>
+                    `${type}: ${count.added} added, ${count.existing} existing`)
+                .join('\n');
 
-            // Then seed templates
-            const templates = await this.seedTemplates();
-            message += `${templates.length} templates added.\n`;
-
-            // Finally seed tasks
-            const tasks = await this.seedTasks();
-            message += `${tasks.length} tasks added.\n`;
-
-            logger.info(message);
-            return { success: true, message };
+            logger.info(`Database seeding completed:\n${message}`);
+            return { success: true, stats };
         } catch (error) {
             logger.error(`Seed failed: ${error.message}`);
             throw error;
         }
     }
 
-    static async seedPersons() {
+    static async seedPersons(stats) {
         const persons = [
             {
                 firstName: "George",
@@ -50,10 +50,24 @@ class Seeder {
             }
         ];
 
-        return await Person.bulkCreate(persons);
+        for (const person of persons) {
+            const [result, created] = await Person.findOrCreate({
+                where: {
+                    firstName: person.firstName,
+                    lastName: person.lastName
+                },
+                defaults: person
+            });
+
+            if (created) {
+                stats.added++;
+            } else {
+                stats.existing++;
+            }
+        }
     }
 
-    static async seedTemplates() {
+    static async seedTemplates(stats) {
         const templateNames = [
             "Daily Tasks",
             "Monday Tasks",
@@ -69,29 +83,40 @@ class Seeder {
             "Afternoon Tasks"
         ];
 
-        const templates = templateNames.map(name => ({ name }));
-        return await Template.bulkCreate(templates);
+        for (const name of templateNames) {
+            const [template, created] = await Template.findOrCreate({
+                where: { name },
+                defaults: { name }
+            });
+
+            if (created) {
+                stats.added++;
+            } else {
+                stats.existing++;
+            }
+        }
     }
 
-    static async seedTasks() {
+    static async seedTasks(stats) {
         try {
-            // Get templates with error checking
-            const templates = await Promise.all([
-                Template.findOne({ where: { name: 'Daily Tasks' } }),
-                Template.findOne({ where: { name: 'Weekly Tasks' } }),
-                Template.findOne({ where: { name: 'Monthly Tasks' } }),
-                Template.findOne({ where: { name: 'Morning Tasks' } }),
-                Template.findOne({ where: { name: 'Afternoon Tasks' } })
-            ]);
+            const templates = await Template.findAll({
+                where: {
+                    name: [
+                        'Daily Tasks',
+                        'Weekly Tasks',
+                        'Monthly Tasks',
+                        'Morning Tasks',
+                        'Afternoon Tasks'
+                    ]
+                }
+            });
 
-            // Verify all templates exist
-            const [dailyTemplate, weeklyTemplate, monthlyTemplate, morningTemplate, afternoonTemplate] = templates;
+            const templateMap = templates.reduce((acc, template) => {
+                acc[template.name] = template;
+                return acc;
+            }, {});
 
-            if (!dailyTemplate || !weeklyTemplate || !monthlyTemplate || !morningTemplate || !afternoonTemplate) {
-                throw new Error('Required templates not found. Please ensure templates are seeded first.');
-            }
-
-            const tasks = [
+            const seedTasks = [
                 // Daily Tasks
                 {
                     name: "Clean Cat Litter",
@@ -99,7 +124,7 @@ class Seeder {
                     template: true,
                     priority: 1,
                     addedBy: "admin",
-                    TemplateId: dailyTemplate.id  // Use TemplateId instead of Templates array
+                    templateName: "Daily Tasks" 
                 },
                 {
                     name: "Pick Up Dishes",
@@ -107,7 +132,7 @@ class Seeder {
                     template: true,
                     priority: 1,
                     addedBy: "admin",
-                    Templates: [dailyTemplate]
+                    templateName: "Daily Tasks"
                 },
                 {
                     name: "Take Out Trash",
@@ -118,7 +143,7 @@ class Seeder {
                     template: true,
                     priority: 1,
                     addedBy: "admin",
-                    Templates: [dailyTemplate]
+                    templateName: "Daily Tasks"
                 },
                 {
                     name: "Clean Kitchen",
@@ -126,7 +151,7 @@ class Seeder {
                     priority: 1,
                     template: true,
                     added_by: "admin",
-                    Templates: [dailyTemplate]
+                    templateName: "Daily Tasks"
                 },
                 {
                     name: "Vacuum first floor carpets",
@@ -134,7 +159,7 @@ class Seeder {
                     priority: 1,
                     template: true,
                     added_by: "admin",
-                    Templates: [dailyTemplate]
+                    templateName: "Daily Tasks"
                 },
                 {
                     name: "Refill toilet paper",
@@ -146,7 +171,7 @@ class Seeder {
                     priority: 1,
                     template: true,
                     added_by: "admin",
-                    Templates: [dailyTemplate]
+                    templateName: "Daily Tasks"
                 },
                 {
                     name: "Collect dirty laundry",
@@ -156,7 +181,7 @@ class Seeder {
                     priority: 1,
                     template: true,
                     added_by: "admin",
-                    Templates: [dailyTemplate]
+                    templateName: "Daily Tasks"
                 },
                 // Weekly Tasks
                 {
@@ -165,7 +190,7 @@ class Seeder {
                     template: true,
                     priority: 2,
                     addedBy: "admin",
-                    Templates: [weeklyTemplate]
+                    templateName: "Weekly Tasks"
                 },
                 {
                     name: "Clean Bathrooms",
@@ -173,7 +198,7 @@ class Seeder {
                     template: true,
                     priority: 2,
                     addedBy: "admin",
-                    Templates: [weeklyTemplate]
+                    templateName: "Weekly Tasks"
                 },
                 {
                     name: "Change Bed Linens",
@@ -181,7 +206,7 @@ class Seeder {
                     template: true,
                     priority: 2,
                     addedBy: "admin",
-                    Templates: [weeklyTemplate]
+                    templateName: "Weekly Tasks"
                 },
                 // Monthly Tasks
                 {
@@ -190,7 +215,7 @@ class Seeder {
                     template: true,
                     priority: 3,
                     addedBy: "admin",
-                    Templates: [monthlyTemplate]
+                    templateName: "Monthly Tasks"
                 },
                 {
                     name: "Deep Clean Kitchen",
@@ -198,7 +223,7 @@ class Seeder {
                     template: true,
                     priority: 3,
                     addedBy: "admin",
-                    Templates: [monthlyTemplate]
+                    templateName: "Monthly Tasks"
                 },
                 {
                     name: "Replace HVAC filters",
@@ -208,7 +233,7 @@ class Seeder {
                     priority: 1,
                     template: true,
                     added_by: "admin",
-                    Templates: [monthlyTemplate]
+                    templateName: "Monthly Tasks"
                 },
                 // Morning Tasks
                 {
@@ -217,7 +242,7 @@ class Seeder {
                     template: true,
                     priority: 1,
                     addedBy: "admin",
-                    Templates: [morningTemplate]
+                    templateName: "Morning Tasks"
                 },
                 {
                     name: "Empty Dishwasher",
@@ -225,7 +250,7 @@ class Seeder {
                     template: true,
                     priority: 1,
                     addedBy: "admin",
-                    Templates: [morningTemplate]
+                    templateName: "Morning Tasks"
                 },
                 // Afternoon Tasks
                 {
@@ -234,7 +259,7 @@ class Seeder {
                     template: true,
                     priority: 1,
                     addedBy: "admin",
-                    Templates: [afternoonTemplate]
+                    templateName: "Afternoon Tasks"
                 },
                 {
                     name: "Wipe Counters",
@@ -242,46 +267,85 @@ class Seeder {
                     template: true,
                     priority: 1,
                     addedBy: "admin",
-                    Templates: [afternoonTemplate]
+                    templateName: "Afternoon Tasks"
                 }
             ];
 
-            // Create tasks without including Template association
-            const createdTasks = await Task.bulkCreate(tasks);
+            for (const taskData of seedTasks) {
+                const template = templateMap[taskData.templateName];
 
-            // Add template associations separately
-            for (const task of createdTasks) {
-                const template = templates.find(t => t.id === task.TemplateId);
-                if (template) {
-                    await task.addTemplate(template);
+                if (!template) {
+                    logger.warn(`Template "${taskData.templateName}" not found for task "${taskData.name}"`);
+                    continue;
+                }
+
+                const { templateName, ...taskDetails } = taskData;
+
+                try {
+                    const [task, created] = await Task.findOrCreate({
+                        where: {
+                            name: taskData.name,
+                            template: true,
+                            templateId: template.id
+                        },
+                        defaults: {
+                            ...taskDetails,
+                            templateId: template.id
+                        }
+                    });
+
+                    if (created) {
+                        stats.added++;
+                        logger.debug(`Created task: ${task.name}`);
+                    } else {
+                        stats.existing++;
+                        logger.debug(`Task exists: ${task.name}`);
+                    }
+                } catch (error) {
+                    logger.error(`Failed to create task "${taskData.name}": ${error.message}`);
                 }
             }
-
-            return createdTasks;
         } catch (error) {
-            logger.error(`Failed to seed tasks: ${error.message}`);
+            logger.error('Task seeding failed:', error);
             throw error;
         }
     }
 
-    static async seedUsers() {
+    static async seedUsers(stats) {
         const users = [
             {
-                firstName: "Rick",
-                lastName: "Dawson",
+                firstName: "Admin",
+                lastName: "User",
                 username: "admin",
                 isAdmin: true,
                 password: await argon2.hash("admin")
             },
             {
-                firstName: "Rose",
-                lastName: "Ponzio",
-                username: "ponzior",
+                firstName: "Shakeem",
+                lastName: "Bembridge",
+                username: "bembridges",
                 password: await argon2.hash("password")
-            }
+            },
+            {
+                firstName: "Mervat",
+                lastName: "Malak",
+                username: "malakm",
+                password: await argon2.hash("password")
+            },
         ];
 
-        return await User.bulkCreate(users);
+        for (const user of users) {
+            const [result, created] = await User.findOrCreate({
+                where: { username: user.username },
+                defaults: user
+            });
+
+            if (created) {
+                stats.added++;
+            } else {
+                stats.existing++;
+            }
+        }
     }
 }
 
