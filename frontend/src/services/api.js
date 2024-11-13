@@ -1,7 +1,7 @@
+// src/services/api.js
 import axios from 'axios';
 import { AuthService } from './auth.service';
 
-// For development environment only
 const isDev = import.meta.env.DEV;
 
 const api = axios.create({
@@ -9,22 +9,16 @@ const api = axios.create({
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json'
-  },
-  // Handle SSL verification only in development
-  ...(isDev && {
-    proxy: false,
-    httpsAgent: false
-  })
+  }
 });
 
-// Request interceptor for API calls
+// Request interceptor
 api.interceptors.request.use(
   (config) => {
-    const token = AuthService.getCurrentToken();
+    const token = AuthService.getToken();
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
-    // Log in development
     if (isDev) {
       console.log('Making request to:', config.baseURL + config.url);
     }
@@ -36,20 +30,15 @@ api.interceptors.request.use(
   }
 );
 
-// Response interceptor for API calls
+// Response interceptor
 api.interceptors.response.use(
   (response) => response,
-  (error) => {
-    const errorDetails = {
-      url: error.config?.url,
-      baseURL: error.config?.baseURL,
-      status: error.response?.status,
-      message: error.message
-    };
-    
-    // In development, log more details
-    if (isDev) {
-      console.error('API Error:', errorDetails);
+  async (error) => {
+    if (error.response?.status === 401) {
+      // Token expired or invalid
+      AuthService.logout();
+      window.location.href = '/login';
+      return Promise.reject(new Error('Authentication required'));
     }
     return Promise.reject(error);
   }
@@ -60,9 +49,18 @@ export const ApiService = {
   getTasks: (date) => api.get(`/tasks/date/${date}`),
   createTask: (task) => api.post('/tasks', task),
   updateTask: (id, task) => api.put(`/tasks/${id}`, task),
+  deleteTask: (id) => api.delete(`/tasks/${id}`),
 
-  // Task Templates
+  // Templates
   getTemplates: () => api.get('/templates'),
+  createTemplate: (template) => api.post('/templates', template),
+  updateTemplate: (id, template) => api.put(`/templates/${id}`, template),
+  deleteTemplate: (id) => api.delete(`/templates/${id}`),
+
+  // Auth
+  login: (credentials) => api.post('/auth/login', credentials),
+  register: (userData) => api.post('/auth/register', userData),
+  refreshToken: () => api.post('/auth/refresh'),
   
   // Events
   getEvents: (date) => api.get(`/events/date/${date}`),
