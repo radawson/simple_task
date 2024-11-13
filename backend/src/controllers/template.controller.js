@@ -3,84 +3,6 @@ import Logger from '../core/Logger.js';
 const logger = Logger.getInstance();
 
 class TemplateController {
-    async list(req, res) {
-        try {
-            const templates = await Template.findAll({
-                include: [{
-                    model: Task,
-                    through: { attributes: [] }
-                }]
-            });
-            logger.info('Templates listed successfully');
-            res.json(templates);
-        } catch (error) {
-            logger.error(`Template listing failed: ${error.message}`);
-            res.status(500).json({ message: 'Failed to list templates' });
-        }
-    }
-
-    async create(req, res) {
-        try {
-            const template = await Template.create({
-                ...req.body,
-                addedBy: req.user.username
-            });
-            logger.info(`Template created: ${template.id}`);
-            res.status(201).json(template);
-        } catch (error) {
-            logger.error(`Template creation failed: ${error.message}`);
-            res.status(400).json({ message: 'Failed to create template' });
-        }
-    }
-
-    async get(req, res) {
-        try {
-            const template = await Template.findByPk(req.params.id, {
-                include: [{
-                    model: Task,
-                    through: { attributes: [] }
-                }]
-            });
-            if (!template) {
-                return res.status(404).json({ message: 'Template not found' });
-            }
-            res.json(template);
-        } catch (error) {
-            logger.error(`Template retrieval failed: ${error.message}`);
-            res.status(500).json({ message: 'Failed to get template' });
-        }
-    }
-
-    async update(req, res) {
-        try {
-            const template = await Template.findByPk(req.params.id);
-            if (!template) {
-                return res.status(404).json({ message: 'Template not found' });
-            }
-            await template.update(req.body);
-            logger.info(`Template updated: ${template.id}`);
-            res.json(template);
-        } catch (error) {
-            logger.error(`Template update failed: ${error.message}`);
-            res.status(400).json({ message: 'Failed to update template' });
-        }
-    }
-
-    async delete(req, res) {
-        try {
-            const template = await Template.findByPk(req.params.id);
-            if (!template) {
-                return res.status(404).json({ message: 'Template not found' });
-            }
-            await template.destroy();
-            logger.info(`Template deleted: ${template.id}`);
-            res.status(204).send();
-        } catch (error) {
-            logger.error(`Template deletion failed: ${error.message}`);
-            res.status(500).json({ message: 'Failed to delete template' });
-        }
-    }
-
     async addTask(req, res) {
         try {
             const { templateId, taskId } = req.body;
@@ -100,10 +22,61 @@ class TemplateController {
         }
     }
 
+    async create(req, res) {
+        try {
+            const template = await Template.create({
+                ...req.body,
+                addedBy: req.user.username
+            });
+            logger.info(`Template created: ${template.id}`);
+            res.status(201).json(template);
+        } catch (error) {
+            logger.error(`Template creation failed: ${error.message}`);
+            res.status(400).json({ message: 'Failed to create template' });
+        }
+    }
+
+    
+    async delete(req, res) {
+        try {
+            const template = await Template.findByPk(req.params.id);
+            if (!template) {
+                return res.status(404).json({ message: 'Template not found' });
+            }
+            await template.destroy();
+            logger.info(`Template deleted: ${template.id}`);
+            res.status(204).send();
+        } catch (error) {
+            logger.error(`Template deletion failed: ${error.message}`);
+            res.status(500).json({ message: 'Failed to delete template' });
+        }
+    }
+
+    async get(req, res) {
+        try {
+            const template = await Template.findByPk(req.params.id, {
+                include: [{
+                    model: Task,
+                    as: 'tasks' // Match association alias
+                }]
+            });
+            if (!template) {
+                return res.status(404).json({ message: 'Template not found' });
+            }
+            res.json(template);
+        } catch (error) {
+            logger.error(`Template retrieval failed: ${error.message}`);
+            res.status(500).json({ message: 'Failed to get template' });
+        }
+    }
+
     async generateTasks(req, res) {
         try {
             const template = await Template.findByPk(req.params.id, {
-                include: [Task]
+                include: [{
+                    model: Task,
+                    as: 'tasks' // Match association alias
+                }]
             });
 
             if (!template) {
@@ -128,6 +101,22 @@ class TemplateController {
         } catch (error) {
             logger.error(`Task generation failed: ${error.message}`);
             res.status(500).json({ message: 'Failed to generate tasks' });
+        }
+    }
+
+    async list(req, res) {
+        try {
+            const templates = await Template.findAll({
+                include: [{
+                    model: Task,
+                    as: 'tasks' // Match association alias
+                }]
+            });
+            logger.info('Templates listed successfully');
+            res.json(templates);
+        } catch (error) {
+            logger.error(`Template listing failed: ${error.message}`);
+            res.status(500).json({ message: 'Failed to list templates' });
         }
     }
 
@@ -160,6 +149,21 @@ class TemplateController {
                 message: 'Failed to remove task from template',
                 error: error.message
             });
+        }
+    }
+
+    async update(req, res) {
+        try {
+            const template = await Template.findByPk(req.params.id);
+            if (!template) {
+                return res.status(404).json({ message: 'Template not found' });
+            }
+            await template.update(req.body);
+            logger.info(`Template updated: ${template.id}`);
+            res.json(template);
+        } catch (error) {
+            logger.error(`Template update failed: ${error.message}`);
+            res.status(400).json({ message: 'Failed to update template' });
         }
     }
 }

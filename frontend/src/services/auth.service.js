@@ -1,3 +1,4 @@
+// src/services/auth.service.js
 import axios from 'axios';
 import authConfig from '../config/auth.config';
 
@@ -47,5 +48,11 @@ export const AuthService = {
 
   getCurrentToken() {
     return localStorage.getItem('token');
+  },
+
+  // Add alias for consistency with api.js
+  getToken() {
+    return this.getCurrentToken();
   }
+  
 };
