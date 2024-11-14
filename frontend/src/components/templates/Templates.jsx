@@ -96,7 +96,9 @@ const Templates = () => {
                                     {template.tasks?.map(task => (
                                         <MDBAccordionItem
                                             key={task.id}
-                                            collapseId={`task-${task.id}`}  // Add required collapseId
+                                            collapseId={`task-${task.id}`}  
+                                            buttonId={`task-button-${task.id}`}  
+                                            buttomA
                                             title={  
                                                 <div className="d-flex justify-content-between align-items-center">
                                                     <MDBCheckbox
