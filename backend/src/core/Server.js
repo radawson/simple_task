@@ -49,12 +49,12 @@ class Server {
     async loadTrustedCertificates(trustPath) {
         try {
             const files = await fs.readdir(trustPath);
-            const certFiles = files.filter(file => 
-                file.endsWith('.crt') || 
-                file.endsWith('.pem') || 
+            const certFiles = files.filter(file =>
+                file.endsWith('.crt') ||
+                file.endsWith('.pem') ||
                 file.endsWith('.cer')
             );
-    
+
             for (const certFile of certFiles) {
                 try {
                     await certUtil.addTrustedRoot(join(trustPath, certFile));
@@ -63,7 +63,7 @@ class Server {
                     this.logger.warn(`Failed to load trusted certificate ${certFile}: ${error.message}`);
                 }
             }
-    
+
             this.logger.info(`Loaded ${certFiles.length} trusted certificates`);
         } catch (error) {
             this.logger.warn(`Failed to load trusted certificates from ${trustPath}: ${error.message}`);
@@ -93,19 +93,14 @@ class Server {
         this.logger.debug('HTTP request logging configured');
 
         // CORS setup
-        const corsOptions = {
-            origin: (origin, callback) => {
-                if (!origin || (this.config.cors?.origins || []).includes(origin)) {
-                    callback(null, true);
-                } else {
-                    callback(new Error('Not allowed by CORS'));
-                }
-            },
-            credentials: this.config.cors?.credentials || false
-        };
-
+        const { createCorsMiddleware } = await import('../config/cors.config.js');
+        const corsOptions = createCorsMiddleware(this.config);
         this.app.use(cors(corsOptions));
-        this.logger.debug(`CORS configured with origins: ${JSON.stringify(this.config.cors?.origins || [])}`);
+
+        this.logger.debug('CORS configured:', {
+            origins: this.config.server.cors.origins,
+            credentials: this.config.server.cors.credentials
+        });
 
         // Request parsing
         this.app.use(express.json({

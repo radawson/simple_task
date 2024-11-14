@@ -2,6 +2,7 @@ project/
 ├── backend/
 │   ├── src/
 │   │   ├── config/
+│   │   │   ├── cors.config.js
 │   │   │   ├── database.config.js
 │   │   │   ├── logger.config.js
 │   │   │   ├── server.config.js
@@ -28,7 +29,6 @@ project/
 │   │   │   └── Storage.js
 │   │   ├── middleware/
 │   │   │   ├── auth.middleware.js
-│   │   │   ├── cors.middleware.js
 │   │   │   ├── error.middleware.js
 │   │   │   ├── jwt.middleware.js
 │   │   │   ├── logger.middleware.js

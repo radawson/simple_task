@@ -108,8 +108,12 @@ class Config {
                 sslCert: process.env.SSL_CERT_PATH,
                 sslChain: process.env.SSL_CHAIN_PATH,
                 sslTrustPath: process.env.SSL_TRUST_PATH,
-                cors: {
-                    origins: (process.env.CORS_ALLOWED_ORIGINS || '*').split(','),
+                cors: {  
+                    origins: process.env.CORS_ALLOWED_ORIGINS ? 
+                        process.env.CORS_ALLOWED_ORIGINS.split(',')
+                            .map(origin => origin.trim())
+                            .filter(Boolean) : 
+                        ['http://localhost:3000'],
                     credentials: true
                 }
             },

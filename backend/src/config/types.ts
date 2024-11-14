@@ -1,3 +1,4 @@
+//src/config/types.ts
 export interface DatabaseConfig {
     type: 'sqlite' | 'postgres';
     host?: string;
