@@ -44,6 +44,15 @@ class Server {
                 }
             };
         }
+        // Configure proxy trust based on config
+        if (config.server.proxy.trust !== undefined) {
+            this.app.set('trust proxy', config.server.proxy.trust);
+            this.logger.info('Proxy trust configured:', {
+                trustSetting: config.server.proxy.trust,
+                trustedIPs: config.server.proxy.proxyIPs
+            });
+        }
+
     }
 
     async loadTrustedCertificates(trustPath) {

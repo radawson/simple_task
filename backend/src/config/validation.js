@@ -107,11 +107,30 @@ export const configSchema = Joi.object({
         sslKey: Joi.string().required(),
         sslCert: Joi.string().required(),
         sslChain: Joi.string(),
-        sslTrustPath: Joi.string(),  // Added trust path
+        sslTrustPath: Joi.string(),
         cors: Joi.object({
             origins: Joi.array().items(Joi.string()).required(),
             credentials: Joi.boolean().required()
-        }).required()
+        }).required(),
+        proxy: Joi.object({
+            enabled: Joi.boolean().default(false),
+            trust: Joi.alternatives().try(
+                Joi.boolean(),
+                Joi.number().min(0),
+                Joi.array().items(Joi.string()),
+                Joi.function()
+            ).default(false),
+            proxyIPs: Joi.array().items(Joi.string())
+                .when('enabled', {
+                    is: true,
+                    then: Joi.required(),
+                    otherwise: Joi.optional()
+                })
+        }).default({
+            enabled: false,
+            trust: false,
+            proxyIPs: []
+        })
     }).required(),
     storage: Joi.object({
         path: Joi.string().required(),
