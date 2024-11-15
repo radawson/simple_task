@@ -120,12 +120,11 @@ export const configSchema = Joi.object({
                 Joi.array().items(Joi.string()),
                 Joi.function()
             ).default(false),
-            proxyIPs: Joi.array().items(Joi.string())
-                .when('enabled', {
-                    is: true,
-                    then: Joi.required(),
-                    otherwise: Joi.optional()
-                })
+            proxyIPs: Joi.when('enabled', {
+                is: true,
+                then: Joi.array().items(Joi.string()).required(),
+                otherwise: Joi.array().items(Joi.string()).optional()
+            })
         }).default({
             enabled: false,
             trust: false,

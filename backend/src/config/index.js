@@ -85,11 +85,6 @@ class Config {
                 pkce: true,
                 timeout: parseInt(process.env.OIDC_TIMEOUT) || 5000
             },
-            proxy: {
-                trust: process.env.NODE_ENV === 'production' ? 1 : false,
-                proxyIPs: process.env.TRUSTED_PROXIES ?
-                    process.env.TRUSTED_PROXIES.split(',') : []
-            },
             security: {
                 rateLimiting: {
                     windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS) || 900000,
@@ -114,12 +109,13 @@ class Config {
                 sslChain: process.env.SSL_CHAIN_PATH,
                 sslTrustPath: process.env.SSL_TRUST_PATH,
                 cors: {
-                    origins: process.env.CORS_ALLOWED_ORIGINS ?
-                        process.env.CORS_ALLOWED_ORIGINS.split(',')
-                            .map(origin => origin.trim())
-                            .filter(Boolean) :
-                        ['http://localhost:3000'],
+                    origins: (process.env.CORS_ALLOWED_ORIGINS || '').split(',').filter(Boolean),
                     credentials: true
+                },
+                proxy: {
+                    enabled: process.env.TRUSTED_PROXIES ? true : false,
+                    trust: process.env.TRUSTED_PROXIES ? 1 : false,
+                    proxyIPs: (process.env.TRUSTED_PROXIES || '').split(',').filter(Boolean)
                 }
             },
             storage: {
