@@ -1,77 +1,117 @@
 // src/components/templates/Templates.jsx
 import React, { useState, useEffect } from 'react';
 import {
-    MDBCarousel,
-    MDBCarouselItem,
-    MDBAccordion,
-    MDBAccordionItem,
-    MDBCheckbox,
+    MDBContainer,
+    MDBDatatable,
+    MDBSelect,
+    MDBInput,
     MDBBtn,
-    MDBInput
+    MDBIcon
 } from 'mdb-react-ui-kit';
 import { ApiService } from '../../services/api';
 import { formatLocalDate } from '../../utils/dateUtils';
 
 const Templates = () => {
     const [templates, setTemplates] = useState([]);
+    const [selectedTemplate, setSelectedTemplate] = useState('0');
     const [selectedDate, setSelectedDate] = useState(formatLocalDate());
-    const [selectedTasks, setSelectedTasks] = useState({});
+    const [selectedTasks, setSelectedTasks] = useState(new Set());
+    const [tableData, setTableData] = useState({
+        columns: [
+            { label: 'Name', field: 'name', width: 200 },
+            { label: 'Description', field: 'description', width: 300 },
+            { label: 'Priority', field: 'priority', width: 100 },
+            { label: 'Actions', field: 'actions', width: 100 }
+        ],
+        rows: []
+    });
 
     useEffect(() => {
         const fetchTemplates = async () => {
             const response = await ApiService.getTemplates();
             setTemplates(response.data);
-            // Initialize selected tasks tracking
-            const initialSelected = {};
-            response.data.forEach(template => {
-                initialSelected[template.id] = new Set();
-            });
-            setSelectedTasks(initialSelected);
         };
         fetchTemplates();
     }, []);
 
-    const handleTaskToggle = (templateId, taskId) => {
-        setSelectedTasks(prev => {
-            const updated = { ...prev };
-            if (updated[templateId].has(taskId)) {
-                updated[templateId].delete(taskId);
-            } else {
-                updated[templateId].add(taskId);
-            }
-            return updated;
-        });
+    const handleTemplateChange = async (templateId) => {
+        setSelectedTemplate(templateId);
+        if (templateId === '0') {
+            // Show all tasks from all templates
+            const allTasks = templates.flatMap(template => 
+                template.tasks.map(task => ({
+                    ...task,
+                    actions: createActionButtons(task)
+                }))
+            );
+            setTableData(prev => ({ ...prev, rows: allTasks }));
+        } else {
+            const template = templates.find(t => t.id === Number(templateId));
+            const templateTasks = template?.tasks.map(task => ({
+                ...task,
+                actions: createActionButtons(task)
+            })) || [];
+            setTableData(prev => ({ ...prev, rows: templateTasks }));
+        }
     };
 
+    const createActionButtons = (task) => (
+        <div>
+            <MDBBtn 
+                floating 
+                size="sm" 
+                color="primary" 
+                className="me-1"
+                onClick={() => handleEdit(task.id)}
+            >
+                <MDBIcon icon="edit" />
+            </MDBBtn>
+            <MDBBtn 
+                floating 
+                size="sm" 
+                color="danger"
+                onClick={() => handleDelete(task.id)}
+            >
+                <MDBIcon icon="trash" />
+            </MDBBtn>
+        </div>
+    );
+
     const handleAddToTasks = async () => {
-        // Collect all selected tasks
-        const tasksToAdd = [];
-        Object.entries(selectedTasks).forEach(([templateId, taskIds]) => {
-            const template = templates.find(t => t.id === Number(templateId));
-            if (template) {
-                template.tasks.forEach(task => {
-                    if (taskIds.has(task.id)) {
-                        tasksToAdd.push({
-                            name: task.name,
-                            description: task.description,
-                            date: selectedDate,
-                            priority: task.priority || 0
-                        });
-                    }
-                });
-            }
+        const tasksToAdd = Array.from(selectedTasks).map(taskId => {
+            const task = tableData.rows.find(t => t.id === taskId);
+            return {
+                name: task.name,
+                description: task.description,
+                date: selectedDate,
+                priority: task.priority || 0
+            };
         });
 
-        // Bulk create tasks
         await Promise.all(tasksToAdd.map(task => ApiService.createTask(task)));
+        setSelectedTasks(new Set());
     };
 
     return (
-        <div className="container py-5">
+        <MDBContainer className="py-5">
             <h1>Template Management</h1>
 
             <div className="row mb-4">
-                <div className="col-md-6">
+                <div className="col-md-4">
+                    <select 
+                        className="form-select" 
+                        value={selectedTemplate}
+                        onChange={(e) => handleTemplateChange(e.target.value)}
+                    >
+                        <option value="0">All Templates</option>
+                        {templates.map(template => (
+                            <option key={template.id} value={template.id}>
+                                {template.name}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+                <div className="col-md-4">
                     <MDBInput
                         type="date"
                         value={selectedDate}
@@ -79,49 +119,27 @@ const Templates = () => {
                         label="Target Date"
                     />
                 </div>
-                <div className="col-md-6">
-                    <MDBBtn onClick={handleAddToTasks}>Add to Tasks</MDBBtn>
+                <div className="col-md-4">
+                    <MDBBtn 
+                        onClick={handleAddToTasks}
+                        disabled={selectedTasks.size === 0}
+                    >
+                        Add Selected to Tasks
+                    </MDBBtn>
                 </div>
             </div>
 
-            <MDBCarousel showControls showIndicators dark>
-                {templates.map((template, index) => (
-                    <MDBCarouselItem itemId={index + 1} key={template.id}>
-                        <div className="card">
-                            <div className="card-header">
-                                <h4>{template.name}</h4>
-                            </div>
-                            <div className="card-body">
-                                <MDBAccordion>
-                                    {template.tasks?.map(task => (
-                                        <MDBAccordionItem
-                                            key={task.id}
-                                            collapseId={`task-${task.id}`}  
-                                            buttonId={`task-button-${task.id}`}  
-                                            buttomA
-                                            title={  
-                                                <div className="d-flex justify-content-between align-items-center">
-                                                    <MDBCheckbox
-                                                        name={`task-${task.id}`}
-                                                        id={`checkbox-${task.id}`}
-                                                        checked={selectedTasks[template.id]?.has(task.id) || false}
-                                                        onChange={() => handleTaskToggle(template.id, task.id)}
-                                                        onClick={e => e.stopPropagation()}
-                                                        label={task.name || 'Untitled Task'}
-                                                    />
-                                                </div>
-                                            }
-                                        >
-                                            {task.description || 'No description available'}
-                                        </MDBAccordionItem>
-                                    )) || <p>No tasks available</p>}
-                                </MDBAccordion>
-                            </div>
-                        </div>
-                    </MDBCarouselItem>
-                ))}
-            </MDBCarousel>
-        </div>
+            <MDBDatatable
+                striped
+                bordered
+                hover
+                data={tableData}
+                selectableRows
+                onRowSelect={(rows) => {
+                    setSelectedTasks(new Set(rows.map(r => r.id)));
+                }}
+            />
+        </MDBContainer>
     );
 };
 
