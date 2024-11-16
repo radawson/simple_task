@@ -20,12 +20,6 @@ const Templates = () => {
     const [selectedTasks, setSelectedTasks] = useState(new Set());
     const [tableData, setTableData] = useState({
         columns: [
-            {
-                label: '',
-                field: 'select',
-                sort: false,
-                width: 30
-            },
             { label: 'Name', field: 'name', width: 200 },
             { label: 'Description', field: 'description', width: 300 },
             { label: 'Priority', field: 'priority', width: 100 },
@@ -40,7 +34,7 @@ const Templates = () => {
 
     const formatTableRows = (tasks) => tasks.map(task => ({
         id: task.id,
-        select: '', // Empty string for checkbox column
+        select: '', 
         name: task.name,
         description: task.description,
         priority: task.priority,
@@ -48,6 +42,34 @@ const Templates = () => {
     }));
 
     // Event Handlers
+    const handleAddToTasks = async () => {
+        try {
+            const tasksToCreate = tableData.rows
+                .filter(task => selectedTasks.has(task.id))
+                .map(task => ({
+                    name: task.name,
+                    description: task.description,
+                    priority: task.priority,
+                    date: selectedDate
+                }));
+    
+            await Promise.all(
+                tasksToCreate.map(task => ApiService.createTask(task))
+            );
+    
+            setSelectedTasks(new Set());
+            setToast({
+                show: true,
+                message: `Added ${tasksToCreate.length} tasks to ${selectedDate}`
+            });
+        } catch (error) {
+            console.error('Failed to add tasks:', error);
+            setToast({
+                show: true,
+                message: 'Failed to add tasks: ' + error.message
+            });
+        }
+    };
 
     const handleDelete = async (taskId) => {
         console.log('Delete task:', taskId);
@@ -57,21 +79,39 @@ const Templates = () => {
         console.log('Edit task:', taskId);
     };
 
-    const handleRowSelect = (event) => {
-        console.log('Row selection event:', event);
+    const handleRowSelect = (selectionEvent) => {
+        console.log('Raw selection event:', selectionEvent);
         
-        // Extract selected rows
-        const selectedRows = event.row;
-        const selectedIndices = event.selected;
+        if (!Array.isArray(selectionEvent)) return;
         
-        // Create new Set of selected task IDs
+        // Create Set from selected task IDs
         const newSelection = new Set(
-            selectedIndices.map(index => selectedRows[index]?.id)
-                .filter(id => id !== undefined)
+            selectionEvent.map(task => task.id)
         );
         
-        console.log('New selection:', newSelection);
+        console.log('Selected task IDs:', newSelection);
         setSelectedTasks(newSelection);
+    };
+
+    const handleTemplateChange = async (templateId) => {
+        setSelectedTemplate(templateId);
+        if (templateId === '0') {
+            // Show all tasks from all templates
+            const allTasks = templates.flatMap(template =>
+                template.tasks.map(task => ({
+                    ...task,
+                    actions: createActionButtons(task)
+                }))
+            );
+            setTableData(prev => ({ ...prev, rows: allTasks }));
+        } else {
+            const template = templates.find(t => t.id === Number(templateId));
+            const templateTasks = template?.tasks.map(task => ({
+                ...task,
+                actions: createActionButtons(task)
+            })) || [];
+            setTableData(prev => ({ ...prev, rows: templateTasks }));
+        }
     };
 
     const handleToastClose = () => {
@@ -106,27 +146,6 @@ const Templates = () => {
         fetchTemplates();
     }, []);
 
-    const handleTemplateChange = async (templateId) => {
-        setSelectedTemplate(templateId);
-        if (templateId === '0') {
-            // Show all tasks from all templates
-            const allTasks = templates.flatMap(template =>
-                template.tasks.map(task => ({
-                    ...task,
-                    actions: createActionButtons(task)
-                }))
-            );
-            setTableData(prev => ({ ...prev, rows: allTasks }));
-        } else {
-            const template = templates.find(t => t.id === Number(templateId));
-            const templateTasks = template?.tasks.map(task => ({
-                ...task,
-                actions: createActionButtons(task)
-            })) || [];
-            setTableData(prev => ({ ...prev, rows: templateTasks }));
-        }
-    };
-
     const createActionButtons = (task) => (
         <div>
             <MDBBtn
@@ -148,46 +167,6 @@ const Templates = () => {
             </MDBBtn>
         </div>
     );
-
-    const handleAddToTasks = async () => {
-        try {
-            const tasksToAdd = tableData.rows
-                .filter(row => selectedTasks.has(row.id))
-                .map(task => ({
-                    name: task.name,
-                    description: task.description,
-                    priority: task.priority || 0,
-                    date: selectedDate,
-                    templateId: null
-                }));
-
-            if (tasksToAdd.length === 0) {
-                setToast({
-                    show: true,
-                    message: 'No tasks selected'
-                });
-                return;
-            }
-
-            // Create tasks sequentially
-            for (const task of tasksToAdd) {
-                await ApiService.createTask(task);
-            }
-
-            setSelectedTasks(new Set());
-            setToast({
-                show: true,
-                message: `Added ${tasksToAdd.length} tasks to ${selectedDate}`
-            });
-
-        } catch (error) {
-            console.error('Failed to add tasks:', error);
-            setToast({
-                show: true,
-                message: error.response?.data?.message || 'Failed to add tasks'
-            });
-        }
-    };
 
     return (
         <>
@@ -238,12 +217,8 @@ const Templates = () => {
 
                 <MDBDatatable
                     striped
-                    bordered
                     hover
-                    data={{
-                        ...tableData,
-                        rows: formatTableRows(tableData.rows)
-                    }}
+                    data={tableData}
                     selectable
                     multi
                     onSelectRow={handleRowSelect}

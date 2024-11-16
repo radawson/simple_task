@@ -1,5 +1,6 @@
 import { Note } from '../models/index.js';
 import Logger from '../core/Logger.js';
+import { Op } from 'sequelize';
 const logger = Logger.getInstance();
 
 class NoteController {
