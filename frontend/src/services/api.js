@@ -50,6 +50,7 @@ export const ApiService = {
   createTask: (task) => api.post('/tasks', task),
   updateTask: (id, task) => api.patch(`/tasks/${id}`, task),
   deleteTask: (id) => api.delete(`/tasks/${id}`),
+  toggleTaskCompletion: (taskId) => api.patch(`/tasks/completed/${taskId}`),
 
   // Templates
   getTemplates: () => api.get('/templates'),

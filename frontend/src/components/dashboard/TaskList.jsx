@@ -16,24 +16,15 @@ const TaskList = ({ tasks = [] }) => {
     }));
   };
 
-  const handleCompletedChange = async (taskId, completed) => {
+  const handleCompletedChange = async (taskId) => {
     if (!taskId) return;
 
-    // Optimistic update
-    const updatedTasks = tasks.map(task =>
-      task.id === taskId ? { ...task, completed } : task
-    );
-    onTaskUpdate?.(taskId, { completed });
-
     try {
-      await ApiService.updateTask(taskId, { completed });
+      await ApiService.toggleTaskCompletion(taskId);
+      // Force refresh of tasks through parent
+      onTaskUpdate?.(taskId);
     } catch (error) {
-      console.error('Failed to update task:', error);
-      // Revert optimistic update
-      const originalTasks = tasks.map(task =>
-        task.id === taskId ? { ...task, completed: !completed } : task
-      );
-      onTaskUpdate?.(taskId, { completed: !completed });
+      console.error('Failed to toggle task completion:', error);
     }
   };
 
@@ -63,8 +54,7 @@ const TaskList = ({ tasks = [] }) => {
                       <MDBCheckbox
                         id={`taskCheck_${task?.id}`}
                         checked={!!task?.completed}
-                        onChange={(e) => handleCompletedChange(task.id, e.target.checked)}
-                        disabled={loading}
+                        onChange={() => handleCompletedChange(task.id)}
                         label="Completed"
                       />
                     </div>
