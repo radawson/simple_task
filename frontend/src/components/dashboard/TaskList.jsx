@@ -6,7 +6,10 @@ import Toast from '../common/Toast.jsx';
 import { ApiService } from '../../services/api';
 import ErrorBoundary from '../ErrorBoundary';
 
-const TaskList = ({ tasks = [] }) => {
+const TaskList = ({ 
+  tasks = [], 
+  onTaskUpdate = () => {} 
+}) => {
   const [openItems, setOpenItems] = useState({});
 
   const toggleAccordion = (taskId) => {
@@ -21,8 +24,7 @@ const TaskList = ({ tasks = [] }) => {
 
     try {
       await ApiService.toggleTaskCompletion(taskId);
-      // Force refresh of tasks through parent
-      onTaskUpdate?.(taskId);
+      onTaskUpdate(taskId); // Now properly destructured
     } catch (error) {
       console.error('Failed to toggle task completion:', error);
     }
@@ -98,13 +100,9 @@ TaskList.propTypes = {
     description: PropTypes.string,
     completed: PropTypes.bool,
     isAdmin: PropTypes.bool,
-    no_check: PropTypes.bool,
-    onTaskUpdate: PropTypes.func
-  }))
-};
-
-TaskList.defaultProps = {
-  tasks: []
+    no_check: PropTypes.bool
+  })),
+  onTaskUpdate: PropTypes.func
 };
 
 export default TaskList;

@@ -23,10 +23,10 @@ class TaskController {
                 return res.status(404).json({ message: 'Task not found' });
             }
 
-            task.completed = !task.completed;
+            const newCompletedState = !task.completed;
+            await task.update({ completed: newCompletedState }); // Fix: Pass object with field
 
-            await task.update();
-            logger.info(`Task ${task.id} marked as completed: ${task.completed}`);
+            logger.info(`Task ${task.id} marked as completed: ${newCompletedState}`);
             return res.status(204).send();
 
         } catch (error) {
