@@ -125,44 +125,32 @@ class TaskController {
             const { date } = req.params;
             logger.info('Retrieving tasks by date', { date });
     
-            if (!date || isNaN(new Date(date).getTime())) {
-                logger.warn('Invalid date provided', { date });
-                return res.status(400).json({ message: 'Invalid date format' });
-            }
-    
             const tasks = await Task.findAll({
                 where: {
                     date: {
-                        [Op.eq]: new Date(date)
+                        [Op.eq]: date  // Use exact date from params
                     }
                 },
-                order: [
-                    ['priority', 'DESC'],
-                    ['createdAt', 'ASC']
-                ],
                 include: [{
                     model: Template,
                     as: 'templates',
-                    through: { attributes: [] } // Exclude join table attributes
-                }]
+                    through: { attributes: [] }
+                }],
+                order: [
+                    ['priority', 'DESC'],
+                    ['name', 'ASC']
+                ]
             });
     
             logger.info('Tasks retrieved by date successfully', { 
-                date, 
+                date,
                 count: tasks.length 
             });
-            return res.json(tasks);
-    
+            
+            res.json(tasks);
         } catch (error) {
-            logger.error('Failed to get tasks by date', {
-                error: error.message,
-                stack: error.stack,
-                date: req.params.date
-            });
-            return res.status(500).json({ 
-                message: 'Failed to retrieve tasks',
-                error: error.message 
-            });
+            logger.error('Failed to get tasks by date:', error);
+            res.status(500).json({ message: error.message });
         }
     };
 

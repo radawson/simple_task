@@ -20,10 +20,26 @@ const Templates = () => {
     const [selectedTasks, setSelectedTasks] = useState(new Set());
     const [tableData, setTableData] = useState({
         columns: [
-            { label: 'Name', field: 'name', width: 200 },
-            { label: 'Description', field: 'description', width: 300 },
-            { label: 'Priority', field: 'priority', width: 100 },
-            { label: 'Actions', field: 'actions', width: 100 }
+            {
+                label: 'Name',
+                field: 'name',
+                className: 'col-3' // 25% width
+            },
+            {
+                label: 'Description',
+                field: 'description',
+                className: 'col-6' // 50% width
+            },
+            {
+                label: 'Priority',
+                field: 'priority',
+                className: 'col-1' // ~8% width
+            },
+            {
+                label: 'Actions',
+                field: 'actions',
+                className: 'col-2' // ~17% width
+            }
         ],
         rows: []
     });
@@ -34,7 +50,7 @@ const Templates = () => {
 
     const formatTableRows = (tasks) => tasks.map(task => ({
         id: task.id,
-        select: '', 
+        select: '',
         name: task.name,
         description: task.description,
         priority: task.priority,
@@ -52,16 +68,26 @@ const Templates = () => {
                     priority: task.priority,
                     date: selectedDate
                 }));
-    
+
             await Promise.all(
                 tasksToCreate.map(task => ApiService.createTask(task))
             );
-    
+
+            // Clear selections
             setSelectedTasks(new Set());
+            setTableData(prev => ({
+                ...prev,
+                rows: prev.rows.map(row => ({
+                    ...row,
+                    selected: false
+                }))
+            }));
+
             setToast({
                 show: true,
                 message: `Added ${tasksToCreate.length} tasks to ${selectedDate}`
             });
+
         } catch (error) {
             console.error('Failed to add tasks:', error);
             setToast({
@@ -80,8 +106,6 @@ const Templates = () => {
     };
 
     const handleRowSelect = (selectionEvent) => {
-        console.log('Raw selection event:', selectionEvent);
-        
         if (!Array.isArray(selectionEvent)) return;
         
         // Create Set from selected task IDs
@@ -89,8 +113,19 @@ const Templates = () => {
             selectionEvent.map(task => task.id)
         );
         
-        console.log('Selected task IDs:', newSelection);
+        // Update selected tasks state
         setSelectedTasks(newSelection);
+        
+        // Update table rows to reflect selection state
+        setTableData(prev => ({
+            ...prev,
+            rows: prev.rows.map(row => ({
+                ...row,
+                selected: newSelection.has(row.id)
+            }))
+        }));
+        
+        console.log('Updated selection:', newSelection);
     };
 
     const handleTemplateChange = async (templateId) => {
@@ -218,12 +253,13 @@ const Templates = () => {
                 <MDBDatatable
                     striped
                     hover
+                    className="table-responsive"
                     data={tableData}
                     selectable
                     multi
                     onSelectRow={handleRowSelect}
-                    selectedRows={Array.from(selectedTasks)}
-                    loading={!templates.length}
+                    selectedRows={[]} // Reset on each render
+                    isLoading={templates.length === 0}
                     searching={true}
                     searchLabel="Search templates"
                     entriesOptions={[5, 10, 25]}

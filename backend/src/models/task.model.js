@@ -24,7 +24,7 @@ class Task extends BaseModel {
             },
             date: {
                 type: DataTypes.DATEONLY,
-                allowNull: true // Allow null for template tasks
+                allowNull: true 
             },
             template: {
                 type: DataTypes.BOOLEAN,
