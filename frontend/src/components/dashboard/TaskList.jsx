@@ -1,16 +1,18 @@
 // src/components/dashboard/TaskList.jsx
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { MDBCheckbox } from 'mdb-react-ui-kit';
 import Toast from '../common/Toast.jsx';
 import { ApiService } from '../../services/api';
+import { socketService } from '../../services/socket.service';
 import ErrorBoundary from '../ErrorBoundary';
 
 const TaskList = ({ 
   tasks = [], 
-  onTaskUpdate = () => {} 
+  onTaskUpdate = () => {},
+  selectedDate  
 }) => {
-  const [openItems, setOpenItems] = useState({});
+  const [openItems, setOpenItems] = useState({})
 
   const toggleAccordion = (taskId) => {
     setOpenItems(prev => ({
@@ -19,16 +21,47 @@ const TaskList = ({
     }));
   };
 
+  useEffect(() => {
+    // Initial connection
+    socketService.connect();
+    
+    // Subscribe to date updates
+    socketService.subscribeToDate(selectedDate);
+    
+    // Set up interval and socket listeners
+    const intervalId = setInterval(updateTasks, 30000);
+    socketService.onTaskUpdate(() => {
+      updateTasks();
+    });
+
+    // Cleanup
+    return () => {
+      clearInterval(intervalId);
+      socketService.unsubscribeFromDate(selectedDate);
+    };
+  }, [selectedDate]);
+
   const handleCompletedChange = async (taskId) => {
     if (!taskId) return;
 
     try {
       await ApiService.toggleTaskCompletion(taskId);
-      onTaskUpdate(taskId); // Now properly destructured
+      updateTasks();
     } catch (error) {
       console.error('Failed to toggle task completion:', error);
     }
   };
+
+  const updateTasks = async () => {
+    try {
+      const updatedTasks = await ApiService.getTasks();
+      onTaskUpdate(updatedTasks);
+    } catch (error) {
+      console.error('Failed to update tasks:', error);
+    }
+  };
+
+
 
   return (
     <ErrorBoundary>
@@ -102,7 +135,8 @@ TaskList.propTypes = {
     isAdmin: PropTypes.bool,
     no_check: PropTypes.bool
   })),
-  onTaskUpdate: PropTypes.func
+  onTaskUpdate: PropTypes.func,
+  selectedDate: PropTypes.string.isRequired
 };
 
 export default TaskList;

@@ -12,6 +12,7 @@ const Dashboard = () => {
   const [events, setEvents] = useState([]);
   const [notes, setNotes] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [selectedDate, setSelectedDate] = useState(formatLocalDate());
 
   useEffect(() => {
     const currentDate = formatLocalDate(); // Use local timezone
@@ -88,11 +89,24 @@ const Dashboard = () => {
     };
   }, []);
 
+  const handleTaskUpdate = async (taskId) => {
+    try {
+      const response = await ApiService.getTasks(selectedDate);
+      setTasks(response.data);
+    } catch (error) {
+      console.error('Failed to refresh tasks:', error);
+    }
+  };
+
   return (
     <div className="container py-5">
       <div className="row">
         <div className="col-12 mb-4">
-          <TaskList tasks={tasks} />
+        <TaskList 
+            tasks={tasks} 
+            onTaskUpdate={handleTaskUpdate}
+            selectedDate={selectedDate} // Pass selectedDate prop
+          />
         </div>
         <div className="col-12 mb-4">
           <EventList events={events} />
