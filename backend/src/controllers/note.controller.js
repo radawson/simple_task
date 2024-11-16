@@ -60,26 +60,25 @@ class NoteController {
 
     getByDate = async (req, res) => {
         try {
-            const date = new Date(req.params.date);
-            if (isNaN(date.getTime())) {
-                return res.status(400).json({ message: 'Invalid date format' });
-            }
-
+            const { date } = req.params;
+            logger.debug('Retrieving notes by date', { date });
+            
             const notes = await Note.findAll({
-                where: { date },
+                where: {
+                    date: {
+                        [Op.eq]: date // Remove automatic date conversion
+                    }
+                },
                 order: [['createdAt', 'DESC']]
             });
-
-            logger.info(`Retrieved ${notes.length} notes for date: ${req.params.date}`);
-            return res.json(notes);
+    
+            logger.info(`Retrieved ${notes.length} notes for date: ${date}`);
+            res.json(notes);
         } catch (error) {
-            logger.error(`Date search failed: ${error.message}`);
-            return res.status(500).json({ 
-                message: 'Failed to get notes by date',
-                error: error.message 
-            });
+            logger.error('Failed to get notes by date:', error);
+            res.status(500).json({ message: error.message });
         }
-    }
+    };
 
     list = async (req, res) => {
         try {

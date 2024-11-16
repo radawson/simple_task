@@ -104,21 +104,25 @@ class TemplateController {
         }
     }
 
-    async list(req, res) {
+    list = async (req, res) => {
         try {
             const templates = await Template.findAll({
                 include: [{
                     model: Task,
-                    as: 'tasks' // Match association alias
+                    as: 'tasks',
+                    required: false, // Keep LEFT JOIN for empty templates
+                    attributes: ['id', 'name', 'description', 'priority'] // Limit returned fields
                 }]
             });
+    
             logger.info('Templates listed successfully');
+            logger.debug(`Found ${templates.length} templates`);
             res.json(templates);
         } catch (error) {
-            logger.error(`Template listing failed: ${error.message}`);
-            res.status(500).json({ message: 'Failed to list templates' });
+            logger.error('Failed to list templates:', error);
+            res.status(500).json({ message: error.message });
         }
-    }
+    };
 
     async removeTask(req, res) {
         try {
