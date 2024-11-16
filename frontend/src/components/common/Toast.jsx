@@ -1,3 +1,4 @@
+//src/components/common/Toast.jsx
 import React from 'react';
 import { MDBBtn, MDBToast } from 'mdb-react-ui-kit';
 

@@ -8,6 +8,7 @@ import {
     MDBBtn,
     MDBIcon
 } from 'mdb-react-ui-kit';
+import Toast from '../common/Toast';
 import { ApiService } from '../../services/api';
 import { formatLocalDate } from '../../utils/dateUtils';
 
@@ -32,6 +33,10 @@ const Templates = () => {
         ],
         rows: []
     });
+    const [toast, setToast] = useState({
+        show: false,
+        message: '',
+    });
 
     const formatTableRows = (tasks) => tasks.map(task => ({
         id: task.id,
@@ -43,6 +48,7 @@ const Templates = () => {
     }));
 
     // Event Handlers
+
     const handleDelete = async (taskId) => {
         console.log('Delete task:', taskId);
     };
@@ -51,20 +57,25 @@ const Templates = () => {
         console.log('Edit task:', taskId);
     };
 
-    // Update row selection handler
-    const handleRowSelect = (row, selected) => {
-        console.log('Row selection event:', { row, selected });
+    const handleRowSelect = (event) => {
+        console.log('Row selection event:', event);
         
-        setSelectedTasks(prev => {
-            const newSelection = new Set(prev);
-            if (selected) {
-                newSelection.add(row.id);
-            } else {
-                newSelection.delete(row.id);
-            }
-            console.log('Updated selection:', newSelection);
-            return newSelection;
-        });
+        // Extract selected rows
+        const selectedRows = event.row;
+        const selectedIndices = event.selected;
+        
+        // Create new Set of selected task IDs
+        const newSelection = new Set(
+            selectedIndices.map(index => selectedRows[index]?.id)
+                .filter(id => id !== undefined)
+        );
+        
+        console.log('New selection:', newSelection);
+        setSelectedTasks(newSelection);
+    };
+
+    const handleToastClose = () => {
+        setToast({ show: false, message: '' });
     };
 
     useEffect(() => {
@@ -139,85 +150,117 @@ const Templates = () => {
     );
 
     const handleAddToTasks = async () => {
-        const tasksToAdd = Array.from(selectedTasks).map(taskId => {
-            const task = tableData.rows.find(t => t.id === taskId);
-            return {
-                name: task.name,
-                description: task.description,
-                date: selectedDate,
-                priority: task.priority || 0
-            };
-        });
+        try {
+            const tasksToAdd = tableData.rows
+                .filter(row => selectedTasks.has(row.id))
+                .map(task => ({
+                    name: task.name,
+                    description: task.description,
+                    priority: task.priority || 0,
+                    date: selectedDate,
+                    templateId: null
+                }));
 
-        await Promise.all(tasksToAdd.map(task => ApiService.createTask(task)));
-        setSelectedTasks(new Set());
+            if (tasksToAdd.length === 0) {
+                setToast({
+                    show: true,
+                    message: 'No tasks selected'
+                });
+                return;
+            }
+
+            // Create tasks sequentially
+            for (const task of tasksToAdd) {
+                await ApiService.createTask(task);
+            }
+
+            setSelectedTasks(new Set());
+            setToast({
+                show: true,
+                message: `Added ${tasksToAdd.length} tasks to ${selectedDate}`
+            });
+
+        } catch (error) {
+            console.error('Failed to add tasks:', error);
+            setToast({
+                show: true,
+                message: error.response?.data?.message || 'Failed to add tasks'
+            });
+        }
     };
 
     return (
-        <MDBContainer className="py-5">
-            <h1>Template Management</h1>
+        <>
+            <MDBContainer className="py-5">
+                <h1>Template Management</h1>
 
-            <div className="row mb-4">
-                <div className="col-md-4">
-                    <select
-                        className="form-select"
-                        value={selectedTemplate}
-                        onChange={(e) => handleTemplateChange(e.target.value)}
-                    >
-                        <option value="0">All Templates</option>
-                        {templates.map(template => (
-                            <option key={template.id} value={template.id}>
-                                {template.name}
-                            </option>
-                        ))}
-                    </select>
+                <div className="row mb-4">
+                    <div className="col-md-4">
+                        <select
+                            className="form-select"
+                            value={selectedTemplate}
+                            onChange={(e) => handleTemplateChange(e.target.value)}
+                        >
+                            <option value="0">All Templates</option>
+                            {templates.map(template => (
+                                <option key={template.id} value={template.id}>
+                                    {template.name}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                    <div className="col-md-4">
+                        <MDBInput
+                            type="date"
+                            value={selectedDate}
+                            onChange={(e) => setSelectedDate(e.target.value)}
+                            label="Target Date"
+                        />
+                    </div>
+                    <div className="col-md-4">
+                        <MDBBtn
+                            onClick={handleAddToTasks}
+                            disabled={selectedTasks.size === 0}
+                        >
+                            Add Selected to Tasks
+                        </MDBBtn>
+                    </div>
                 </div>
-                <div className="col-md-4">
+                <div className="row mb-4 ">
                     <MDBInput
-                        type="date"
-                        value={selectedDate}
-                        onChange={(e) => setSelectedDate(e.target.value)}
-                        label="Target Date"
+                        type="text"
+                        value={searchTerm}
+                        label="Search Templates"
+                        onChange={(e) => setSearchTerm(e.target.value)}
                     />
                 </div>
-                <div className="col-md-4">
-                    <MDBBtn
-                        onClick={handleAddToTasks}
-                        disabled={selectedTasks.size === 0}
-                    >
-                        Add Selected to Tasks
-                    </MDBBtn>
-                </div>
-            </div>
-            <div className="row mb-4 ">
-                <MDBInput
-                    type="text"
-                    value={searchTerm}
-                    label="Search Templates"
-                    onChange={(e) => setSearchTerm(e.target.value)}
+
+
+                <MDBDatatable
+                    striped
+                    bordered
+                    hover
+                    data={{
+                        ...tableData,
+                        rows: formatTableRows(tableData.rows)
+                    }}
+                    selectable
+                    multi
+                    onSelectRow={handleRowSelect}
+                    selectedRows={Array.from(selectedTasks)}
+                    loading={!templates.length}
+                    searching={true}
+                    searchLabel="Search templates"
+                    entriesOptions={[5, 10, 25]}
+                    entries={10}
                 />
-            </div>
-
-
-            <MDBDatatable
-                striped
-                bordered
-                hover
-                data={{
-                    ...tableData,
-                    rows: formatTableRows(tableData.rows)
-                }}
-                selectable
-                multi
-                onSelectRow={handleRowSelect}
-                selectedRows={Array.from(selectedTasks)}
-                loading={!templates.length}
-                searching={true}
-                searchLabel="Search templates"
-                entriesOptions={[5, 10, 25]}
-                entries={10}
+            </MDBContainer>
+            <Toast
+                show={toast.show}
+                message={toast.message}
+                onClose={handleToastClose}
             />
-        </MDBContainer>
+        </>
     );
 };
 
