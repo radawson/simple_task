@@ -86,11 +86,10 @@ class TaskController {
      */
     get = async (req, res) => {
         try {
-            logger.info('Retrieving task', { taskId: req.params.id });
-
             const task = await Task.findByPk(req.params.id, {
                 include: [{
                     model: Template,
+                    as: 'templates',
                     through: { attributes: [] }
                 }]
             });
@@ -125,14 +124,12 @@ class TaskController {
         try {
             const { date } = req.params;
             logger.info('Retrieving tasks by date', { date });
-
+    
             if (!date || isNaN(new Date(date).getTime())) {
                 logger.warn('Invalid date provided', { date });
-                return res.status(400).json({ 
-                    message: 'Invalid date format' 
-                });
+                return res.status(400).json({ message: 'Invalid date format' });
             }
-
+    
             const tasks = await Task.findAll({
                 where: {
                     date: {
@@ -145,16 +142,17 @@ class TaskController {
                 ],
                 include: [{
                     model: Template,
-                    through: { attributes: [] }
+                    as: 'templates',
+                    through: { attributes: [] } // Exclude join table attributes
                 }]
             });
-
+    
             logger.info('Tasks retrieved by date successfully', { 
                 date, 
                 count: tasks.length 
             });
             return res.json(tasks);
-
+    
         } catch (error) {
             logger.error('Failed to get tasks by date', {
                 error: error.message,
@@ -202,6 +200,7 @@ class TaskController {
                 ],
                 include: [{
                     model: Template,
+                    as: 'templates',
                     through: { attributes: [] }
                 }]
             });

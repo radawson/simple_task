@@ -1,3 +1,4 @@
+//src/routes/index.js
 import express from 'express';
 import { authenticate } from '../middleware/auth.middleware.js';
 

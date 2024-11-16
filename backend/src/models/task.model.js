@@ -47,9 +47,11 @@ class Task extends BaseModel {
     }
 
     static associate(models) {
-        this.belongsTo(models.Template, {
-            foreignKey: 'templateId',
-            as: 'sourceTemplate'
+        // Many-to-Many relationship with Template
+        this.belongsToMany(models.Template, {
+            through: 'TaskTemplates',
+            foreignKey: 'taskId',
+            as: 'templates'
         });
     }
 }
