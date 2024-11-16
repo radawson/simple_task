@@ -16,4 +16,4 @@ const Toast = ({ message, show, onClose }) => {
   );
 };
 
-export default Toast; // Add default export
+export default Toast;

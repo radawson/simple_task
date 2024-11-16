@@ -31,7 +31,7 @@ const createUserRoutes = (socketService) => {
         userController.getProfile
     );
 
-    router.put('/profile', 
+    router.patch('/profile', 
         authenticate, 
         validateUser, 
         userController.updateProfile
@@ -61,7 +61,7 @@ const createUserRoutes = (socketService) => {
         userController.createSSOUser
     );
 
-    router.put('/sso/:id/sync', 
+    router.patch('/sso/:id/sync', 
         authenticate, 
         authorize(['admin']), 
         userController.syncSSOUser

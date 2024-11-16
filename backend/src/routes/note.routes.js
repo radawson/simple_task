@@ -16,7 +16,7 @@ const createNoteRoutes = (socketService) => {
 
     // Protected routes require authentication
     router.post('/', authenticate, validateNote, noteController.create);
-    router.put('/:id', authenticate, validateNote, noteController.update);
+    router.patch('/:id', authenticate, validateNote, noteController.update);
     router.delete('/:id', authenticate, noteController.delete);
 
     return router;

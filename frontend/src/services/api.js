@@ -48,13 +48,13 @@ export const ApiService = {
   // Tasks
   getTasks: (date) => api.get(`/tasks/date/${date}`),
   createTask: (task) => api.post('/tasks', task),
-  updateTask: (id, task) => api.put(`/tasks/${id}`, task),
+  updateTask: (id, task) => api.patch(`/tasks/${id}`, task),
   deleteTask: (id) => api.delete(`/tasks/${id}`),
 
   // Templates
   getTemplates: () => api.get('/templates'),
   createTemplate: (template) => api.post('/templates', template),
-  updateTemplate: (id, template) => api.put(`/templates/${id}`, template),
+  updateTemplate: (id, template) => api.patch(`/templates/${id}`, template),
   deleteTemplate: (id) => api.delete(`/templates/${id}`),
 
   // Auth
@@ -65,10 +65,10 @@ export const ApiService = {
   // Events
   getEvents: (date) => api.get(`/events/date/${date}`),
   createEvent: (event) => api.post('/events', event),
-  updateEvent: (id, event) => api.put(`/events/${id}`, event),
+  updateEvent: (id, event) => api.patch(`/events/${id}`, event),
   
   // Notes
   getNotes: (date) => api.get(`/notes/date/${date}`),
   createNote: (note) => api.post('/notes', note),
-  updateNote: (id, note) => api.put(`/notes/${id}`, note),
+  updateNote: (id, note) => api.patch(`/notes/${id}`, note),
 };

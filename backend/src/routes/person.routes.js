@@ -11,7 +11,7 @@ const createPersonRoutes = (socketService) => {
     // Specialized endpoints (order matters - put specific routes before parameterized ones)
     router.get('/search', authenticate, personController.search);
     router.post('/bulk', authenticate, authorize(['admin']), personController.bulkCreate);
-    router.put('/bulk', authenticate, authorize(['admin']), personController.bulkUpdate);
+    router.patch('/bulk', authenticate, authorize(['admin']), personController.bulkUpdate);
 
     // Basic CRUD with admin/manager authorization
     router.get('/', authenticate, personController.list);
@@ -24,7 +24,7 @@ const createPersonRoutes = (socketService) => {
 
     // Routes with :id parameter
     router.get('/:id', authenticate, personController.get);
-    router.put('/:id',
+    router.patch('/:id',
         authenticate,
         authorize(['admin', 'manager']),
         validatePerson,

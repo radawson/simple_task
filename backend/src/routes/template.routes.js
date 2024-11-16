@@ -12,7 +12,7 @@ const createTemplateRoutes = (socketService) => {
     router.get('/', authenticate, templateController.list);
     router.get('/:id', authenticate, templateController.get);
     router.post('/', authenticate, validateTemplate, templateController.create);
-    router.put('/:id', authenticate, validateTemplate, templateController.update);
+    router.patch('/:id', authenticate, validateTemplate, templateController.update);
     router.delete('/:id', authenticate, templateController.delete);
 
     // Template-specific routes

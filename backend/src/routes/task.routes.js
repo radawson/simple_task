@@ -15,7 +15,7 @@ const createTaskRoutes = (socketService) => {
 
     // Protected routes require authentication
     router.post('/', authenticate, validateTask, taskController.create);
-    router.put('/:id', authenticate, validateTask, taskController.update);
+    router.patch('/:id', authenticate, taskController.update);
     router.delete('/:id', authenticate, taskController.delete);
 
     return router;

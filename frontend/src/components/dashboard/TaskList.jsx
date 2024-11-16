@@ -1,7 +1,9 @@
 // src/components/dashboard/TaskList.jsx
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { MDBAccordion, MDBAccordionItem, MDBCheckbox } from 'mdb-react-ui-kit';
+import { MDBCheckbox } from 'mdb-react-ui-kit';
+import Toast from '../common/Toast.jsx';
+import { ApiService } from '../../services/api';
 import ErrorBoundary from '../ErrorBoundary';
 
 const TaskList = ({ tasks = [] }) => {
@@ -17,21 +19,21 @@ const TaskList = ({ tasks = [] }) => {
   const handleCompletedChange = async (taskId, completed) => {
     if (!taskId) return;
 
-    const formData = new FormData();
-    formData.append('completed', completed.toString());
-
     try {
-      await fetch(`/api/tasks/${taskId}`, {
-        method: 'PATCH',
-        body: formData
-      });
+        await ApiService.updateTask(taskId, { completed });
+        
+        // Update parent state if callback exists
+        if (typeof onTaskUpdate === 'function') {
+            onTaskUpdate(taskId, { completed });
+        }
     } catch (error) {
-      console.error('Error updating task:', error);
+        console.error('Error updating task:', error);
     }
-  };
+};
 
   return (
     <ErrorBoundary>
+      <>
       <div className="card">
         <h3 className="m-2">Tasks</h3>
         <div className="accordion accordion-flush" id="task_accordion">
@@ -82,6 +84,12 @@ const TaskList = ({ tasks = [] }) => {
           ))}
         </div>
       </div>
+      <Toast
+        message="Task updated successfully"
+        show={false}
+        onClose={() => {}}
+       />
+      </>
     </ErrorBoundary>
   );
 };
@@ -93,7 +101,8 @@ TaskList.propTypes = {
     description: PropTypes.string,
     completed: PropTypes.bool,
     isAdmin: PropTypes.bool,
-    no_check: PropTypes.bool
+    no_check: PropTypes.bool,
+    onTaskUpdate: PropTypes.func
   }))
 };
 

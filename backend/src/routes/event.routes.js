@@ -15,7 +15,7 @@ const createEventRoutes = (socketService) => {
 
     // Protected routes require authentication
     router.post('/', authenticate, validateEvent, eventController.create);
-    router.put('/:id', authenticate, validateEvent, eventController.update);
+    router.patch('/:id', authenticate, validateEvent, eventController.update);
     router.delete('/:id', authenticate, eventController.delete);
 
     // Calendar routes require authentication

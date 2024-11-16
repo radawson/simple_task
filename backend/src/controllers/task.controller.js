@@ -1,6 +1,7 @@
 import { Task, Template } from '../models/index.js';
 import { Op } from 'sequelize';
 import Logger from '../core/Logger.js';
+import { validateTask } from '../middleware/validation.middleware.js';
 const logger = Logger.getInstance();
 
 /**
@@ -225,29 +226,40 @@ class TaskController {
      */
     update = async (req, res) => {
         try {
-            logger.info('Attempting to update task', { 
-                taskId: req.params.id,
-                updates: req.body 
-            });
-
             const task = await Task.findByPk(req.params.id);
             if (!task) {
                 logger.warn('Task not found for update', { taskId: req.params.id });
                 return res.status(404).json({ message: 'Task not found' });
             }
-
+    
+            // Merge existing task with updates
+            const updatedTaskData = {
+                ...task.toJSON(),
+                ...req.body
+            };
+    
+            // Validate complete task after merge
+            try {
+                validateTask(updatedTaskData);
+            } catch (validationError) {
+                return res.status(400).json({ 
+                    message: 'Validation error', 
+                    error: validationError.message 
+                });
+            }
+    
             await task.update(req.body);
-
+    
             if (req.body.templateIds) {
                 const templates = await Template.findAll({
                     where: { id: req.body.templateIds }
                 });
                 await task.setTemplates(templates);
             }
-
+    
             logger.info('Task updated successfully', { taskId: task.id });
             return res.json(task);
-
+    
         } catch (error) {
             logger.error('Task update failed', {
                 error: error.message,

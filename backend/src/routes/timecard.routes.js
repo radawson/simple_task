@@ -49,7 +49,7 @@ const createTimecardRoutes = (socketService) => {
         timecardController.get
     );
 
-    router.put('/:id',
+    router.patch('/:id',
         authenticate,
         validateTimecard,
         timecardController.update
