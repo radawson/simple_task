@@ -12,6 +12,7 @@ const createTaskRoutes = (socketService) => {
     router.get('/date/:date', taskController.getByDate);
     router.get('/:id', taskController.get);
     router.get('/', taskController.list);
+    router.patch('/completed/:id', taskController.completedToggle);
 
     // Protected routes require authentication
     router.post('/', authenticate, validateTask, taskController.create);

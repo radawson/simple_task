@@ -9,15 +9,49 @@ const logger = Logger.getInstance();
  */
 class TaskController {
     /**
+     * Mark a task completed without authentication
+     * @param {Request} req - Express request object
+     * @param {Response} res - Express response object
+     */
+    completedToggle = async (req, res) => {
+        try {
+            logger.info('Marking task as completed', { taskId: req.params.id });
+
+            const task = await Task.findByPk(req.params.id);
+            if (!task) {
+                logger.warn('Task not found for completion', { taskId: req.params.id });
+                return res.status(404).json({ message: 'Task not found' });
+            }
+
+            task.completed = !task.completed;
+
+            await task.update();
+            logger.info(`Task ${task.id} marked as completed: ${task.completed}`);
+            return res.status(204).send();
+
+        } catch (error) {
+            logger.error('Task completion failed', {
+                error: error.message,
+                stack: error.stack,
+                taskId: req.params.id
+            });
+            return res.status(500).json({
+                message: 'Failed to mark task as completed',
+                error: error.message
+            });
+        }
+    };
+
+    /**
      * Create a new task
      * @param {Request} req - Express request object
      * @param {Response} res - Express response object
      */
     create = async (req, res) => {
         try {
-            logger.info('Creating new task', { 
+            logger.info('Creating new task', {
                 user: req.user.username,
-                taskData: req.body 
+                taskData: req.body
             });
 
             const task = await Task.create({
@@ -41,9 +75,9 @@ class TaskController {
                 stack: error.stack,
                 userData: req.body
             });
-            return res.status(400).json({ 
+            return res.status(400).json({
                 message: 'Failed to create task',
-                error: error.message 
+                error: error.message
             });
         }
     };
@@ -73,9 +107,9 @@ class TaskController {
                 stack: error.stack,
                 taskId: req.params.id
             });
-            return res.status(500).json({ 
+            return res.status(500).json({
                 message: 'Failed to delete task',
-                error: error.message 
+                error: error.message
             });
         }
     };
@@ -109,9 +143,9 @@ class TaskController {
                 stack: error.stack,
                 taskId: req.params.id
             });
-            return res.status(500).json({ 
+            return res.status(500).json({
                 message: 'Failed to get task',
-                error: error.message 
+                error: error.message
             });
         }
     };
@@ -125,7 +159,7 @@ class TaskController {
         try {
             const { date } = req.params;
             logger.info('Retrieving tasks by date', { date });
-    
+
             const tasks = await Task.findAll({
                 where: {
                     date: {
@@ -142,12 +176,12 @@ class TaskController {
                     ['name', 'ASC']
                 ]
             });
-    
-            logger.info('Tasks retrieved by date successfully', { 
+
+            logger.info('Tasks retrieved by date successfully', {
                 date,
-                count: tasks.length 
+                count: tasks.length
             });
-            
+
             res.json(tasks);
         } catch (error) {
             logger.error('Failed to get tasks by date:', error);
@@ -163,16 +197,16 @@ class TaskController {
     list = async (req, res) => {
         try {
             logger.info('Listing tasks with filters', { query: req.query });
-            
-            const { 
-                page = 1, 
-                limit = 10, 
-                completed, 
+
+            const {
+                page = 1,
+                limit = 10,
+                completed,
                 priority,
                 date,
-                template 
+                template
             } = req.query;
-            
+
             const where = {};
             if (completed !== undefined) where.completed = completed === 'true';
             if (priority !== undefined) where.priority = parseInt(priority);
@@ -194,7 +228,7 @@ class TaskController {
                 }]
             });
 
-            logger.info('Tasks retrieved successfully', { 
+            logger.info('Tasks retrieved successfully', {
                 count: tasks.count,
                 page,
                 limit
@@ -212,9 +246,9 @@ class TaskController {
                 error: error.message,
                 stack: error.stack
             });
-            return res.status(500).json({ 
+            return res.status(500).json({
                 message: 'Failed to list tasks',
-                error: error.message 
+                error: error.message
             });
         }
     };
@@ -230,39 +264,39 @@ class TaskController {
                 taskId: req.params.id,
                 updates: req.body
             });
-    
+
             const task = await Task.findByPk(req.params.id);
             if (!task) {
                 logger.warn('Task not found for update', { taskId: req.params.id });
                 return res.status(404).json({ message: 'Task not found' });
             }
-    
+
             // Skip full validation for partial updates
             if (req.body.completed !== undefined) {
                 await task.update({ completed: req.body.completed });
-                logger.info('Task completion status updated', { 
-                    taskId: task.id, 
-                    completed: req.body.completed 
+                logger.info('Task completion status updated', {
+                    taskId: task.id,
+                    completed: req.body.completed
                 });
                 return res.json(task);
             }
-    
+
             // Full validation only for complete updates
             const updatedTaskData = {
                 ...task.toJSON(),
                 ...req.body
             };
-    
+
             try {
                 validateTask(updatedTaskData);
             } catch (validationError) {
                 logger.error('Validation failed:', validationError);
                 return res.status(400).json({ message: validationError.message });
             }
-    
+
             await task.update(req.body);
             return res.json(task);
-    
+
         } catch (error) {
             logger.error('Update failed:', error);
             return res.status(500).json({ message: error.message });
