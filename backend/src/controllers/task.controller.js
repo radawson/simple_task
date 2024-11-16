@@ -226,51 +226,46 @@ class TaskController {
      */
     update = async (req, res) => {
         try {
+            logger.debug('Task update request:', {
+                taskId: req.params.id,
+                updates: req.body
+            });
+    
             const task = await Task.findByPk(req.params.id);
             if (!task) {
                 logger.warn('Task not found for update', { taskId: req.params.id });
                 return res.status(404).json({ message: 'Task not found' });
             }
     
-            // Merge existing task with updates
+            // Skip full validation for partial updates
+            if (req.body.completed !== undefined) {
+                await task.update({ completed: req.body.completed });
+                logger.info('Task completion status updated', { 
+                    taskId: task.id, 
+                    completed: req.body.completed 
+                });
+                return res.json(task);
+            }
+    
+            // Full validation only for complete updates
             const updatedTaskData = {
                 ...task.toJSON(),
                 ...req.body
             };
     
-            // Validate complete task after merge
             try {
                 validateTask(updatedTaskData);
             } catch (validationError) {
-                return res.status(400).json({ 
-                    message: 'Validation error', 
-                    error: validationError.message 
-                });
+                logger.error('Validation failed:', validationError);
+                return res.status(400).json({ message: validationError.message });
             }
     
             await task.update(req.body);
-    
-            if (req.body.templateIds) {
-                const templates = await Template.findAll({
-                    where: { id: req.body.templateIds }
-                });
-                await task.setTemplates(templates);
-            }
-    
-            logger.info('Task updated successfully', { taskId: task.id });
             return res.json(task);
     
         } catch (error) {
-            logger.error('Task update failed', {
-                error: error.message,
-                stack: error.stack,
-                taskId: req.params.id,
-                updates: req.body
-            });
-            return res.status(400).json({ 
-                message: 'Failed to update task',
-                error: error.message 
-            });
+            logger.error('Update failed:', error);
+            return res.status(500).json({ message: error.message });
         }
     };
 }
