@@ -1,5 +1,5 @@
 // src/components/dashboard/TaskList.jsx
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { MDBCheckbox } from 'mdb-react-ui-kit';
 import Toast from '../common/Toast.jsx';
@@ -21,26 +21,6 @@ const TaskList = ({
     }));
   };
 
-  useEffect(() => {
-    // Initial connection
-    socketService.connect();
-    
-    // Subscribe to date updates
-    socketService.subscribeToDate(selectedDate);
-    
-    // Set up interval and socket listeners
-    const intervalId = setInterval(updateTasks, 30000);
-    socketService.onTaskUpdate(() => {
-      updateTasks();
-    });
-
-    // Cleanup
-    return () => {
-      clearInterval(intervalId);
-      socketService.unsubscribeFromDate(selectedDate);
-    };
-  }, [selectedDate]);
-
   const handleCompletedChange = async (taskId) => {
     if (!taskId) return;
 
@@ -52,16 +32,37 @@ const TaskList = ({
     }
   };
 
-  const updateTasks = async () => {
+  const updateTasks = useCallback(async () => {
+    if (!selectedDate) return;
     try {
-      const updatedTasks = await ApiService.getTasks();
+      const updatedTasks = await ApiService.getTasks(selectedDate);
       onTaskUpdate(updatedTasks);
     } catch (error) {
       console.error('Failed to update tasks:', error);
     }
-  };
+  }, [selectedDate, onTaskUpdate]);
 
+  useEffect(() => {
+    if (!selectedDate) return; // Add guard clause
 
+    // Connect socket and subscribe
+    socketService.connect();
+    socketService.subscribeToDate(selectedDate);
+    
+    // Set up interval
+    const intervalId = setInterval(updateTasks, 30000);
+
+    // Set up socket listener
+    socketService.onTaskUpdate(() => {
+      updateTasks();
+    });
+
+    // Cleanup
+    return () => {
+      clearInterval(intervalId);
+      socketService.unsubscribeFromDate(selectedDate);
+    };
+  }, [selectedDate, updateTasks]);
 
   return (
     <ErrorBoundary>
