@@ -1,5 +1,6 @@
 // src/components/templates/Templates.jsx
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
     MDBContainer,
     MDBDatatable,
@@ -13,6 +14,7 @@ import { ApiService } from '../../services/api';
 import { formatLocalDate } from '../../utils/dateUtils';
 
 const Templates = () => {
+    const navigate = useNavigate();
     const [templates, setTemplates] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedTemplate, setSelectedTemplate] = useState('0');
@@ -47,15 +49,6 @@ const Templates = () => {
         show: false,
         message: '',
     });
-
-    const formatTableRows = (tasks) => tasks.map(task => ({
-        id: task.id,
-        select: '',
-        name: task.name,
-        description: task.description,
-        priority: task.priority,
-        actions: createActionButtons(task)
-    }));
 
     // Event Handlers
     const handleAddToTasks = async () => {
@@ -102,7 +95,7 @@ const Templates = () => {
     };
 
     const handleEdit = (taskId) => {
-        navigate(`/tasks/edit/${taskId}`);
+        navigate(`/tasks/edit/${taskId}`); 
     };
 
     const handleRowSelect = (selectionEvent) => {
@@ -257,6 +250,7 @@ const Templates = () => {
                     data={tableData}
                     selectable
                     multi
+                    confirmDelete={true}
                     onSelectRow={handleRowSelect}
                     selectedRows={[]} // Reset on each render
                     isLoading={templates.length === 0}

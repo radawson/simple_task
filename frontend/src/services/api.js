@@ -46,11 +46,14 @@ api.interceptors.response.use(
 
 export const ApiService = {
   // Tasks
-  getTasks: (date) => api.get(`/tasks/date/${date}`),
   createTask: (task) => api.post('/tasks', task),
-  updateTask: (id, task) => api.patch(`/tasks/${id}`, task),
   deleteTask: (id) => api.delete(`/tasks/${id}`),
+  getTask: (id) => api.get(`/tasks/${id}`),
+  getTasks: (date) => api.get(`/tasks/date/${date}`),
+  listTasks: () => api.get('/tasks'),
   toggleTaskCompletion: (taskId) => api.patch(`/tasks/completed/${taskId}`),
+  updateTask: (id, task) => api.patch(`/tasks/${id}`, task),
+
 
   // Templates
   getTemplates: () => api.get('/templates'),

@@ -1,15 +1,17 @@
+//src/components/layout/Layout.jsx
 import React from 'react';
 import Navbar from './Navbar';
 import Toast from '../common/Toast';
+import { Outlet } from 'react-router-dom';
 
-const Layout = ({ children }) => {
+const Layout = () => {
   return (
     <>
       <Navbar />
       <div className="container-fluid">
         <main>
           <Toast />
-          {children}
+          <Outlet />
         </main>
       </div>
     </>

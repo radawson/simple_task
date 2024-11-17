@@ -101,17 +101,33 @@ const Tasks = () => {
 
     const fetchTasks = async () => {
         try {
-            const response = await ApiService.getTasks();
-            const formattedTasks = response.data.map(task => ({
-                ...task,
+            const response = await ApiService.listTasks();
+            console.log('API Response:', response);
+    
+            // Extract tasks array from paginated response
+            const tasksArray = response?.data?.tasks || [];
+    
+            const formattedTasks = tasksArray.map(task => ({
+                id: task.id,
+                name: task.name,
+                description: task.description,
+                date: task.date,
+                priority: task.priority,
+                completed: task.completed,
                 actions: createActionButtons(task)
             }));
+    
+            setTasks(tasksArray); // Store raw tasks
             setTableData(prev => ({
                 ...prev,
                 rows: formattedTasks
             }));
         } catch (error) {
             console.error('Failed to fetch tasks:', error);
+            setToast({
+                show: true,
+                message: 'Failed to load tasks: ' + error.message
+            });
         }
     };
 

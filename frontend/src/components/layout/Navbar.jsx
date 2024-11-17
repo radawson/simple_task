@@ -54,9 +54,7 @@ export default function Navbar() {
               <MDBNavbarItem>
                 <MDBNavbarLink href='/qr'>QR Code</MDBNavbarLink>
               </MDBNavbarItem>
-            </MDBNavbarNav>
-            <MDBNavbarNav right>
-              <MDBNavbarItem>
+              <MDBNavbarItem right>
                 <MDBNavbarLink href='/login'>Login</MDBNavbarLink>
               </MDBNavbarItem>
             </MDBNavbarNav>
@@ -73,6 +71,13 @@ export default function Navbar() {
         className='list-unstyled'
       >
         <div className='p-3'>
+        <MDBSideNavItem
+            onClick={toggleSidenav}
+          >
+            <MDBSideNavLink href='/'>
+              <MDBIcon fas icon='home' className='me-2'/> Today
+            </MDBSideNavLink>
+          </MDBSideNavItem>
           <MDBSideNavItem
             onClick={toggleSidenav}
           >
