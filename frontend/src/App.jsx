@@ -14,7 +14,10 @@ function App() {
       <Router>
         <Layout>
           <Routes>
-            <Route path="/" element={<Dashboard />} />
+          <Route path="/" element={<Dashboard />} />
+            <Route path="/tasks" element={<Tasks />} />
+            <Route path="/tasks/new" element={<TaskEdit />} />
+            <Route path="/tasks/edit/:id" element={<TaskEdit />} />
             <Route path="/qr" element={<QRGenerator />} />
             <Route path="/templates" element={<Templates />} />
             <Route path="/login" element={<Login />} />

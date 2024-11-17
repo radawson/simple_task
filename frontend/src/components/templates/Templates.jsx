@@ -102,7 +102,7 @@ const Templates = () => {
     };
 
     const handleEdit = (taskId) => {
-        console.log('Edit task:', taskId);
+        navigate(`/tasks/edit/${taskId}`);
     };
 
     const handleRowSelect = (selectionEvent) => {
