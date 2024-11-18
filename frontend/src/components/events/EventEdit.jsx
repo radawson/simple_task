@@ -46,19 +46,18 @@ const EventEdit = () => {
           ...prev,
           participants: e
         }));
+        return;
       }
       // For single selects (status, class, organizer)
-      else {
-        const name = e.name || e.target?.name;
-        const value = e.value || e;
-        setEvent(prev => ({
-          ...prev,
-          [name]: value
-        }));
-      }
+      const name = e.name;
+      const value = e.value || e;
+      setEvent(prev => ({
+        ...prev,
+        [name]: value
+      }));
       return;
     }
-
+  
     // Handle regular input changes
     const { name, value, type, checked } = e.target;
     setEvent(prev => ({
@@ -228,8 +227,13 @@ const EventEdit = () => {
                   label="Participants"
                   name="participants"
                   multiple
-                  value={event.participants}
-                  onChange={values => handleChange(values)}  // Update this
+                  value={event.participants || []} // Ensure value is always an array
+                  onChange={values => {
+                    setEvent(prev => ({
+                      ...prev,
+                      participants: values
+                    }));
+                  }}
                   data={persons.map(person => ({
                     text: `${person.firstName} ${person.lastName}`,
                     value: person.id

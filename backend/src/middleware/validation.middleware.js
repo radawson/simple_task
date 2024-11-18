@@ -13,17 +13,21 @@ const schemas = {
 
     event: Joi.object({
         summary: Joi.string().required().max(200),
-        description: Joi.string(),
+        description: Joi.string().allow('', null),
         dtstart: Joi.date().required(),
-        dtend: Joi.date().min(Joi.ref('dtstart')),
-        location: Joi.string(),
-        participants: Joi.alternatives().try(
-            Joi.string(),
-            Joi.array().items(Joi.string())
-        ),
-        status: Joi.string().valid('CONFIRMED', 'TENTATIVE', 'CANCELLED'),
-        priority: Joi.number().min(0).max(9)
-    }),
+        dtend: Joi.date().min(Joi.ref('dtstart')).allow(null),
+        timeStart: Joi.string().allow('', null),
+        timeEnd: Joi.string().allow('', null),
+        location: Joi.string().allow('', null),
+        status: Joi.string().valid('CONFIRMED', 'TENTATIVE', 'CANCELLED').default('CONFIRMED'),
+        categories: Joi.array().items(Joi.string()).allow(null),
+        priority: Joi.number().min(0).max(9).default(0),
+        url: Joi.string().uri().allow('', null),
+        organizer: Joi.string().allow('', null),
+        transp: Joi.string().valid('OPAQUE', 'TRANSPARENT').default('OPAQUE'),
+        class: Joi.string().valid('PUBLIC', 'PRIVATE', 'CONFIDENTIAL').default('PUBLIC'),
+        participants: Joi.array().items(Joi.string()).allow(null)
+    }).options({ stripUnknown: true }),
 
     note: Joi.object({
         title: Joi.string()
@@ -38,10 +42,19 @@ const schemas = {
     person: Joi.object({
         firstName: Joi.string()
             .required()
-            .max(200),
+            .max(20)
+            .trim(),
         lastName: Joi.string()
-            .max(200),
-    }),
+            .max(20)
+            .allow('', null)
+            .trim(),
+        email: Joi.string()
+            .email()
+            .allow('', null),
+        birthdate: Joi.date()
+            .allow(null)
+            .iso()
+    }).options({ stripUnknown: true }),
 
     task: Joi.object({
         name: Joi.string()
