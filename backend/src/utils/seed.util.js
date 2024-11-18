@@ -318,19 +318,19 @@ class Seeder {
                 lastName: "User",
                 username: "admin",
                 isAdmin: true,
-                password: await argon2.hash("admin")
+                password: "$argon2id$v=19$m=65536,t=3,p=4$o+KqN5tXo5rMSjvDXLJDTg$jOLST3gTsAVfWjxcl9egIDU+0WvXz0K1yHaedCQphSM"
             },
             {
                 firstName: "Shakeem",
                 lastName: "Bembridge",
                 username: "bembridges",
-                password: await argon2.hash("password")
+                password: "$argon2id$v=19$m=65536,t=3,p=4$YNC6FRIb/4MR1l9jmKR48Q$L0xh8gdGwtqmtPoI6WDI0dDy3XatD0hEwk4V7htqSkY"
             },
             {
                 firstName: "Mervat",
                 lastName: "Malak",
                 username: "malakm",
-                password: await argon2.hash("password")
+                password: "$argon2id$v=19$m=65536,t=3,p=4$F6AWOCY7rGVESHILDRGqsg$nlTYuNRg7CxK6oTFOZclQLiT/35zltUyLwJVpf3EcyE"
             },
         ];
 
