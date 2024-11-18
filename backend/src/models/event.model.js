@@ -12,7 +12,7 @@ class Event extends BaseModel {
             summary: {
                 type: DataTypes.STRING(200),
                 allowNull: false,
-                field: 'name'
+                field: 'title'
             },
             description: {
                 type: DataTypes.TEXT,
@@ -74,6 +74,7 @@ class Event extends BaseModel {
             },
             priority: {
                 type: DataTypes.INTEGER,
+                allowNull: true,
                 defaultValue: 0
             },
             url: {

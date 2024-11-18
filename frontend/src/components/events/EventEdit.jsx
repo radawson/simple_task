@@ -69,16 +69,34 @@ const EventEdit = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      if (id) {
-        await ApiService.updateEvent(id, event);
-      } else {
-        await ApiService.createEvent(event);
-      }
-      navigate('/events');
+        // Map fields to match database columns
+        const eventData = {
+            title: event.summary,
+            description: event.description,
+            date_start: event.dtstart,
+            date_end: event.dtend,
+            time_start: event.timeStart,
+            time_end: event.timeEnd,
+            location: event.location,
+            participants: event.participants,
+            status: event.status,
+            person: event.organizer,
+            transp: event.transp,
+            classification: event.class,
+            priority: event.priority,
+            url: event.url
+        };
+
+        if (id) {
+            await ApiService.updateEvent(id, eventData);
+        } else {
+            await ApiService.createEvent(eventData);
+        }
+        navigate('/events');
     } catch (error) {
-      console.error('Failed to save event:', error);
+        console.error('Failed to save event:', error);
     }
-  };
+};
 
   useEffect(() => {
     const loadData = async () => {
