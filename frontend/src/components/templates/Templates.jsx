@@ -233,15 +233,6 @@ const Templates = () => {
                         </MDBBtn>
                     </div>
                 </div>
-                <div className="row mb-4 mx-1">
-                    <MDBInput
-                        type="text"
-                        value={searchTerm}
-                        label="Search Templates"
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                    />
-                </div>
-
 
                 <MDBDatatable
                     striped
@@ -250,12 +241,10 @@ const Templates = () => {
                     data={tableData}
                     selectable
                     multi
-                    confirmDelete={true}
                     onSelectRow={handleRowSelect}
-                    selectedRows={[]} // Reset on each render
                     isLoading={templates.length === 0}
-                    searching={true}
-                    searchLabel="Search templates"
+                    search
+                    searchLabel="Search Templates"
                     entriesOptions={[5, 10, 25]}
                     entries={10}
                 />

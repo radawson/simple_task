@@ -75,17 +75,17 @@ const TaskEdit = () => {
               <MDBInput
                 label="Title"
                 name="name"
-                value={task.name}
+                value={task.name || ''}
                 onChange={handleChange}
                 required
               />
             </div>
-            
+
             <div className="mb-3">
               <MDBTextArea
                 label="Description"
                 name="description"
-                value={task.description}
+                value={task.description || ''}
                 onChange={handleChange}
                 rows={3}
               />
@@ -129,8 +129,8 @@ const TaskEdit = () => {
               <MDBBtn type="submit" color="primary">
                 {id ? 'Save' : 'Create'}
               </MDBBtn>
-              <MDBBtn 
-                type="button" 
+              <MDBBtn
+                type="button"
                 color="secondary"
                 onClick={() => navigate(-1)}
               >
