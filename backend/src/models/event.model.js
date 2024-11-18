@@ -12,7 +12,7 @@ class Event extends BaseModel {
             summary: {
                 type: DataTypes.STRING(200),
                 allowNull: false,
-                field: 'title'
+                field: 'summary'
             },
             description: {
                 type: DataTypes.TEXT,

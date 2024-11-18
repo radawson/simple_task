@@ -12,7 +12,7 @@ const schemas = {
     }),
 
     event: Joi.object({
-        title: Joi.string().required().max(200),
+        summary: Joi.string().required().max(200),
         description: Joi.string().allow('', null),
         dtstart: Joi.date().required(),
         dtend: Joi.date().min(Joi.ref('dtstart')).allow(null),
