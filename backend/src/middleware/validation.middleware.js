@@ -20,13 +20,12 @@ const schemas = {
         timeEnd: Joi.string().allow('', null),
         location: Joi.string().allow('', null),
         status: Joi.string().valid('CONFIRMED', 'TENTATIVE', 'CANCELLED').default('CONFIRMED'),
-        categories: Joi.array().items(Joi.string()).allow(null),
+        participants: Joi.array().items(Joi.string()).allow(null).default([]),
         priority: Joi.number().min(0).max(9).default(0),
         url: Joi.string().uri().allow('', null),
         organizer: Joi.string().allow('', null),
         transp: Joi.string().valid('OPAQUE', 'TRANSPARENT').default('OPAQUE'),
-        class: Joi.string().valid('PUBLIC', 'PRIVATE', 'CONFIDENTIAL').default('PUBLIC'),
-        participants: Joi.array().items(Joi.string()).allow(null)
+        class: Joi.string().valid('PUBLIC', 'PRIVATE', 'CONFIDENTIAL').default('PUBLIC')
     }).options({ stripUnknown: true }),
 
     note: Joi.object({

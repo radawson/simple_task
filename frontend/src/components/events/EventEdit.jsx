@@ -57,7 +57,7 @@ const EventEdit = () => {
       }));
       return;
     }
-  
+
     // Handle regular input changes
     const { name, value, type, checked } = e.target;
     setEvent(prev => ({
@@ -227,16 +227,17 @@ const EventEdit = () => {
                   label="Participants"
                   name="participants"
                   multiple
-                  value={event.participants || []} // Ensure value is always an array
-                  onChange={values => {
+                  value={event.participants}
+                  onChange={(selectedValues) => {
                     setEvent(prev => ({
                       ...prev,
-                      participants: values
+                      participants: selectedValues || []
                     }));
                   }}
                   data={persons.map(person => ({
                     text: `${person.firstName} ${person.lastName}`,
-                    value: person.id
+                    value: person.id,
+                    selected: event.participants?.includes(person.id)
                   }))}
                 />
               </div>

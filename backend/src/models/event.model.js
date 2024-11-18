@@ -9,102 +9,58 @@ class Event extends BaseModel {
                 primaryKey: true,
                 autoIncrement: true
             },
-            // Custom fields
-            addedBy: {
-                type: DataTypes.STRING(30),
-                field: 'added_by'
-            },
-            completed: {
-                type: DataTypes.BOOLEAN,
-                defaultValue: false
-            },
-            description: DataTypes.TEXT,
-            participants: {
-                type: DataTypes.JSON,  // Changed from ARRAY to JSON for flexibility
-                defaultValue: [],
-                field: 'participants',
-                validate: {
-                    isValidParticipants(value) {
-                        if (!Array.isArray(value) && typeof value !== 'string') {
-                            throw new Error('Participants must be an array or string');
-                        }
-                        if (Array.isArray(value)) {
-                            value.forEach(participant => {
-                                if (typeof participant === 'object' && (!participant.firstName || !participant.lastName)) {
-                                    throw new Error('Person objects must have firstName and lastName');
-                                }
-                                if (typeof participant !== 'object' && typeof participant !== 'string') {
-                                    throw new Error('Participants must be Person objects or strings');
-                                }
-                            });
-                        }
-                    }
-                }
-            },
-            // iCal standard fields
             summary: {
                 type: DataTypes.STRING(200),
                 allowNull: false,
                 field: 'name'
             },
-            description: DataTypes.TEXT,
+            description: {
+                type: DataTypes.TEXT,
+                allowNull: true
+            },
             dtstart: {
                 type: DataTypes.DATEONLY,
-                field: 'date_start',
-                allowNull: false
+                allowNull: false,
+                field: 'date_start'
             },
             dtend: {
                 type: DataTypes.DATEONLY,
+                allowNull: true,
                 field: 'date_end'
             },
             timeStart: {
                 type: DataTypes.TIME,
+                allowNull: true,
                 field: 'time_start'
             },
             timeEnd: {
                 type: DataTypes.TIME,
+                allowNull: true,
                 field: 'time_end'
             },
-            location: DataTypes.STRING(200),
-            uid: {
+            location: {
                 type: DataTypes.STRING(200),
-                field: 'ical_uid',
-                unique: true
+                allowNull: true
             },
-            sequence: {
-                type: DataTypes.INTEGER,
-                defaultValue: 0
+            participants: {
+                type: DataTypes.JSON,
+                allowNull: true,
+                defaultValue: [],
+                get() {
+                    const raw = this.getDataValue('participants');
+                    return raw ? JSON.parse(raw) : [];
+                },
+                set(value) {
+                    this.setDataValue('participants', JSON.stringify(value || []));
+                }
             },
             status: {
                 type: DataTypes.ENUM('CONFIRMED', 'TENTATIVE', 'CANCELLED'),
                 defaultValue: 'CONFIRMED'
             },
-            rrule: {
-                type: DataTypes.STRING(200),
-                field: 'recurrence_rule'
-            },
-            categories: {
-                type: DataTypes.JSON,
-                defaultValue: [],
-                get() {
-                    const rawValue = this.getDataValue('categories');
-                    return rawValue ? JSON.parse(rawValue) : [];
-                },
-                set(value) {
-                    this.setDataValue('categories', JSON.stringify(value));
-                }
-            },
-            priority: {
-                type: DataTypes.INTEGER,
-                validate: {
-                    min: 0,
-                    max: 9
-                }
-            },
-            url: DataTypes.STRING(500),
             organizer: {
                 type: DataTypes.STRING(50),
-                allowNull: false,
+                allowNull: true,
                 field: 'person'
             },
             transp: {
@@ -112,9 +68,17 @@ class Event extends BaseModel {
                 defaultValue: 'OPAQUE'
             },
             class: {
-                type: DataTypes.ENUM('PUBLIC', 'PRIVATE', 'CONFIDENTIAL'),
-                defaultValue: 'PUBLIC',
+                type: DataTypes.STRING,
+                allowNull: true,
                 field: 'classification'
+            },
+            priority: {
+                type: DataTypes.INTEGER,
+                defaultValue: 0
+            },
+            url: {
+                type: DataTypes.STRING(500),
+                allowNull: true
             }
         }, {
             sequelize,
