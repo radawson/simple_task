@@ -1,4 +1,4 @@
-// src/services/api.js
+//src/services/api.js
 import axios from 'axios';
 import { AuthService } from './auth.service';
 
@@ -73,6 +73,7 @@ export const ApiService = {
   deleteEvent: (id) => api.delete(`/events/${id}`),
   getEvent: (id) => api.get(`/events/${id}`),
   getEvents: (date) => api.get(`/events/date/${date}`),
+  getEventsByRange: (start, end) => api.get(`/events/range/${start}/${end}`),
   listEvents: () => api.get('/events'),
   updateEvent: (id, event) => api.patch(`/events/${id}`, event),
   
@@ -83,4 +84,8 @@ export const ApiService = {
   getNotes: (date) => api.get(`/notes/date/${date}`),
   listNotes: () => api.get('/notes'),
   updateNote: (id, note) => api.patch(`/notes/${id}`, note),
+
+  // Calendar Import 
+  importCalendar: (calendar) => api.post('/events/import', calendar),
+  exportCalendar: (id) => api.get(`/events/export/${id}`),
 };

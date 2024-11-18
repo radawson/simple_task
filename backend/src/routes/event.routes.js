@@ -1,3 +1,4 @@
+//src/routes/event.routes.js
 import express from 'express';
 import { validateEvent } from '../middleware/validation.middleware.js';
 import { authenticate } from '../middleware/auth.middleware.js';
