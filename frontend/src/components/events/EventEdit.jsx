@@ -38,6 +38,28 @@ const EventEdit = () => {
   const [loading, setLoading] = useState(!!id);
 
   const handleChange = (e) => {
+    // Handle MDBSelect changes (receives value directly)
+    if (!e.target) {
+      // For participants (multiple select)
+      if (Array.isArray(e)) {
+        setEvent(prev => ({
+          ...prev,
+          participants: e
+        }));
+      }
+      // For single selects (status, class, organizer)
+      else {
+        const name = e.name || e.target?.name;
+        const value = e.value || e;
+        setEvent(prev => ({
+          ...prev,
+          [name]: value
+        }));
+      }
+      return;
+    }
+
+    // Handle regular input changes
     const { name, value, type, checked } = e.target;
     setEvent(prev => ({
       ...prev,
@@ -162,22 +184,24 @@ const EventEdit = () => {
             <div className="row mb-3">
               <div className="col-md-6">
                 <MDBSelect
+                  name="status"  // Add this
                   data={[
                     { value: "CONFIRMED", text: "Confirmed" },
                     { value: "TENTATIVE", text: "Tentative" },
                     { value: "CANCELLED", text: "Cancelled" },
                   ]}
-                  onChange={handleChange}
+                  onChange={value => handleChange({ name: 'status', value })}  // Update this
                 />
               </div>
               <div className="col-md-6">
                 <MDBSelect
+                  name="class"  // Add this
                   data={[
                     { value: "PUBLIC", text: "Public" },
                     { value: "PRIVATE", text: "Private" },
                     { value: "CONFIDENTIAL", text: "Confidential" }
                   ]}
-                  onChange={handleChange}
+                  onChange={value => handleChange({ name: 'class', value })}  // Update this
                 />
               </div>
             </div>
@@ -205,7 +229,7 @@ const EventEdit = () => {
                   name="participants"
                   multiple
                   value={event.participants}
-                  onChange={handleChange}
+                  onChange={values => handleChange(values)}  // Update this
                   data={persons.map(person => ({
                     text: `${person.firstName} ${person.lastName}`,
                     value: person.id
