@@ -35,9 +35,11 @@ export default function Navbar() {
           </MDBNavbarBrand>
           <MDBNavbarToggler
             type='button'
-            onClick={toggleSidenav}
+            data-target='#navbarToggleSidebar'
+            aria-controls='navbarToggleSidebar'
             aria-expanded='false'
             aria-label='Toggle navigation'
+            onClick={() => setShowSidenav(!showSidenav)}
           >
             <MDBIcon icon='bars' fas />
           </MDBNavbarToggler>
@@ -47,6 +49,12 @@ export default function Navbar() {
             <MDBNavbarNav className='mb-2 mb-lg-0'>
               <MDBNavbarItem>
                 <MDBNavbarLink href='/tasks'>Tasks</MDBNavbarLink>
+              </MDBNavbarItem>
+              <MDBNavbarItem>
+                <MDBNavbarLink href='/events'>Events</MDBNavbarLink>
+              </MDBNavbarItem>
+              <MDBNavbarItem>
+                <MDBNavbarLink href='/notes'>Notes</MDBNavbarLink>
               </MDBNavbarItem>
               <MDBNavbarItem>
                 <MDBNavbarLink href='/templates'>Templates</MDBNavbarLink>
@@ -83,6 +91,20 @@ export default function Navbar() {
           >
             <MDBSideNavLink href='/tasks'>
               <MDBIcon fas icon='tasks' className='me-2'/> Tasks
+            </MDBSideNavLink>
+          </MDBSideNavItem>
+          <MDBSideNavItem
+            onClick={toggleSidenav}
+          >
+            <MDBSideNavLink href='/events'>
+              <MDBIcon fas icon='calendar' className='me-2'/> Events
+            </MDBSideNavLink>
+          </MDBSideNavItem>
+          <MDBSideNavItem
+            onClick={toggleSidenav}
+          >
+            <MDBSideNavLink href='/notes'>
+              <MDBIcon fas icon='note-sticky' className='me-2'/> Notes
             </MDBSideNavLink>
           </MDBSideNavItem>
           <MDBSideNavItem

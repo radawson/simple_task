@@ -35,7 +35,7 @@ const TaskList = ({
   const updateTasks = useCallback(async () => {
     if (!selectedDate) return;
     try {
-      const updatedTasks = await ApiService.listTasks(s);
+      const updatedTasks = await ApiService.getTasks(selectedDate);
       onTaskUpdate(updatedTasks);
     } catch (error) {
       console.error('Failed to update tasks:', error);

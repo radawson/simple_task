@@ -233,7 +233,7 @@ const Templates = () => {
                         </MDBBtn>
                     </div>
                 </div>
-                <div className="row mb-4 ">
+                <div className="row mb-4 mx-1">
                     <MDBInput
                         type="text"
                         value={searchTerm}
