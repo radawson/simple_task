@@ -235,6 +235,7 @@ const Templates = () => {
                 </div>
 
                 <MDBDatatable
+                    fixedHeader
                     striped
                     hover
                     className="table-responsive"

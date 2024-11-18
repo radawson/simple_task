@@ -45,6 +45,35 @@ api.interceptors.response.use(
 );
 
 export const ApiService = {
+  // Auth
+  login: (credentials) => api.post('/auth/login', credentials),
+  register: (userData) => api.post('/auth/register', userData),
+  refreshToken: () => api.post('/auth/refresh'),
+
+  // Events
+  createEvent: (event) => api.post('/events', event),
+  deleteEvent: (id) => api.delete(`/events/${id}`),
+  getEvent: (id) => api.get(`/events/${id}`),
+  getEvents: (date) => api.get(`/events/date/${date}`),
+  getEventsByRange: (start, end) => api.get(`/events/range/${start}/${end}`),
+  listEvents: () => api.get('/events'),
+  updateEvent: (id, event) => api.patch(`/events/${id}`, event),
+
+  // Notes
+  createNote: (note) => api.post('/notes', note),
+  deleteNote: (id) => api.delete(`/notes/${id}`),
+  getNote: (id) => api.get(`/notes/${id}`),
+  getNotes: (date) => api.get(`/notes/date/${date}`),
+  listNotes: () => api.get('/notes'),
+  updateNote: (id, note) => api.patch(`/notes/${id}`, note),
+
+  // Persons
+  createPerson: (person) => api.post('/persons', person),
+  deletePerson: (id) => api.delete(`/persons/${id}`),
+  getPerson: (id) => api.get(`/persons/${id}`),
+  listPersons: () => api.get('/persons'),
+  updatePerson: (id, person) => api.patch(`/persons/${id}`, person),
+
   // Tasks
   createTask: (task) => api.post('/tasks', task),
   deleteTask: (id) => api.delete(`/tasks/${id}`),
@@ -54,7 +83,6 @@ export const ApiService = {
   toggleTaskCompletion: (taskId) => api.patch(`/tasks/completed/${taskId}`),
   updateTask: (id, task) => api.patch(`/tasks/${id}`, task),
 
-
   // Templates
   createTemplate: (template) => api.post('/templates', template),
   deleteTemplate: (id) => api.delete(`/templates/${id}`),
@@ -62,28 +90,6 @@ export const ApiService = {
   getTemplates: () => api.get('/templates'),
   listTemplates: () => api.get('/templates'), // redundant, but keeps the pattern
   updateTemplate: (id, template) => api.patch(`/templates/${id}`, template),
-
-  // Auth
-  login: (credentials) => api.post('/auth/login', credentials),
-  register: (userData) => api.post('/auth/register', userData),
-  refreshToken: () => api.post('/auth/refresh'),
-  
-  // Events
-  createEvent: (event) => api.post('/events', event),
-  deleteEvent: (id) => api.delete(`/events/${id}`),
-  getEvent: (id) => api.get(`/events/${id}`),
-  getEvents: (date) => api.get(`/events/date/${date}`),
-  getEventsByRange: (start, end) => api.get(`/events/range/${start}/${end}`),
-  listEvents: () => api.get('/events'),
-  updateEvent: (id, event) => api.patch(`/events/${id}`, event),
-  
-  // Notes
-  createNote: (note) => api.post('/notes', note),
-  deleteNote: (id) => api.delete(`/notes/${id}`),
-  getNote: (id) => api.get(`/notes/${id}`),
-  getNotes: (date) => api.get(`/notes/date/${date}`),
-  listNotes: () => api.get('/notes'),
-  updateNote: (id, note) => api.patch(`/notes/${id}`, note),
 
   // Calendar Import 
   importCalendar: (calendar) => api.post('/events/import', calendar),

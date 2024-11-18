@@ -1,127 +1,206 @@
-// src/components/tasks/TaskEdit.jsx
+// src/components/events/EventEdit.jsx
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   MDBInput,
   MDBTextArea,
   MDBBtn,
-  MDBSwitch,
+  MDBSelect,
   MDBCard,
   MDBCardBody,
-  MDBContainer
+  MDBContainer,
+  MDBTimepicker
 } from 'mdb-react-ui-kit';
 import { ApiService } from '../../services/api';
 import { formatLocalDate } from '../../utils/dateUtils';
 
-const TaskEdit = () => {
+const EventEdit = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [task, setTask] = useState({
-    name: '',
+  const [persons, setPersons] = useState([]);
+  const [event, setEvent] = useState({
+    summary: '',
     description: '',
-    date: formatLocalDate(),
-    priority: 1,
-    template: false
+    dtstart: formatLocalDate(),
+    dtend: formatLocalDate(),
+    timeStart: '',
+    timeEnd: '',
+    location: '',
+    status: 'CONFIRMED',
+    categories: [],
+    priority: 0,
+    url: '',
+    organizer: '',
+    transp: 'OPAQUE',
+    class: 'PUBLIC',
+    participants: []
   });
   const [loading, setLoading] = useState(!!id);
 
   useEffect(() => {
-    const loadTask = async () => {
-      if (id) {
-        try {
-          const response = await ApiService.getTask(id);
-          setTask(response.data);
-        } catch (error) {
-          console.error('Failed to load task:', error);
-        } finally {
-          setLoading(false);
+    const loadData = async () => {
+      try {
+        // Load persons for participant selector
+        const personsResponse = await ApiService.listPersons();
+        setPersons(personsResponse.data);
+
+        if (id) {
+          const eventResponse = await ApiService.getEvent(id);
+          setEvent(eventResponse.data);
         }
+      } catch (error) {
+        console.error('Failed to load data:', error);
+      } finally {
+        setLoading(false);
       }
     };
-    loadTask();
+    loadData();
   }, [id]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       if (id) {
-        await ApiService.updateTask(id, task);
+        await ApiService.updateEvent(id, event);
       } else {
-        await ApiService.createTask(task);
+        await ApiService.createEvent(event);
       }
-      navigate('/tasks');
+      navigate('/events');
     } catch (error) {
-      console.error('Failed to save task:', error);
+      console.error('Failed to save event:', error);
     }
-  };
-
-  const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setTask(prev => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value
-    }));
   };
 
   if (loading) return <div>Loading...</div>;
 
   return (
     <MDBContainer className="py-5">
-      <h1>{id ? 'Edit Task' : 'New Task'}</h1>
+      <h1>{id ? 'Edit Event' : 'New Event'}</h1>
       <MDBCard>
         <MDBCardBody>
           <form onSubmit={handleSubmit}>
             <div className="mb-3">
               <MDBInput
                 label="Title"
-                name="name"
-                value={task.name}
-                onChange={handleChange}
+                name="summary"
+                value={event.summary}
                 required
               />
             </div>
-            
+
             <div className="mb-3">
               <MDBTextArea
                 label="Description"
                 name="description"
-                value={task.description}
-                onChange={handleChange}
+                value={event.description || ''}
                 rows={3}
               />
             </div>
 
             <div className="row mb-3">
-              <div className="col-md-8">
+              <div className="col-md-6">
                 <MDBInput
                   type="date"
-                  label="Date"
-                  name="date"
-                  value={task.date}
-                  onChange={handleChange}
-                  disabled={task.template}
-                  required={!task.template}
+                  label="Start Date"
+                  name="dtstart"
+                  value={event.dtstart}
+                  required
                 />
               </div>
-              <div className="col-md-4">
+              <div className="col-md-6">
                 <MDBInput
-                  type="number"
-                  label="Priority"
-                  name="priority"
-                  value={task.priority}
-                  onChange={handleChange}
-                  min={1}
-                  max={5}
+                  type="time"
+                  label="Start Time"
+                  name="timeStart"
+                  value={event.timeStart || ''}
+                />
+              </div>
+            </div>
+
+            <div className="row mb-3">
+              <div className="col-md-6">
+                <MDBInput
+                  type="date"
+                  label="End Date"
+                  name="dtend"
+                  value={event.dtend || ''}
+                />
+              </div>
+              <div className="col-md-6">
+                <MDBInput
+                  type="time"
+                  label="End Time"
+                  name="timeEnd"
+                  value={event.timeEnd || ''}
                 />
               </div>
             </div>
 
             <div className="mb-3">
-              <MDBSwitch
-                name="template"
-                checked={task.template}
-                onChange={handleChange}
-                label="Template"
+              <MDBInput
+                label="Location"
+                name="location"
+                value={event.location || ''}
+              />
+            </div>
+
+            <div className="row mb-3">
+              <div className="col-md-6">
+                <MDBSelect
+                  data={[
+                    { value: "CONFIRMED", text: "Confirmed" },
+                    { value: "TENTATIVE", text: "Tentative" },
+                    { value: "CANCELLED", text: "Cancelled" },
+                  ]}
+                />
+              </div>
+              <div className="col-md-6">
+                <MDBSelect
+                  data={[
+                    { value: "PUBLIC", text: "Public" },
+                    { value: "PRIVATE", text: "Private" },
+                    { value: "CONFIDENTIAL", text: "Confidential" }
+                  ]}
+                />
+              </div>
+            </div>
+
+            <div className="row mb-3">
+              <div className="col-md-6">
+                <MDBSelect
+                  label="Organizer"
+                  name="organizer"
+                  value={event.organizer}
+                  data={[
+                    { text: 'Select Organizer', value: '' },
+                    ...persons.map(person => ({
+                      text: `${person.firstName} ${person.lastName}`,
+                      value: person.id
+                    }))
+                  ]}
+                  required
+                />
+              </div>
+              <div className="col-md-6">
+                <MDBSelect
+                  label="Participants"
+                  name="participants"
+                  multiple
+                  value={event.participants}
+                  data={persons.map(person => ({
+                    text: `${person.firstName} ${person.lastName}`,
+                    value: person.id
+                  }))}
+                />
+              </div>
+            </div>
+
+            <div className="mb-3">
+              <MDBInput
+                type="url"
+                label="URL"
+                name="url"
+                value={event.url || ''}
               />
             </div>
 
@@ -129,8 +208,8 @@ const TaskEdit = () => {
               <MDBBtn type="submit" color="primary">
                 {id ? 'Save' : 'Create'}
               </MDBBtn>
-              <MDBBtn 
-                type="button" 
+              <MDBBtn
+                type="button"
                 color="secondary"
                 onClick={() => navigate(-1)}
               >
@@ -141,8 +220,8 @@ const TaskEdit = () => {
                   type="button"
                   color="danger"
                   onClick={async () => {
-                    await ApiService.deleteTask(id);
-                    navigate('/tasks');
+                    await ApiService.deleteEvent(id);
+                    navigate('/events');
                   }}
                 >
                   Delete
@@ -156,4 +235,4 @@ const TaskEdit = () => {
   );
 };
 
-export default TaskEdit;
+export default EventEdit;

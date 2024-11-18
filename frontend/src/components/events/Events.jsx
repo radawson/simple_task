@@ -1,5 +1,5 @@
 // src/components/tasks/Tasks.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useCallback, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
     MDBContainer,
@@ -14,11 +14,10 @@ import { formatLocalDate } from '../../utils/dateUtils';
 
 const Events = () => {
     const navigate = useNavigate();
-    const [events, setEvents] = useState([]);
-    const [searchTerm, setSearchTerm] = useState('');
+    const [endDate, setEndDate] = useState('');
     const [selectedDate, setSelectedDate] = useState(formatLocalDate());
     const [selectedEvents, setSelectedEvents] = useState(new Set());
-    const [tableData, setTableData] = useState({
+    const [asyncData, setAsyncData] = useState({
         columns: [
             {
                 label: 'Name',
@@ -28,17 +27,22 @@ const Events = () => {
             {
                 label: 'Description',
                 field: 'description',
-                className: 'col-5'
+                className: 'col-3'
             },
             {
-                label: 'Date',
-                field: 'date',
-                className: 'col-2'
-            },
-            {
-                label: 'Priority',
-                field: 'priority',
+                label: 'Start Date',
+                field: 'dtstart',
                 className: 'col-1'
+            },
+            {
+                label: 'End Date',
+                field: 'dtend',
+                className: 'col-1'
+            },
+            {
+                label: 'Participants',
+                field: 'participants',
+                className: 'col-3'
             },
             {
                 label: 'Actions',
@@ -48,6 +52,9 @@ const Events = () => {
         ],
         rows: []
     });
+
+    const [loading, setLoading] = useState(false);
+
     const [toast, setToast] = useState({
         show: false,
         message: ''
@@ -77,6 +84,20 @@ const Events = () => {
         navigate('/events/new');
     };
 
+    const handleRowSelect = (selectionEvent) => {
+        if (!Array.isArray(selectionEvent)) return;
+
+        // Create Set from selected task IDs
+        const newSelection = new Set(
+            selectionEvent.map(event => event.id)
+        );
+
+        // Update selected tasks state
+        setSelectedEvents(newSelection);
+
+        console.log('Updated selection:', newSelection);
+    };
+
     const createActionButtons = (event) => (
         <div>
             <MDBBtn
@@ -99,41 +120,47 @@ const Events = () => {
         </div>
     );
 
-    const fetchEvents = async () => {
+    const fetchEvents = useCallback(async () => {
+        setLoading(true);
         try {
-            const response = await ApiService.listEvents();
-            console.log('API Response:', response);
-    
-            // Extract tasks array from paginated response
-            const eventsArray = response?.data?.events || [];
-    
+            let response;
+            if (!selectedDate) {
+                response = await ApiService.listEvents();
+            } else if (!endDate) {
+            response = await ApiService.getEvents(selectedDate);
+            } else {
+                response = await ApiService.getEventsByRange(selectedDate, endDate);
+            }
+            const eventsArray = response?.data || [];
+
             const formattedEvents = eventsArray.map(event => ({
                 id: event.id,
                 name: event.name,
                 description: event.description,
                 date: event.date,
-                priority: task.priority,
-                completed: task.completed,
+                priority: event.priority,
+                completed: event.completed,
                 actions: createActionButtons(event)
             }));
-    
-            setTasks(eventsArray); 
-            setTableData(prev => ({
+
+            setAsyncData(prev => ({
                 ...prev,
                 rows: formattedEvents
             }));
         } catch (error) {
-            console.error('Failed to fetch tasks:', error);
+            console.error('Failed to fetch events:', error);
             setToast({
                 show: true,
-                message: 'Failed to load tasks: ' + error.message
+                message: 'Failed to load events: ' + error.message
             });
+        } finally {
+            setLoading(false);
         }
-    };
+    }, [selectedDate]);
 
     useEffect(() => {
         fetchEvents();
-    }, []);
+    }, [fetchEvents]);
 
     return (
         <MDBContainer className="py-5">
@@ -145,31 +172,36 @@ const Events = () => {
             </div>
 
             <div className="row mb-4">
-                <div className="col-md-8">
+            <div className="col-md-4">
                     <MDBInput
-                        type="text"
-                        value={searchTerm}
-                        label="Search Tasks"
-                        onChange={(e) => setSearchTerm(e.target.value)}
+                        type="date"
+                        value={selectedDate}
+                        onChange={(e) => setSelectedDate(e.target.value)}
+                        label="Start Date"
                     />
                 </div>
                 <div className="col-md-4">
                     <MDBInput
                         type="date"
-                        value={selectedDate}
-                        onChange={(e) => setSelectedDate(e.target.value)}
-                        label="Filter by Date"
+                        value={endDate}
+                        onChange={(e) => setEndDate(e.target.value)}
+                        label="End Date"
                     />
                 </div>
             </div>
 
             <MDBDatatable
+                fixedHeader
                 striped
                 hover
                 className="table-responsive"
-                data={tableData}
-                searching={true}
-                searchLabel="Search tasks"
+                data={asyncData}
+                selectable
+                multi
+                onSelectRow={handleRowSelect}
+                isLoading={loading}
+                search
+                searchLabel="Search Events"
                 entriesOptions={[5, 10, 25]}
                 entries={10}
             />

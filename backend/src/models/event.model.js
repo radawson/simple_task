@@ -10,14 +10,15 @@ class Event extends BaseModel {
                 autoIncrement: true
             },
             // Custom fields
-            completed: {
-                type: DataTypes.BOOLEAN,
-                defaultValue: false
-            },
             addedBy: {
                 type: DataTypes.STRING(30),
                 field: 'added_by'
             },
+            completed: {
+                type: DataTypes.BOOLEAN,
+                defaultValue: false
+            },
+            description: DataTypes.TEXT,
             participants: {
                 type: DataTypes.JSON,  // Changed from ARRAY to JSON for flexibility
                 defaultValue: [],
