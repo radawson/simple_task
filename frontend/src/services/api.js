@@ -56,10 +56,12 @@ export const ApiService = {
 
 
   // Templates
-  getTemplates: () => api.get('/templates'),
   createTemplate: (template) => api.post('/templates', template),
-  updateTemplate: (id, template) => api.patch(`/templates/${id}`, template),
   deleteTemplate: (id) => api.delete(`/templates/${id}`),
+  getTemplate: (id) => api.get(`/templates/${id}`),
+  getTemplates: () => api.get('/templates'),
+  listTemplates: () => api.get('/templates'), // redundant, but keeps the pattern
+  updateTemplate: (id, template) => api.patch(`/templates/${id}`, template),
 
   // Auth
   login: (credentials) => api.post('/auth/login', credentials),
@@ -67,12 +69,18 @@ export const ApiService = {
   refreshToken: () => api.post('/auth/refresh'),
   
   // Events
-  getEvents: (date) => api.get(`/events/date/${date}`),
   createEvent: (event) => api.post('/events', event),
+  deleteEvent: (id) => api.delete(`/events/${id}`),
+  getEvent: (id) => api.get(`/events/${id}`),
+  getEvents: (date) => api.get(`/events/date/${date}`),
+  listEvents: () => api.get('/events'),
   updateEvent: (id, event) => api.patch(`/events/${id}`, event),
   
   // Notes
-  getNotes: (date) => api.get(`/notes/date/${date}`),
   createNote: (note) => api.post('/notes', note),
+  deleteNote: (id) => api.delete(`/notes/${id}`),
+  getNote: (id) => api.get(`/notes/${id}`),
+  getNotes: (date) => api.get(`/notes/date/${date}`),
+  listNotes: () => api.get('/notes'),
   updateNote: (id, note) => api.patch(`/notes/${id}`, note),
 };
