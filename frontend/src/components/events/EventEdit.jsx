@@ -37,6 +37,28 @@ const EventEdit = () => {
   });
   const [loading, setLoading] = useState(!!id);
 
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setEvent(prev => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value
+    }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      if (id) {
+        await ApiService.updateEvent(id, event);
+      } else {
+        await ApiService.createEvent(event);
+      }
+      navigate('/events');
+    } catch (error) {
+      console.error('Failed to save event:', error);
+    }
+  };
+
   useEffect(() => {
     const loadData = async () => {
       try {
@@ -57,20 +79,6 @@ const EventEdit = () => {
     loadData();
   }, [id]);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      if (id) {
-        await ApiService.updateEvent(id, event);
-      } else {
-        await ApiService.createEvent(event);
-      }
-      navigate('/events');
-    } catch (error) {
-      console.error('Failed to save event:', error);
-    }
-  };
-
   if (loading) return <div>Loading...</div>;
 
   return (
@@ -84,6 +92,7 @@ const EventEdit = () => {
                 label="Title"
                 name="summary"
                 value={event.summary}
+                onChange={handleChange}
                 required
               />
             </div>
@@ -93,6 +102,7 @@ const EventEdit = () => {
                 label="Description"
                 name="description"
                 value={event.description || ''}
+                onChange={handleChange}
                 rows={3}
               />
             </div>
@@ -104,6 +114,7 @@ const EventEdit = () => {
                   label="Start Date"
                   name="dtstart"
                   value={event.dtstart}
+                  onChange={handleChange}
                   required
                 />
               </div>
@@ -113,6 +124,7 @@ const EventEdit = () => {
                   label="Start Time"
                   name="timeStart"
                   value={event.timeStart || ''}
+                  onChange={handleChange}
                 />
               </div>
             </div>
@@ -124,6 +136,7 @@ const EventEdit = () => {
                   label="End Date"
                   name="dtend"
                   value={event.dtend || ''}
+                  onChange={handleChange}
                 />
               </div>
               <div className="col-md-6">
@@ -132,6 +145,7 @@ const EventEdit = () => {
                   label="End Time"
                   name="timeEnd"
                   value={event.timeEnd || ''}
+                  onChange={handleChange}
                 />
               </div>
             </div>
@@ -141,6 +155,7 @@ const EventEdit = () => {
                 label="Location"
                 name="location"
                 value={event.location || ''}
+                onChange={handleChange}
               />
             </div>
 
@@ -152,6 +167,7 @@ const EventEdit = () => {
                     { value: "TENTATIVE", text: "Tentative" },
                     { value: "CANCELLED", text: "Cancelled" },
                   ]}
+                  onChange={handleChange}
                 />
               </div>
               <div className="col-md-6">
@@ -161,6 +177,7 @@ const EventEdit = () => {
                     { value: "PRIVATE", text: "Private" },
                     { value: "CONFIDENTIAL", text: "Confidential" }
                   ]}
+                  onChange={handleChange}
                 />
               </div>
             </div>
@@ -171,6 +188,7 @@ const EventEdit = () => {
                   label="Organizer"
                   name="organizer"
                   value={event.organizer}
+                  onChange={handleChange}
                   data={[
                     { text: 'Select Organizer', value: '' },
                     ...persons.map(person => ({
@@ -187,6 +205,7 @@ const EventEdit = () => {
                   name="participants"
                   multiple
                   value={event.participants}
+                  onChange={handleChange}
                   data={persons.map(person => ({
                     text: `${person.firstName} ${person.lastName}`,
                     value: person.id
@@ -201,6 +220,7 @@ const EventEdit = () => {
                 label="URL"
                 name="url"
                 value={event.url || ''}
+                onChange={handleChange}
               />
             </div>
 
