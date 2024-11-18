@@ -1,6 +1,6 @@
 import { Person, Event, Timecard } from '../models/index.js';
 import { Op } from 'sequelize';
-import Logger from '../core/Logger,js';
+import Logger from '../core/Logger.js';
 const logger = Logger.getInstance();
 
 /**

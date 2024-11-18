@@ -35,6 +35,14 @@ const schemas = {
             .required()
     }),
 
+    person: Joi.object({
+        firstName: Joi.string()
+            .required()
+            .max(200),
+        lastName: Joi.string()
+            .max(200),
+    }),
+
     task: Joi.object({
         name: Joi.string()
             .required()
@@ -140,6 +148,7 @@ const validators = {
     validateFile: validate(schemas.file),
     validateNote: validate(schemas.note),
     validatePassword: validate(schemas.password),
+    validatePerson: validate(schemas.person),
     validateTask: validate(schemas.task),
     validateTemplate: validate(schemas.template),
     validateTimecard: validate(schemas.timecard),
@@ -160,6 +169,7 @@ export const {
     validateFile,
     validateNote,
     validatePassword,
+    validatePerson,
     validateTask,
     validateTemplate,
     validateTimecard,
