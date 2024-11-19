@@ -20,16 +20,19 @@ class EventController {
         try {
             logger.info('Creating new event', { user: req.user.username });
             
-            const event = await Event.create({
+            // Convert single participant to array if needed
+            const eventData = {
                 ...req.body,
+                participants: Array.isArray(req.body.participants) 
+                    ? req.body.participants 
+                    : req.body.participants ? [req.body.participants] : [],
                 addedBy: req.user.username
-            });
+            };
+            
+            const event = await Event.create(eventData);
             
             logger.info('Event created successfully', { eventId: event.id });
-            
-            // Notify subscribers
             this.notifySubscribers(event, 'create');
-            
             return res.status(201).json(event);
         } catch (error) {
             logger.error('Event creation failed', { 
@@ -366,13 +369,20 @@ class EventController {
                 logger.warn('Event not found for update', { eventId: req.params.id });
                 return res.status(404).json({ message: 'Event not found' });
             }
-
+    
+            // Convert single participant to array if needed
+            const updateData = {
+                ...req.body,
+                participants: Array.isArray(req.body.participants)
+                    ? req.body.participants
+                    : req.body.participants ? [req.body.participants] : []
+            };
+    
             const oldDate = event.dtstart;
-            await event.update(req.body);
+            await event.update(updateData);
             
             logger.info('Event updated successfully', { eventId: event.id });
-
-            // If date changed, notify both old and new date subscribers
+    
             if (oldDate !== event.dtstart) {
                 const oldFormattedDate = new Date(oldDate).toISOString().split('T')[0];
                 this.socketService.notifyEventUpdate(oldFormattedDate, {
@@ -382,7 +392,6 @@ class EventController {
             }
             
             this.notifySubscribers(event, 'update');
-            
             return res.json(event);
         } catch (error) {
             logger.error('Event update failed', {

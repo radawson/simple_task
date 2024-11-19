@@ -18,7 +18,7 @@ const EventEdit = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [persons, setPersons] = useState([]);
-  const [event, setEvent] = useState({
+  const [calEvent, setCalEvent] = useState({
     summary: '',
     description: '',
     dtstart: formatLocalDate(),
@@ -33,53 +33,45 @@ const EventEdit = () => {
     organizer: '',
     transp: 'OPAQUE',
     class: 'PUBLIC',
-    participants: []
+    participants: ''
   });
   const [loading, setLoading] = useState(!!id);
 
   const handleChange = (e) => {
-    // Handle MDBSelect changes (receives value directly)
-    if (!e.target) {
-      // For participants (multiple select)
-      if (Array.isArray(e)) {
-        setEvent(prev => ({
-          ...prev,
-          participants: e
-        }));
-        return;
-      }
-      // For single selects (status, class, organizer)
-      const name = e.name;
-      const value = e.value || e;
-      setEvent(prev => ({
+    // For MDBSelect components that pass value directly
+    if (typeof e === 'object' && !e.target && 'name' in e) {
+      setCalEvent(prev => ({
         ...prev,
-        [name]: value
+        [e.name]: e.value
       }));
       return;
     }
-
-    // Handle regular input changes
-    const { name, value, type, checked } = e.target;
-    setEvent(prev => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value
-    }));
+  
+    // For regular input elements
+    if (e?.target) {
+      const { name, value, type, checked } = e.target;
+      setCalEvent(prev => ({
+        ...prev,
+        [name]: type === 'checkbox' ? checked : value
+      }));
+      return;
+    }
   };
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-
-        if (id) {
-            await ApiService.updateEvent(id, event);
-        } else {
-            await ApiService.createEvent(event);
-        }
-        navigate('/events');
+      if (id) {
+        await ApiService.updateEvent(id, calEvent);
+      } else {
+        await ApiService.createEvent(calEvent);
+      }
+      navigate('/events');
     } catch (error) {
-        console.error('Failed to save event:', error);
+      console.error('Failed to save event:', error);
     }
-};
+  };
 
   useEffect(() => {
     const loadData = async () => {
@@ -90,7 +82,7 @@ const EventEdit = () => {
 
         if (id) {
           const eventResponse = await ApiService.getEvent(id);
-          setEvent(eventResponse.data);
+          setCalEvent(eventResponse.data);
         }
       } catch (error) {
         console.error('Failed to load data:', error);
@@ -113,7 +105,7 @@ const EventEdit = () => {
               <MDBInput
                 label="Title"
                 name="summary"
-                value={event.summary}
+                value={calEvent.summary}
                 onChange={handleChange}
                 required
               />
@@ -123,7 +115,7 @@ const EventEdit = () => {
               <MDBTextArea
                 label="Description"
                 name="description"
-                value={event.description || ''}
+                value={calEvent.description || ''}
                 onChange={handleChange}
                 rows={3}
               />
@@ -135,7 +127,7 @@ const EventEdit = () => {
                   type="date"
                   label="Start Date"
                   name="dtstart"
-                  value={event.dtstart}
+                  value={calEvent.dtstart}
                   onChange={handleChange}
                   required
                 />
@@ -145,7 +137,7 @@ const EventEdit = () => {
                   type="time"
                   label="Start Time"
                   name="timeStart"
-                  value={event.timeStart || ''}
+                  value={calEvent.timeStart || ''}
                   onChange={handleChange}
                 />
               </div>
@@ -157,7 +149,7 @@ const EventEdit = () => {
                   type="date"
                   label="End Date"
                   name="dtend"
-                  value={event.dtend || ''}
+                  value={calEvent.dtend || ''}
                   onChange={handleChange}
                 />
               </div>
@@ -166,7 +158,7 @@ const EventEdit = () => {
                   type="time"
                   label="End Time"
                   name="timeEnd"
-                  value={event.timeEnd || ''}
+                  value={calEvent.timeEnd || ''}
                   onChange={handleChange}
                 />
               </div>
@@ -176,7 +168,7 @@ const EventEdit = () => {
               <MDBInput
                 label="Location"
                 name="location"
-                value={event.location || ''}
+                value={calEvent.location || ''}
                 onChange={handleChange}
               />
             </div>
@@ -190,7 +182,7 @@ const EventEdit = () => {
                     { value: "TENTATIVE", text: "Tentative" },
                     { value: "CANCELLED", text: "Cancelled" },
                   ]}
-                  onChange={value => handleChange({ name: 'status', value })}  // Update this
+                  onChange={value => handleChange({ name: 'status', value })}
                 />
               </div>
               <div className="col-md-6">
@@ -201,7 +193,7 @@ const EventEdit = () => {
                     { value: "PRIVATE", text: "Private" },
                     { value: "CONFIDENTIAL", text: "Confidential" }
                   ]}
-                  onChange={value => handleChange({ name: 'class', value })}  // Update this
+                  onChange={value => handleChange({ name: 'class', value })}
                 />
               </div>
             </div>
@@ -211,7 +203,7 @@ const EventEdit = () => {
                 <MDBSelect
                   label="Organizer"
                   name="organizer"
-                  value={event.organizer}
+                  value={calEvent.organizer}
                   onChange={handleChange}
                   data={[
                     { text: 'Select Organizer', value: '' },
@@ -225,20 +217,18 @@ const EventEdit = () => {
               </div>
               <div className="col-md-6">
                 <MDBSelect
+                  autoSelect
                   label="Participants"
                   name="participants"
-                  value={event.participants}
-                  onChange={(selectedValues) => {
-                    setEvent(prev => ({
-                      ...prev,
-                      participants: selectedValues || []
-                    }));
-                  }}
-                  data={persons.map(person => ({
-                    text: `${person.firstName} ${person.lastName}`,
-                    value: person.id,
-                    selected: event.participants?.includes(person.id)
-                  }))}
+                  value={calEvent.participants}
+                  onChange={handleChange}
+                  data={[
+                    { text: 'Everyone', value: '0' },
+                    ...persons.map(person => ({
+                      text: `${person.firstName} ${person.lastName}`,
+                      value: person.id
+                    }))
+                  ]}
                 />
               </div>
             </div>
@@ -248,7 +238,7 @@ const EventEdit = () => {
                 type="url"
                 label="URL"
                 name="url"
-                value={event.url || ''}
+                value={calEvent.url || ''}
                 onChange={handleChange}
               />
             </div>
