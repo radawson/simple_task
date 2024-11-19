@@ -20,7 +20,10 @@ const schemas = {
         timeEnd: Joi.string().allow('', null),
         location: Joi.string().allow('', null),
         status: Joi.string().valid('CONFIRMED', 'TENTATIVE', 'CANCELLED').default('CONFIRMED'),
-        participants: Joi.array().items(Joi.string()).allow(null).default([]),
+        participants: Joi.alternatives().try(
+            Joi.string().allow('', null),
+            Joi.array().items(Joi.string())
+        ).default([]),
         priority: Joi.number().min(0).max(9).default(0),
         url: Joi.string().uri().allow('', null),
         organizer: Joi.string().allow('', null),
