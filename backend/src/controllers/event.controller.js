@@ -18,9 +18,11 @@ class EventController {
      */
     create = async (req, res) => {
         try {
-            logger.info('Creating new event', { user: req.user.username });
+            logger.info('Creating new event', { 
+                user: req.user.username,
+                eventData: JSON.stringify(req.body)  // Log full request
+            });
             
-            // Convert single participant to array if needed
             const eventData = {
                 ...req.body,
                 participants: Array.isArray(req.body.participants) 
@@ -28,6 +30,10 @@ class EventController {
                     : req.body.participants ? [req.body.participants] : [],
                 addedBy: req.user.username
             };
+            
+            logger.info('Processed event data', {
+                processedData: JSON.stringify(eventData)  // Log processed data
+            });
             
             const event = await Event.create(eventData);
             
@@ -37,12 +43,20 @@ class EventController {
         } catch (error) {
             logger.error('Event creation failed', { 
                 error: error.message,
+                code: error.code,
+                name: error.name,
                 stack: error.stack,
-                userData: req.body 
+                userData: JSON.stringify(req.body),
+                validationErrors: error.errors?.map(e => ({
+                    message: e.message,
+                    field: e.path,
+                    value: e.value
+                }))
             });
             return res.status(400).json({ 
                 message: 'Failed to create event',
-                error: error.message 
+                error: error.message,
+                details: error.errors?.map(e => e.message)
             });
         }
     };

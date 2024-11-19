@@ -28,7 +28,7 @@ const schemas = {
         url: Joi.string().uri().allow('', null),
         organizer: Joi.string().allow('', null),
         transp: Joi.string().valid('OPAQUE', 'TRANSPARENT').default('OPAQUE'),
-        class: Joi.string().valid('PUBLIC', 'PRIVATE', 'CONFIDENTIAL').default('PUBLIC')
+        class: Joi.string().allow('', null),
     }).options({ stripUnknown: true }),
 
     note: Joi.object({
