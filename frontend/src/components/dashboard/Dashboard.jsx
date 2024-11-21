@@ -26,6 +26,11 @@ const Dashboard = () => {
           ApiService.getNotes(currentDate)
         ]);
 
+        // Debugging
+        // console.log('Tasks:', tasksRes.data);
+        console.log('Events:', eventsRes.data);
+        // console.log('Notes:', notesRes.data);
+
         setTasks(tasksRes.data);
         setEvents(eventsRes.data);
         setNotes(notesRes.data);
