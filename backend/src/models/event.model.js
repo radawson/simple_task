@@ -11,32 +11,44 @@ class Event extends BaseModel {
             },
             summary: {
                 type: DataTypes.STRING(200),
-                allowNull: false,
-                field: 'summary'
+                allowNull: false
             },
             description: {
                 type: DataTypes.TEXT,
                 allowNull: true
             },
-            dtstart: {
+            date_start: {
                 type: DataTypes.DATEONLY,
                 allowNull: false,
-                field: 'date_start'
+                set(value) {
+                    // Handle ISO date string format
+                    if (typeof value === 'string') {
+                        const date = new Date(value);
+                        this.setDataValue('date_start', date.toISOString().split('T')[0]);
+                    } else {
+                        this.setDataValue('date_start', value);
+                    }
+                }
             },
-            dtend: {
+            date_end: {
                 type: DataTypes.DATEONLY,
                 allowNull: true,
-                field: 'date_end'
+                set(value) {
+                    if (typeof value === 'string') {
+                        const date = new Date(value);
+                        this.setDataValue('date_end', date.toISOString().split('T')[0]);
+                    } else {
+                        this.setDataValue('date_end', value);
+                    }
+                }
             },
-            timeStart: {
-                type: DataTypes.TIME,
-                allowNull: true,
-                field: 'time_start'
+            time_start: {
+                type: DataTypes.STRING(5),
+                allowNull: true
             },
-            timeEnd: {
-                type: DataTypes.TIME,
-                allowNull: true,
-                field: 'time_end'
+            time_end: {
+                type: DataTypes.STRING(5),
+                allowNull: true
             },
             location: {
                 type: DataTypes.STRING(200),
@@ -48,10 +60,20 @@ class Event extends BaseModel {
                 defaultValue: [],
                 get() {
                     const raw = this.getDataValue('participants');
-                    return raw ? JSON.parse(raw) : [];
+                    if (!raw) return [];
+                    try {
+                        return typeof raw === 'string' ? JSON.parse(raw) : raw;
+                    } catch (e) {
+                        return [];
+                    }
                 },
                 set(value) {
-                    this.setDataValue('participants', JSON.stringify(value || []));
+                    try {
+                        const toStore = Array.isArray(value) ? value : [];
+                        this.setDataValue('participants', JSON.stringify(toStore));
+                    } catch (e) {
+                        this.setDataValue('participants', '[]');
+                    }
                 }
             },
             status: {
@@ -60,17 +82,15 @@ class Event extends BaseModel {
             },
             organizer: {
                 type: DataTypes.STRING(50),
-                allowNull: true,
-                field: 'person'
+                allowNull: true
             },
             transp: {
                 type: DataTypes.ENUM('OPAQUE', 'TRANSPARENT'),
                 defaultValue: 'OPAQUE'
             },
-            class: {
+            classification: {
                 type: DataTypes.STRING,
-                allowNull: true,
-                field: 'classification'
+                allowNull: true
             },
             priority: {
                 type: DataTypes.INTEGER,
@@ -80,12 +100,23 @@ class Event extends BaseModel {
             url: {
                 type: DataTypes.STRING(500),
                 allowNull: true
+            },
+            added_by: {
+                type: DataTypes.STRING(30),
+                allowNull: true
+            },
+            calendar_id: {
+                type: DataTypes.INTEGER,
+                allowNull: true
             }
         }, {
             sequelize,
             modelName: 'Event',
             tableName: 'events',
-            timestamps: true
+            timestamps: true,
+            underscored: true,
+            createdAt: 'created_at',
+            updatedAt: 'updated_at'
         });
     }
 
@@ -93,8 +124,8 @@ class Event extends BaseModel {
         return {
             summary: icalEvent.summary,
             description: icalEvent.description,
-            dtstart: icalEvent.start,
-            dtend: icalEvent.end,
+            date_start: icalEvent.start,
+            date_end: icalEvent.end,
             location: icalEvent.location,
             uid: icalEvent.uid,
             status: icalEvent.status,
@@ -113,8 +144,8 @@ class Event extends BaseModel {
         return {
             summary: this.summary,
             description: this.description,
-            start: this.dtstart,
-            end: this.dtend,
+            start: this.date_start,
+            end: this.date_end,
             location: this.location,
             uid: this.uid,
             status: this.status,
@@ -137,7 +168,7 @@ class Event extends BaseModel {
             targetKey: 'username'
         });
         this.belongsTo(models.Person, {
-            foreignKey: 'person',
+            foreignKey: 'organizer',
             targetKey: 'id'
         });
         this.belongsTo(models.Calendar);

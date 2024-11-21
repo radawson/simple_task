@@ -1,5 +1,5 @@
 import { Event, Person } from '../models/index.js';
-import { Op } from 'sequelize';
+import sequelize, { Op } from 'sequelize';
 import Logger from '../core/Logger.js';
 const logger = Logger.getInstance();
 
@@ -18,30 +18,46 @@ class EventController {
      */
     create = async (req, res) => {
         try {
-            logger.info('Creating new event', { 
+            logger.info('Creating new event', {
                 user: req.user.username,
                 eventData: JSON.stringify(req.body)  // Log full request
             });
-            
+
+
+
+            // Remove any timestamp fields from input
+            const { created_at, updated_at, ...eventInput } = req.body;
+
             const eventData = {
                 ...req.body,
-                participants: Array.isArray(req.body.participants) 
-                    ? req.body.participants 
+                summary: req.body.summary,
+                description: req.body.description,
+                date_start: new Date(req.body.dtstart).toISOString().split('T')[0] || new Date().toISOString().split('T')[0],
+                date_end: req.body.dtend ? new Date(req.body.dtend).toISOString().split('T')[0] : null,
+                time_start: req.body.timeStart?.substring(0, 5) || null,
+                time_end: req.body.timeEnd?.substring(0, 5) || null,
+                location: req.body.location,
+                participants: Array.isArray(req.body.participants)
+                    ? req.body.participants
                     : req.body.participants ? [req.body.participants] : [],
-                addedBy: req.user.username
+                status: req.body.status,
+                classification: req.body.class || 'PUBLIC',
+                priority: req.body.priority || 0,
+                url: req.body.url,
+                added_by: req.user.username
             };
-            
+
             logger.info('Processed event data', {
                 processedData: JSON.stringify(eventData)  // Log processed data
             });
-            
+
             const event = await Event.create(eventData);
-            
+
             logger.info('Event created successfully', { eventId: event.id });
             this.notifySubscribers(event, 'create');
             return res.status(201).json(event);
         } catch (error) {
-            logger.error('Event creation failed', { 
+            logger.error('Event creation failed', {
                 error: error.message,
                 code: error.code,
                 name: error.name,
@@ -53,7 +69,7 @@ class EventController {
                     value: e.value
                 }))
             });
-            return res.status(400).json({ 
+            return res.status(400).json({
                 message: 'Failed to create event',
                 error: error.message,
                 details: error.errors?.map(e => e.message)
@@ -69,7 +85,7 @@ class EventController {
     delete = async (req, res) => {
         try {
             logger.info('Attempting to delete event', { eventId: req.params.id });
-            
+
             const event = await Event.findByPk(req.params.id);
             if (!event) {
                 logger.warn('Event not found for deletion', { eventId: req.params.id });
@@ -78,14 +94,14 @@ class EventController {
 
             // Store date before deletion
             const eventDate = event.dtstart;
-            
+
             await event.destroy();
-            
+
             logger.info('Event deleted successfully', { eventId: req.params.id });
-            
+
             // Notify subscribers
             this.notifySubscribers({ id: req.params.id, dtstart: eventDate }, 'delete');
-            
+
             return res.status(204).send();
         } catch (error) {
             logger.error('Event deletion failed', {
@@ -93,9 +109,9 @@ class EventController {
                 stack: error.stack,
                 eventId: req.params.id
             });
-            return res.status(500).json({ 
+            return res.status(500).json({
                 message: 'Failed to delete event',
-                error: error.message 
+                error: error.message
             });
         }
     };
@@ -174,46 +190,44 @@ class EventController {
             const { date } = req.params;
             logger.info('Retrieving events by date', { date });
 
-            // Validate date format
-            const parsedDate = new Date(date);
-            if (!date || isNaN(parsedDate.getTime())) {
-                logger.warn('Invalid date format provided', { date });
-                return res.status(400).json({
-                    message: 'Invalid date format. Expected YYYY-MM-DD'
-                });
-            }
-
             const events = await Event.findAll({
                 where: {
-                    dtstart: date  // Using your DATEONLY field
+                    date_start: date  // Changed from dtstart
                 },
                 include: [{
                     model: Person,
-                    attributes: ['id', 'firstName', 'lastName']
+                    required: false,
+                    attributes: ['id', 'firstName', 'lastName'],
+                    on: {
+                        id: sequelize.where(sequelize.col('Event.organizer'), '=', sequelize.col('Person.id'))
+                    }
                 }],
                 order: [
-                    ['timeStart', 'ASC'],  // Order by time if available
-                    ['dtstart', 'ASC'],    // Then by date
-                    ['priority', 'DESC']    // High priority items first
-                ]
+                    ['time_start', 'ASC'],
+                    ['date_start', 'ASC'],
+                    ['priority', 'DESC']
+                ],
+                attributes: {
+                    exclude: ['PersonId', 'UserId', 'CalendarId'] // Remove unused fields
+                }
             });
 
-            logger.info('Events retrieved successfully', {
-                date,
-                count: events.length
-            });
-
-            return res.status(200).json(events);
-
+            logger.debug('Events retrieved', { count: events.length });
+            return res.json(events);
         } catch (error) {
             logger.error('Failed to get events by date', {
-                error: error.message,
-                stack: error.stack,
+                error: {
+                    message: error.message,
+                    name: error.name,
+                    stack: error.stack,
+                    sql: error.sql,
+                    parameters: error.parameters
+                },
                 date: req.params.date
             });
             return res.status(500).json({
-                message: 'Failed to retrieve events',
-                error: error.message
+                message: error.message,
+                details: error.sql
             });
         }
     };
@@ -373,17 +387,17 @@ class EventController {
      */
     update = async (req, res) => {
         try {
-            logger.info('Attempting to update event', { 
+            logger.info('Attempting to update event', {
                 eventId: req.params.id,
-                updates: req.body 
+                updates: req.body
             });
-            
+
             const event = await Event.findByPk(req.params.id);
             if (!event) {
                 logger.warn('Event not found for update', { eventId: req.params.id });
                 return res.status(404).json({ message: 'Event not found' });
             }
-    
+
             // Convert single participant to array if needed
             const updateData = {
                 ...req.body,
@@ -391,12 +405,12 @@ class EventController {
                     ? req.body.participants
                     : req.body.participants ? [req.body.participants] : []
             };
-    
+
             const oldDate = event.dtstart;
             await event.update(updateData);
-            
+
             logger.info('Event updated successfully', { eventId: event.id });
-    
+
             if (oldDate !== event.dtstart) {
                 const oldFormattedDate = new Date(oldDate).toISOString().split('T')[0];
                 this.socketService.notifyEventUpdate(oldFormattedDate, {
@@ -404,7 +418,7 @@ class EventController {
                     event: { id: event.id }
                 });
             }
-            
+
             this.notifySubscribers(event, 'update');
             return res.json(event);
         } catch (error) {
@@ -414,9 +428,9 @@ class EventController {
                 eventId: req.params.id,
                 updates: req.body
             });
-            return res.status(400).json({ 
+            return res.status(400).json({
                 message: 'Failed to update event',
-                error: error.message 
+                error: error.message
             });
         }
     };

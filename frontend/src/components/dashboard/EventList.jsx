@@ -24,7 +24,7 @@ const EventList = ({ events }) => {
         {events.map((event) => (
           <MDBAccordionItem
             key={event.id}
-            header={`${event.clock_time}: ${event.name} for ${event.person}`}
+            header={`${event.start_time}: ${event.summary} for ${event.participants}`}
           >
             <div className="d-flex justify-content-between align-items-center">
               <div className="form-outline no-border">

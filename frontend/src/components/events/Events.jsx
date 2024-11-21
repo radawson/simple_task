@@ -21,28 +21,33 @@ const Events = () => {
         columns: [
             {
                 label: 'Name',
-                field: 'name',
-                className: 'col-3'
+                field: 'summary',
+                className: 'col-2'
             },
             {
                 label: 'Description',
                 field: 'description',
-                className: 'col-3'
+                className: 'col-2'
             },
             {
-                label: 'Start Date',
-                field: 'dtstart',
+                label: 'Date',
+                field: 'date_start',
                 className: 'col-1'
             },
             {
-                label: 'End Date',
-                field: 'dtend',
+                label: 'Time',
+                field: 'time',
                 className: 'col-1'
+            },
+            {
+                label: 'Location',
+                field: 'location',
+                className: 'col-2'
             },
             {
                 label: 'Participants',
                 field: 'participants',
-                className: 'col-3'
+                className: 'col-2'
             },
             {
                 label: 'Actions',
@@ -135,11 +140,15 @@ const Events = () => {
 
             const formattedEvents = eventsArray.map(event => ({
                 id: event.id,
-                name: event.name,
-                description: event.description,
-                date: event.date,
-                priority: event.priority,
-                completed: event.completed,
+                summary: event.summary,
+                description: event.description || '',
+                date_start: event.date_start,
+                time: `${event.time_start || ''} ${event.time_end ? `- ${event.time_end}` : ''}`.trim(),
+                location: event.location || '',
+                status: event.status,
+                participants: Array.isArray(event.participants) ? 
+                    event.participants.join(', ') : 
+                    event.participants || '',
                 actions: createActionButtons(event)
             }));
 

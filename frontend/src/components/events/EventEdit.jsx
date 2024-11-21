@@ -46,7 +46,7 @@ const EventEdit = () => {
       }));
       return;
     }
-  
+
     // For regular input elements
     if (e?.target) {
       const { name, value, type, checked } = e.target;
@@ -176,24 +176,30 @@ const EventEdit = () => {
             <div className="row mb-3">
               <div className="col-md-6">
                 <MDBSelect
-                  name="status"  // Add this
+                  name="status"
                   data={[
                     { value: "CONFIRMED", text: "Confirmed" },
                     { value: "TENTATIVE", text: "Tentative" },
                     { value: "CANCELLED", text: "Cancelled" },
                   ]}
-                  onChange={value => handleChange({ name: 'status', value })}
+                  onChange={value => handleChange({
+                    name: 'status',
+                    value: typeof value === 'object' ? value.value : value
+                  })}
                 />
               </div>
               <div className="col-md-6">
                 <MDBSelect
-                  name="class"  // Add this
+                  name="class"
                   data={[
                     { value: "PUBLIC", text: "Public" },
                     { value: "PRIVATE", text: "Private" },
                     { value: "CONFIDENTIAL", text: "Confidential" }
                   ]}
-                  onChange={value => handleChange({ name: 'class', value })}
+                  onChange={value => handleChange({
+                    name: 'class',
+                    value: typeof value === 'object' ? value.value : value
+                  })}
                 />
               </div>
             </div>
@@ -204,7 +210,10 @@ const EventEdit = () => {
                   label="Organizer"
                   name="organizer"
                   value={calEvent.organizer}
-                  onChange={handleChange}
+                  onChange={value => handleChange({
+                    name: 'organizer',
+                    value: typeof value === 'object' ? value.value : value
+                  })}
                   data={[
                     { text: 'Select Organizer', value: '' },
                     ...persons.map(person => ({
@@ -212,16 +221,17 @@ const EventEdit = () => {
                       value: person.id
                     }))
                   ]}
-                  required
                 />
               </div>
               <div className="col-md-6">
                 <MDBSelect
-                  autoSelect
                   label="Participants"
                   name="participants"
                   value={calEvent.participants}
-                  onChange={handleChange}
+                  onChange={value => handleChange({
+                    name: 'participants',
+                    value: typeof value === 'object' ? value.value : value
+                  })}
                   data={[
                     { text: 'Everyone', value: '0' },
                     ...persons.map(person => ({

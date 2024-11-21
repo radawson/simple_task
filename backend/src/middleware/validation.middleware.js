@@ -12,24 +12,56 @@ const schemas = {
     }),
 
     event: Joi.object({
-        summary: Joi.string().required().max(200),
-        description: Joi.string().allow('', null),
-        dtstart: Joi.date().required(),
-        dtend: Joi.date().min(Joi.ref('dtstart')).allow(null),
-        timeStart: Joi.string().allow('', null),
-        timeEnd: Joi.string().allow('', null),
-        location: Joi.string().allow('', null),
-        status: Joi.string().valid('CONFIRMED', 'TENTATIVE', 'CANCELLED').default('CONFIRMED'),
+        summary: Joi.string()
+            .required()
+            .max(200),
+        classification: Joi.string()
+            .allow('', null),
+        description: Joi.string()
+            .allow('', null),
+        dtstart: Joi.date()
+            .required(),
+        dtend: Joi.date()
+            .min(Joi.ref('dtstart'))
+            .allow(null),
+        timeStart: Joi.string()
+            .pattern(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/)
+            .allow('', null),
+        timeEnd: Joi.string()
+            .pattern(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/)
+            .allow('', null),
+        location: Joi.string()
+            .max(200)
+            .allow('', null),
         participants: Joi.alternatives().try(
             Joi.string().allow('', null),
             Joi.array().items(Joi.string())
         ).default([]),
-        priority: Joi.number().min(0).max(9).default(0),
-        url: Joi.string().uri().allow('', null),
-        organizer: Joi.string().allow('', null),
-        transp: Joi.string().valid('OPAQUE', 'TRANSPARENT').default('OPAQUE'),
-        class: Joi.string().allow('', null),
-    }).options({ stripUnknown: true }),
+        status: Joi.string()
+            .valid('CONFIRMED', 'TENTATIVE', 'CANCELLED')
+            .default('CONFIRMED'),
+        organizer: Joi.string()
+            .max(50)
+            .allow('', null),
+        transp: Joi.string()
+            .valid('OPAQUE', 'TRANSPARENT')
+            .default('OPAQUE'),
+        priority: Joi.number()
+            .integer()
+            .min(0)
+            .max(9)
+            .default(0),
+        url: Joi.string()
+            .max(500)
+            .uri()
+            .allow('', null),
+        calendarId: Joi.number()
+            .integer()
+            .allow(null)
+    }).options({
+        stripUnknown: true,
+        abortEarly: false
+    }),
 
     note: Joi.object({
         title: Joi.string()
@@ -141,7 +173,7 @@ const schemas = {
 const validate = (schema) => {
     return (req, res, next) => {
         const { error } = schema.validate(req.body, { abortEarly: false });
-        
+
         if (error) {
             logger.warn(`Validation error: ${error.message}`);
             return res.status(400).json({

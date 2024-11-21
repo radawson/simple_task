@@ -15,15 +15,15 @@ class Note extends BaseModel {
       },
       content: DataTypes.TEXT,
       date: DataTypes.DATEONLY,
-      addedBy: {
+      added_by: {
         type: DataTypes.STRING(30),
-        field: 'added_by',
         allowNull: true
       }
     }, {
       sequelize,
       modelName: 'Note',
-      tableName: 'notes'
+      tableName: 'notes',
+      timestamps: true
     });
   }
 
