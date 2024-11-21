@@ -9,39 +9,37 @@ const EventList = ({ events = [] }) => {
     return timeEnd ? `${timeStart} - ${timeEnd}` : timeStart;
   };
 
-  const formatParticipants = (participants, person) => {
-    if (!participants) return '';
-    if (!Array.isArray(participants)) return participants;
-  
-    // If we have a Person object, use it to map IDs to names
-    if (person) {
-      return participants.map(id => {
-        if (id === person.id) {
-          return `${person.firstName} ${person.lastName}`;
-        }
-        return id;
-      }).join(', ');
+  const formatParticipants = (event) => {
+    if (!event) return '';
+
+    // Use participant details if available
+    if (event.participantDetails?.length > 0) {
+      return event.participantDetails
+        .map(p => `${p.firstName} ${p.lastName}`)
+        .join(', ');
     }
-  
-    return participants.join(', ');
+
+    return '';
   };
 
   const getHeader = (event) => {
-    
     try {
       const time = formatTime(event?.time_start, event?.time_end) || '';
-      const participants = formatParticipants(event?.participants, event?.Person) || '';
+      const participants = formatParticipants(event);
+      const organizer = event?.Organizer
+        ? `${event.Organizer.firstName} ${event.Organizer.lastName}`
+        : '';
       const summary = event?.summary || '';
-      
-      // Build header string with explicit parts
-      const header = [
-        time && `${time}: `,
-        summary,
-        participants && ` for ${participants}`,
-        event.location && ` @ ${event.location}`
-      ].filter(Boolean).join('');
-      
-      return header || 'Untitled Event'; // Fallback value
+
+      // Build header string
+      const parts = [];
+      if (time) parts.push(`${time}:`);
+      parts.push(summary);
+      if (organizer) parts.push(`(by ${organizer})`);
+      if (participants) parts.push(`with ${participants}`);
+      if (event.location) parts.push(`@ ${event.location}`);
+
+      return parts.join(' ') || 'Untitled Event';
     } catch (err) {
       console.error('Error generating header:', err);
       return 'Error: Could not generate header';
@@ -70,7 +68,7 @@ const EventList = ({ events = [] }) => {
           <MDBAccordionItem
             id={event?.id || index}
             key={event?.id || index}
-            collapseId={`collapse-${index}`} 
+            collapseId={`collapse-${index}`}
             headerClassName="d-flex justify-content-between align-items-center"
             headerTitle={String(getHeader(event))}
           >

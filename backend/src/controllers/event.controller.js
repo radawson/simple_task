@@ -181,53 +181,77 @@ class EventController {
     };
 
     /**
-         * Retrieve events for a specific date
-         * @param {Request} req - Express request object
-         * @param {Response} res - Express response object
-         */
+    * Retrieve events for a specific date
+    * @param {Request} req - Express request object
+    * @param {Response} res - Express response object
+    */
     getByDate = async (req, res) => {
         try {
             const { date } = req.params;
             logger.info('Retrieving events by date', { date });
-
+    
+            // Get events with organizer details
             const events = await Event.findAll({
                 where: {
-                    date_start: date  // Changed from dtstart
+                    date_start: date
                 },
                 include: [{
                     model: Person,
+                    as: 'Organizer',  // Use the alias
                     required: false,
-                    attributes: ['id', 'firstName', 'lastName'],
-                    on: {
-                        id: sequelize.where(sequelize.col('Event.organizer'), '=', sequelize.col('Person.id'))
-                    }
+                    attributes: ['id', 'firstName', 'lastName']
                 }],
                 order: [
                     ['time_start', 'ASC'],
                     ['date_start', 'ASC'],
                     ['priority', 'DESC']
-                ],
-                attributes: {
-                    exclude: ['PersonId', 'UserId', 'CalendarId'] // Remove unused fields
-                }
+                ]
             });
-
-            logger.debug('Events retrieved', { count: events.length });
-            return res.json(events);
+    
+            // Collect all unique participant IDs
+            const participantIds = [...new Set(
+                events.flatMap(event => event.participants || [])
+            )];
+    
+            // Fetch participant details if there are any
+            let participantMap = new Map();
+            if (participantIds.length > 0) {
+                const participantDetails = await Person.findAll({
+                    where: {
+                        id: participantIds
+                    },
+                    attributes: ['id', 'firstName', 'lastName']
+                });
+    
+                participantMap = new Map(
+                    participantDetails.map(p => [p.id, p])
+                );
+            }
+    
+            // Add participant details to each event
+            const eventsWithParticipants = events.map(event => {
+                const eventData = event.toJSON();
+                eventData.participantDetails = (eventData.participants || [])
+                    .map(id => participantMap.get(id))
+                    .filter(Boolean);
+                return eventData;
+            });
+    
+            logger.debug('Events retrieved with participants', {
+                eventCount: events.length,
+                participantIds: participantIds
+            });
+    
+            return res.json(eventsWithParticipants);
         } catch (error) {
             logger.error('Failed to get events by date', {
-                error: {
-                    message: error.message,
-                    name: error.name,
-                    stack: error.stack,
-                    sql: error.sql,
-                    parameters: error.parameters
-                },
-                date: req.params.date
+                error: error.message,
+                stack: error.stack,
+                date: date
             });
-            return res.status(500).json({
-                message: error.message,
-                details: error.sql
+            return res.status(500).json({ 
+                message: 'Failed to retrieve events',
+                error: error.message 
             });
         }
     };

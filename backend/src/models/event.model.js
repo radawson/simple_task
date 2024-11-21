@@ -168,6 +168,7 @@ class Event extends BaseModel {
             targetKey: 'username'
         });
         this.belongsTo(models.Person, {
+            as: 'Organizer',  // Add alias for organizer
             foreignKey: 'organizer',
             targetKey: 'id'
         });
