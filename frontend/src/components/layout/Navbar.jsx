@@ -1,4 +1,6 @@
+// src/components/layout/Navbar.jsx
 import React, { useState } from 'react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import {
   MDBNavbar,
   MDBContainer,
@@ -15,17 +17,65 @@ import {
 } from 'mdb-react-ui-kit';
 
 export default function Navbar() {
-  const [showSidenav, setShowSidenav] = useState(false);
+  const [showNav, setShowNav] = useState(false);
+  const [sideNavOpen, setSideNavOpen] = useState(false);  
+  const navigate = useNavigate();
+  const location = useLocation();
 
-  const toggleSidenav = () => {
-    setShowSidenav(!showSidenav);
+  const navItems = [
+    { path: '/', icon: 'home', label: 'Today' },
+    { path: '/tasks', icon: 'tasks', label: 'Tasks' },
+    { path: '/events', icon: 'calendar', label: 'Events' },
+    { path: '/notes', icon: 'note-sticky', label: 'Notes' },
+    { path: '/templates', icon: 'clipboard-list', label: 'Templates' },
+    { path: '/qr', icon: 'qrcode', label: 'QR Code' },
+    { path: 'https://wiki.partridgecrossing.org/', icon: 'book', label: 'Wiki', external: true },
+    { path: '/login', icon: 'sign-in-alt', label: 'Login', className: 'ms-auto' }
+  ];
+
+  const handleNavigation = (item) => {
+    if (item.external) {
+      window.open(item.path, '_blank', 'noopener,noreferrer');
+    } else {
+      navigate(item.path);
+    }
+    setShowNav(false);
+    setSideNavOpen(false);
+  };
+
+  const NavLink = ({ item }) => {
+    if (item.external) {
+      return (
+        <MDBNavbarLink 
+          href={item.path}
+          target="_blank"
+          rel="noopener noreferrer"
+          onClick={() => setShowNav(false)}
+        >
+          <MDBIcon fas icon={item.icon} className='me-2 d-lg-none'/>
+          {item.label}
+        </MDBNavbarLink>
+      );
+    }
+
+    return (
+      <MDBNavbarLink 
+        tag={Link} 
+        to={item.path}
+        active={location.pathname === item.path}
+        onClick={() => setShowNav(false)}
+      >
+        <MDBIcon fas icon={item.icon} className='me-2 d-lg-none'/>
+        {item.label}
+      </MDBNavbarLink>
+    );
   };
 
   return (
     <>
       <MDBNavbar expand='lg' light bgColor='light'>
-        <MDBContainer>
-          <MDBNavbarBrand href='/' className='navbar-brand mt-2 mt-lg-0'>
+        <MDBContainer fluid>
+          <MDBNavbarBrand tag={Link} to='/' className='mt-2 mt-lg-0'>
             <img
               src='/img/ptx_logo2.png'
               height='15'
@@ -33,101 +83,46 @@ export default function Navbar() {
               loading='lazy'
             />
           </MDBNavbarBrand>
+          
           <MDBNavbarToggler
             type='button'
-            data-target='#navbarToggleSidebar'
-            aria-controls='navbarToggleSidebar'
+            aria-controls='navbarSupportedContent'
             aria-expanded='false'
             aria-label='Toggle navigation'
-            onClick={() => setShowSidenav(!showSidenav)}
+            onClick={() => setShowNav(!showNav)}  // Changed to toggle showNav
           >
             <MDBIcon icon='bars' fas />
           </MDBNavbarToggler>
 
-          {/* Desktop Navigation */}
-          <MDBCollapse navbar show={false}>
-            <MDBNavbarNav className='mb-2 mb-lg-0'>
-              <MDBNavbarItem>
-                <MDBNavbarLink href='/tasks'>Tasks</MDBNavbarLink>
-              </MDBNavbarItem>
-              <MDBNavbarItem>
-                <MDBNavbarLink href='/events'>Events</MDBNavbarLink>
-              </MDBNavbarItem>
-              <MDBNavbarItem>
-                <MDBNavbarLink href='/notes'>Notes</MDBNavbarLink>
-              </MDBNavbarItem>
-              <MDBNavbarItem>
-                <MDBNavbarLink href='/templates'>Templates</MDBNavbarLink>
-              </MDBNavbarItem>
-              <MDBNavbarItem>
-                <MDBNavbarLink href='/qr'>QR Code</MDBNavbarLink>
-              </MDBNavbarItem>
-              <MDBNavbarItem right>
-                <MDBNavbarLink href='/login'>Login</MDBNavbarLink>
-              </MDBNavbarItem>
+          <MDBCollapse navbar open={showNav}>
+            <MDBNavbarNav className='mr-auto mb-2 mb-lg-0'>
+              {navItems.map((item, index) => (
+                <MDBNavbarItem key={index} className={item.className}>
+                  <NavLink item={item} />
+                </MDBNavbarItem>
+              ))}
             </MDBNavbarNav>
           </MDBCollapse>
         </MDBContainer>
       </MDBNavbar>
 
-      {/* Sidenav */}
       <MDBSideNav
-        open={showSidenav}
-        setOpen={showSidenav}
-        position='end'
-        closeOnEsc={true}
-        className='list-unstyled'
+        open={sideNavOpen}
+        closeOnEsc
+        className='pt-4'
       >
-        <div className='p-3'>
-        <MDBSideNavItem
-            onClick={toggleSidenav}
-          >
-            <MDBSideNavLink href='/'>
-              <MDBIcon fas icon='home' className='me-2'/> Today
-            </MDBSideNavLink>
-          </MDBSideNavItem>
-          <MDBSideNavItem
-            onClick={toggleSidenav}
-          >
-            <MDBSideNavLink href='/tasks'>
-              <MDBIcon fas icon='tasks' className='me-2'/> Tasks
-            </MDBSideNavLink>
-          </MDBSideNavItem>
-          <MDBSideNavItem
-            onClick={toggleSidenav}
-          >
-            <MDBSideNavLink href='/events'>
-              <MDBIcon fas icon='calendar' className='me-2'/> Events
-            </MDBSideNavLink>
-          </MDBSideNavItem>
-          <MDBSideNavItem
-            onClick={toggleSidenav}
-          >
-            <MDBSideNavLink href='/notes'>
-              <MDBIcon fas icon='note-sticky' className='me-2'/> Notes
-            </MDBSideNavLink>
-          </MDBSideNavItem>
-          <MDBSideNavItem
-            onClick={toggleSidenav}
-          >
-            <MDBSideNavLink href='/templates'>
-              <MDBIcon fas icon='clipboard-list' className='me-2'/> Templates
-            </MDBSideNavLink>
-          </MDBSideNavItem>
-          <MDBSideNavItem
-            onClick={toggleSidenav}
-          >
-            <MDBSideNavLink href='/qr'>
-              <MDBIcon fas icon='qrcode' className='me-2'/> QR Code
-            </MDBSideNavLink>
-          </MDBSideNavItem>
-          <MDBSideNavItem
-            onClick={toggleSidenav}
-          >
-            <MDBSideNavLink href='/login'>
-              <MDBIcon fas icon='sign-in-alt' className='me-2'/> Login
-            </MDBSideNavLink>
-          </MDBSideNavItem>
+        <div className='list-group list-group-flush'>
+          {navItems.map((item, index) => (
+            <MDBSideNavItem key={index} className='list-group-item list-group-item-action'>
+              <MDBSideNavLink
+                onClick={() => handleNavigation(item)}
+                className={`d-flex align-items-center ${!item.external && location.pathname === item.path ? 'active' : ''}`}
+              >
+                <MDBIcon fas icon={item.icon} className='me-2'/>
+                {item.label}
+              </MDBSideNavLink>
+            </MDBSideNavItem>
+          ))}
         </div>
       </MDBSideNav>
     </>

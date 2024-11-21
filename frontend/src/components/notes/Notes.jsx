@@ -17,17 +17,16 @@ const Notes = () => {
     const [notes, setNotes] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedDate, setSelectedDate] = useState(formatLocalDate());
-    const [selectedNotes, setSelectedNotes] = useState(new Set());
     const [tableData, setTableData] = useState({
         columns: [
             {
-                label: 'Name',
-                field: 'name',
+                label: 'Title',
+                field: 'title',
                 className: 'col-3'
             },
             {
-                label: 'Description',
-                field: 'description',
+                label: 'Content',
+                field: 'content',
                 className: 'col-5'
             },
             {
@@ -36,8 +35,8 @@ const Notes = () => {
                 className: 'col-2'
             },
             {
-                label: 'Priority',
-                field: 'priority',
+                label: 'Added By',
+                field: 'added_by',
                 className: 'col-1'
             },
             {
@@ -54,37 +53,37 @@ const Notes = () => {
     });
 
     const handleEdit = (noteId) => {
-        navigate(`/tasks/edit/${taskId}`);
+        navigate(`/notes/edit/${noteId}`);
     };
 
-    const handleDelete = async (taskId) => {
+    const handleDelete = async (noteId) => {
         try {
-            await ApiService.deleteTask(taskId);
-            fetchTasks();
+            await ApiService.deleteNote(noteId);
+            fetchNotes();
             setToast({
                 show: true,
-                message: 'Task deleted successfully'
+                message: 'Note deleted successfully'
             });
         } catch (error) {
             setToast({
                 show: true,
-                message: 'Failed to delete task: ' + error.message
+                message: 'Failed to delete note: ' + error.message
             });
         }
     };
 
-    const handleNewTask = () => {
-        navigate('/tasks/new');
+    const handleNewNote = () => {
+        navigate('/notes/new');
     };
 
-    const createActionButtons = (task) => (
+    const createActionButtons = (note) => (
         <div>
             <MDBBtn
                 floating
                 size="sm"
                 color="primary"
                 className="me-1"
-                onClick={() => handleEdit(task.id)}
+                onClick={() => handleEdit(note.id)}
             >
                 <MDBIcon icon="edit" />
             </MDBBtn>
@@ -92,55 +91,56 @@ const Notes = () => {
                 floating
                 size="sm"
                 color="danger"
-                onClick={() => handleDelete(task.id)}
+                onClick={() => handleDelete(note.id)}
             >
                 <MDBIcon icon="trash" />
             </MDBBtn>
         </div>
     );
 
-    const fetchTasks = async () => {
+    const fetchNotes = async () => {
         try {
-            const response = await ApiService.listTasks();
-            console.log('API Response:', response);
-    
-            // Extract tasks array from paginated response
-            const tasksArray = response?.data?.tasks || [];
-    
-            const formattedTasks = tasksArray.map(task => ({
-                id: task.id,
-                name: task.name,
-                description: task.description,
-                date: task.date,
-                priority: task.priority,
-                completed: task.completed,
-                actions: createActionButtons(task)
+            const response = await ApiService.listNotes({
+                date: selectedDate,
+                search: searchTerm
+            });
+            
+            const notesArray = response?.data?.notes || [];
+            
+            const formattedNotes = notesArray.map(note => ({
+                id: note.id,
+                title: note.title,
+                content: note.content?.substring(0, 100) + (note.content?.length > 100 ? '...' : ''),
+                date: note.date,
+                added_by: note.added_by,
+                actions: createActionButtons(note)
             }));
     
-            setTasks(tasksArray); // Store raw tasks
+            setNotes(notesArray); // Store raw notes
             setTableData(prev => ({
                 ...prev,
-                rows: formattedTasks
+                rows: formattedNotes
             }));
         } catch (error) {
-            console.error('Failed to fetch tasks:', error);
+            console.error('Failed to fetch notes:', error);
             setToast({
                 show: true,
-                message: 'Failed to load tasks: ' + error.message
+                message: 'Failed to load notes: ' + error.message
             });
         }
     };
 
+    // Fetch notes when date or search term changes
     useEffect(() => {
-        fetchTasks();
-    }, []);
+        fetchNotes();
+    }, [selectedDate, searchTerm]);
 
     return (
         <MDBContainer className="py-5">
             <div className="d-flex justify-content-between align-items-center mb-4">
-                <h1>Tasks</h1>
-                <MDBBtn onClick={handleNewTask}>
-                    <MDBIcon icon="plus" className="me-2" /> New Task
+                <h1>Notes</h1>
+                <MDBBtn onClick={handleNewNote}>
+                    <MDBIcon icon="plus" className="me-2" /> New Note
                 </MDBBtn>
             </div>
 
@@ -149,7 +149,7 @@ const Notes = () => {
                     <MDBInput
                         type="text"
                         value={searchTerm}
-                        label="Search Tasks"
+                        label="Search Notes"
                         onChange={(e) => setSearchTerm(e.target.value)}
                     />
                 </div>
@@ -168,8 +168,8 @@ const Notes = () => {
                 hover
                 className="table-responsive"
                 data={tableData}
-                searching={true}
-                searchLabel="Search tasks"
+                searching={false} // We're handling search ourselves
+                searchLabel="Search notes"
                 entriesOptions={[5, 10, 25]}
                 entries={10}
             />

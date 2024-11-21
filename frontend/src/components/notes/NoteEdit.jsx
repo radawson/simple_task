@@ -1,149 +1,188 @@
-// src/components/tasks/TaskEdit.jsx
+// src/components/notes/NoteEdit.jsx
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   MDBInput,
   MDBTextArea,
   MDBBtn,
-  MDBSwitch,
   MDBCard,
   MDBCardBody,
-  MDBContainer
+  MDBContainer,
+  MDBSpinner
 } from 'mdb-react-ui-kit';
 import { ApiService } from '../../services/api';
 import { formatLocalDate } from '../../utils/dateUtils';
+import Toast from '../common/Toast';
 
-const TaskEdit = () => {
+const NoteEdit = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [task, setTask] = useState({
-    name: '',
-    description: '',
-    date: formatLocalDate(),
-    priority: 1,
-    template: false
-  });
   const [loading, setLoading] = useState(!!id);
+  const [toast, setToast] = useState({ show: false, message: '', type: 'info' });
+  const [note, setNote] = useState({
+    title: '',
+    content: '',
+    date: formatLocalDate(),
+  });
 
   useEffect(() => {
-    const loadTask = async () => {
+    const loadNote = async () => {
       if (id) {
         try {
-          const response = await ApiService.getTask(id);
-          setTask(response.data);
+          const response = await ApiService.getNote(id);
+          setNote(response.data);
         } catch (error) {
-          console.error('Failed to load task:', error);
+          console.error('Failed to load note:', error);
+          setToast({
+            show: true,
+            message: 'Failed to load note: ' + error.message,
+            type: 'danger'
+          });
         } finally {
           setLoading(false);
         }
       }
     };
-    loadTask();
+    loadNote();
   }, [id]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
     try {
       if (id) {
-        await ApiService.updateTask(id, task);
+        await ApiService.updateNote(id, note);
       } else {
-        await ApiService.createTask(task);
+        await ApiService.createNote(note);
       }
-      navigate('/tasks');
+      setToast({
+        show: true,
+        message: `Note successfully ${id ? 'updated' : 'created'}`,
+        type: 'success'
+      });
+      setTimeout(() => navigate('/notes'), 1500);
     } catch (error) {
-      console.error('Failed to save task:', error);
+      console.error('Failed to save note:', error);
+      setToast({
+        show: true,
+        message: 'Failed to save note: ' + error.message,
+        type: 'danger'
+      });
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setTask(prev => ({
+    const { name, value } = e.target;
+    setNote(prev => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value
+      [name]: value
     }));
   };
 
-  if (loading) return <div>Loading...</div>;
+  const handleDelete = async () => {
+    if (!window.confirm('Are you sure you want to delete this note?')) {
+      return;
+    }
+
+    setLoading(true);
+    try {
+      await ApiService.deleteNote(id);
+      setToast({
+        show: true,
+        message: 'Note successfully deleted',
+        type: 'success'
+      });
+      setTimeout(() => navigate('/notes'), 1500);
+    } catch (error) {
+      console.error('Failed to delete note:', error);
+      setToast({
+        show: true,
+        message: 'Failed to delete note: ' + error.message,
+        type: 'danger'
+      });
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <MDBContainer className="py-5 d-flex justify-content-center">
+        <MDBSpinner role="status">
+          <span className="visually-hidden">Loading...</span>
+        </MDBSpinner>
+      </MDBContainer>
+    );
+  }
 
   return (
     <MDBContainer className="py-5">
-      <h1>{id ? 'Edit Task' : 'New Task'}</h1>
+      <h1>{id ? 'Edit Note' : 'New Note'}</h1>
       <MDBCard>
         <MDBCardBody>
           <form onSubmit={handleSubmit}>
             <div className="mb-3">
               <MDBInput
                 label="Title"
-                name="name"
-                value={task.name}
+                name="title"
+                value={note.title}
                 onChange={handleChange}
                 required
+                maxLength={200}
               />
             </div>
             
             <div className="mb-3">
               <MDBTextArea
-                label="Description"
-                name="description"
-                value={task.description}
+                label="Content"
+                name="content"
+                value={note.content}
                 onChange={handleChange}
-                rows={3}
+                rows={5}
               />
             </div>
 
-            <div className="row mb-3">
-              <div className="col-md-8">
-                <MDBInput
-                  type="date"
-                  label="Date"
-                  name="date"
-                  value={task.date}
-                  onChange={handleChange}
-                  disabled={task.template}
-                  required={!task.template}
-                />
-              </div>
-              <div className="col-md-4">
-                <MDBInput
-                  type="number"
-                  label="Priority"
-                  name="priority"
-                  value={task.priority}
-                  onChange={handleChange}
-                  min={1}
-                  max={5}
-                />
-              </div>
-            </div>
-
             <div className="mb-3">
-              <MDBSwitch
-                name="template"
-                checked={task.template}
+              <MDBInput
+                type="date"
+                label="Date"
+                name="date"
+                value={note.date}
                 onChange={handleChange}
-                label="Template"
+                required
               />
             </div>
 
             <div className="d-flex gap-2">
-              <MDBBtn type="submit" color="primary">
-                {id ? 'Save' : 'Create'}
+              <MDBBtn 
+                type="submit" 
+                color="primary"
+                disabled={loading}
+              >
+                {loading ? (
+                  <>
+                    <MDBSpinner size='sm' className='me-2' />
+                    Saving...
+                  </>
+                ) : id ? 'Save' : 'Create'}
               </MDBBtn>
+              
               <MDBBtn 
                 type="button" 
                 color="secondary"
-                onClick={() => navigate(-1)}
+                onClick={() => navigate('/notes')}
+                disabled={loading}
               >
                 Cancel
               </MDBBtn>
+              
               {id && (
                 <MDBBtn
                   type="button"
                   color="danger"
-                  onClick={async () => {
-                    await ApiService.deleteTask(id);
-                    navigate('/tasks');
-                  }}
+                  onClick={handleDelete}
+                  disabled={loading}
                 >
                   Delete
                 </MDBBtn>
@@ -152,8 +191,15 @@ const TaskEdit = () => {
           </form>
         </MDBCardBody>
       </MDBCard>
+
+      <Toast
+        show={toast.show}
+        message={toast.message}
+        type={toast.type}
+        onClose={() => setToast({ show: false, message: '', type: 'info' })}
+      />
     </MDBContainer>
   );
 };
 
-export default TaskEdit;
+export default NoteEdit;

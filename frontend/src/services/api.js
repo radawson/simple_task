@@ -56,7 +56,7 @@ export const ApiService = {
   getEvent: (id) => api.get(`/events/${id}`),
   getEvents: (date) => api.get(`/events/date/${date}`),
   getEventsByRange: (start, end) => api.get(`/events/range/${start}/${end}`),
-  listEvents: () => api.get('/events'),
+  listEvents: (params) => api.get('/events', { params }),
   updateEvent: (id, event) => api.patch(`/events/${id}`, event),
 
   // Notes
@@ -64,14 +64,14 @@ export const ApiService = {
   deleteNote: (id) => api.delete(`/notes/${id}`),
   getNote: (id) => api.get(`/notes/${id}`),
   getNotes: (date) => api.get(`/notes/date/${date}`),
-  listNotes: () => api.get('/notes'),
+  listNotes: (params) => axios.get('/api/notes', { params }),
   updateNote: (id, note) => api.patch(`/notes/${id}`, note),
 
   // Persons
   createPerson: (person) => api.post('/persons', person),
   deletePerson: (id) => api.delete(`/persons/${id}`),
   getPerson: (id) => api.get(`/persons/${id}`),
-  listPersons: () => api.get('/persons'),
+  listPersons: (params) => api.get('/persons', { params }),
   updatePerson: (id, person) => api.patch(`/persons/${id}`, person),
 
   // Tasks
@@ -79,7 +79,7 @@ export const ApiService = {
   deleteTask: (id) => api.delete(`/tasks/${id}`),
   getTask: (id) => api.get(`/tasks/${id}`),
   getTasks: (date) => api.get(`/tasks/date/${date}`),
-  listTasks: () => api.get('/tasks'),
+  listTasks: (params) => api.get('/tasks', { params }),
   toggleTaskCompletion: (taskId) => api.patch(`/tasks/completed/${taskId}`),
   updateTask: (id, task) => api.patch(`/tasks/${id}`, task),
 
@@ -88,7 +88,7 @@ export const ApiService = {
   deleteTemplate: (id) => api.delete(`/templates/${id}`),
   getTemplate: (id) => api.get(`/templates/${id}`),
   getTemplates: () => api.get('/templates'),
-  listTemplates: () => api.get('/templates'), // redundant, but keeps the pattern
+  listTemplates: (params) => api.get('/templates', { params }), // redundant, but keeps the pattern
   updateTemplate: (id, template) => api.patch(`/templates/${id}`, template),
 
   // Calendar Import 

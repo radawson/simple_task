@@ -65,6 +65,68 @@ const Events = () => {
         message: ''
     });
 
+    const fetchEvents = useCallback(async () => {
+        setLoading(true);
+        try {
+            let response;
+            if (!selectedDate) {
+                response = await ApiService.listEvents();
+            } else if (!endDate) {
+                response = await ApiService.getEvents(selectedDate);
+            } else {
+                response = await ApiService.getEventsByRange(selectedDate, endDate);
+            }
+            const eventsArray = response?.data || [];
+
+            const formattedEvents = eventsArray.map(event => ({
+                id: event.id,
+                summary: event.summary,
+                description: event.description || '',
+                date_start: event.date_start,
+                time: `${event.time_start || ''} ${event.time_end ? `- ${event.time_end}` : ''}`.trim(),
+                location: event.location || '',
+                status: event.status,
+                participants: formatParticipants(event), // Use the new format function
+                organizer: event.Organizer
+                    ? `${event.Organizer.firstName} ${event.Organizer.lastName}`
+                    : '',
+                actions: createActionButtons(event)
+            }));
+
+            setAsyncData(prev => ({
+                ...prev,
+                rows: formattedEvents
+            }));
+        } catch (error) {
+            console.error('Failed to fetch events:', error);
+            setToast({
+                show: true,
+                message: 'Failed to load events: ' + error.message,
+                type: 'danger'
+            });
+        } finally {
+            setLoading(false);
+        }
+    }, [selectedDate, endDate]);
+
+    const formatParticipants = (event) => {
+        if (!event) return '';
+
+        // Use participant details if available
+        if (event.participantDetails?.length > 0) {
+            return event.participantDetails
+                .map(p => `${p.firstName} ${p.lastName}`)
+                .join(', ');
+        }
+
+        // Show organizer if available
+        const organizer = event.Organizer
+            ? `${event.Organizer.firstName} ${event.Organizer.lastName}`
+            : '';
+
+        return organizer;
+    };
+
     const handleEdit = (eventId) => {
         navigate(`/events/edit/${eventId}`);
     };
@@ -125,51 +187,6 @@ const Events = () => {
         </div>
     );
 
-    const fetchEvents = useCallback(async () => {
-        setLoading(true);
-        try {
-            let response;
-            if (!selectedDate) {
-                response = await ApiService.listEvents();
-            } else if (!endDate) {
-            response = await ApiService.getEvents(selectedDate);
-            } else {
-                response = await ApiService.getEventsByRange(selectedDate, endDate);
-            }
-            const eventsArray = response?.data || [];
-
-            const formattedEvents = eventsArray.map(event => ({
-                id: event.id,
-                summary: event.summary,
-                description: event.description || '',
-                date_start: event.date_start,
-                time: `${event.time_start || ''} ${event.time_end ? `- ${event.time_end}` : ''}`.trim(),
-                location: event.location || '',
-                status: event.status,
-                participants: Array.isArray(event.participants) ? 
-                    event.participants.join(', ') : 
-                    event.participants || '',
-                actions: createActionButtons(event)
-            }));
-
-            setAsyncData(prev => ({
-                ...prev,
-                rows: formattedEvents
-            }));
-        } catch (error) {
-            console.error('Failed to fetch events:', error);
-            setToast({
-                show: true,
-                message: 'Failed to load events: ' + error.message
-            });
-        } finally {
-            setLoading(false);
-        }
-    }, [selectedDate]);
-
-    useEffect(() => {
-        fetchEvents();
-    }, [fetchEvents]);
 
     return (
         <MDBContainer className="py-5">
@@ -181,7 +198,7 @@ const Events = () => {
             </div>
 
             <div className="row mb-4">
-            <div className="col-md-4">
+                <div className="col-md-4">
                     <MDBInput
                         type="date"
                         value={selectedDate}
@@ -213,6 +230,7 @@ const Events = () => {
                 searchLabel="Search Events"
                 entriesOptions={[5, 10, 25]}
                 entries={10}
+                noFoundMessage="No events found"
             />
 
             <Toast

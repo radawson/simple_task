@@ -1,3 +1,4 @@
+// src/App.jsx
 import { BrowserRouter as Navigate } from 'react-router-dom';
 import { createBrowserRouter, RouterProvider, Outlet } from 'react-router-dom';
 import Layout from './components/layout/Layout';
@@ -5,6 +6,7 @@ import Dashboard from './components/dashboard/Dashboard';
 import Login from './components/auth/Login';
 import Register from './components/auth/Register';
 import { AuthProvider } from './context/AuthContext';
+import { ToastProvider } from './context/ToastContext';
 import QRGenerator from './components/qr/QRGenerator';
 import Templates from './components/templates/Templates';
 import Tasks from './components/tasks/Tasks';
@@ -17,12 +19,16 @@ import NoteEdit from './components/notes/NoteEdit';
 function App() {
   const router = createBrowserRouter([
     {
-      element: <AuthProvider>{/* Don't self-close */}
-        <Layout>
-          <Outlet />
-        </Layout>
-      </AuthProvider>,
-      path: '/', // Add root path
+      element: (
+        <AuthProvider>
+          <ToastProvider>
+            <Layout>
+              <Outlet />
+            </Layout>
+          </ToastProvider>
+        </AuthProvider>
+      ),
+      path: '/',
       children: [
         { index: true, element: <Dashboard /> },
         {
