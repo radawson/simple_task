@@ -197,8 +197,8 @@ const Events = () => {
                 </MDBBtn>
             </div>
 
-            <div className="row mb-4">
-                <div className="col-md-4">
+            <div className="row">
+                <div className="col-md-4  mb-4">
                     <MDBInput
                         type="date"
                         value={selectedDate}
@@ -206,7 +206,7 @@ const Events = () => {
                         label="Start Date"
                     />
                 </div>
-                <div className="col-md-4">
+                <div className="col-md-4  mb-4">
                     <MDBInput
                         type="date"
                         value={endDate}

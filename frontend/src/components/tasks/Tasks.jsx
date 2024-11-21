@@ -1,5 +1,5 @@
 // src/components/tasks/Tasks.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useCallback, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
     MDBContainer,
@@ -14,11 +14,11 @@ import { formatLocalDate } from '../../utils/dateUtils';
 
 const Tasks = () => {
     const navigate = useNavigate();
-    const [tasks, setTasks] = useState([]);
-    const [searchTerm, setSearchTerm] = useState('');
+    const [endDate, setEndDate] = useState('');
     const [selectedDate, setSelectedDate] = useState(formatLocalDate());
     const [selectedTasks, setSelectedTasks] = useState(new Set());
-    const [tableData, setTableData] = useState({
+    const [loading, setLoading] = useState(false);
+    const [asyncData, setAsyncData] = useState({
         columns: [
             {
                 label: 'Name',
@@ -28,7 +28,7 @@ const Tasks = () => {
             {
                 label: 'Description',
                 field: 'description',
-                className: 'col-5'
+                className: 'col-4'
             },
             {
                 label: 'Date',
@@ -41,6 +41,11 @@ const Tasks = () => {
                 className: 'col-1'
             },
             {
+                label: 'Status',
+                field: 'status',
+                className: 'col-1'
+            },
+            {
                 label: 'Actions',
                 field: 'actions',
                 className: 'col-1'
@@ -48,10 +53,61 @@ const Tasks = () => {
         ],
         rows: []
     });
+
     const [toast, setToast] = useState({
         show: false,
-        message: ''
+        message: '',
+        type: 'info'
     });
+
+    const fetchTasks = useCallback(async () => {
+        setLoading(true);
+        try {
+            let response;
+            if (!selectedDate) {
+                response = await ApiService.listTasks();
+            } else if (!endDate) {
+                response = await ApiService.getTasks(selectedDate);
+            } else {
+                response = await ApiService.getTasksByRange(selectedDate, endDate);
+            }
+            
+            // Debug log
+            console.log('API Response:', response);
+            
+            // The response data is already the tasks array
+            const tasksArray = Array.isArray(response.data) ? response.data : 
+                              Array.isArray(response.data.tasks) ? response.data.tasks : 
+                              [];
+    
+            const formattedTasks = tasksArray.map(task => ({
+                id: task.id,
+                name: task.name,
+                description: task.description || '',
+                date: task.date,
+                priority: task.priority,
+                status: task.completed ? 'Completed' : 'Pending',
+                actions: createActionButtons(task)
+            }));
+    
+            // Debug log
+            console.log('Formatted Tasks:', formattedTasks);
+    
+            setAsyncData(prev => ({
+                ...prev,
+                rows: formattedTasks
+            }));
+        } catch (error) {
+            console.error('Failed to fetch tasks:', error);
+            setToast({
+                show: true,
+                message: 'Failed to load tasks: ' + error.message,
+                type: 'danger'
+            });
+        } finally {
+            setLoading(false);
+        }
+    }, [selectedDate, endDate]);
 
     const handleEdit = (taskId) => {
         navigate(`/tasks/edit/${taskId}`);
@@ -63,18 +119,30 @@ const Tasks = () => {
             fetchTasks();
             setToast({
                 show: true,
-                message: 'Task deleted successfully'
+                message: 'Task deleted successfully',
+                type: 'success'
             });
         } catch (error) {
             setToast({
                 show: true,
-                message: 'Failed to delete task: ' + error.message
+                message: 'Failed to delete task: ' + error.message,
+                type: 'danger'
             });
         }
     };
 
     const handleNewTask = () => {
         navigate('/tasks/new');
+    };
+
+    const handleRowSelect = (selectionEvent) => {
+        if (!Array.isArray(selectionEvent)) return;
+        
+        const newSelection = new Set(
+            selectionEvent.map(task => task.id)
+        );
+        
+        setSelectedTasks(newSelection);
     };
 
     const createActionButtons = (task) => (
@@ -99,41 +167,9 @@ const Tasks = () => {
         </div>
     );
 
-    const fetchTasks = async () => {
-        try {
-            const response = await ApiService.listTasks();
-            console.log('API Response:', response);
-    
-            // Extract tasks array from paginated response
-            const tasksArray = response?.data?.tasks || [];
-    
-            const formattedTasks = tasksArray.map(task => ({
-                id: task.id,
-                name: task.name,
-                description: task.description,
-                date: task.date,
-                priority: task.priority,
-                completed: task.completed,
-                actions: createActionButtons(task)
-            }));
-    
-            setTasks(tasksArray); // Store raw tasks
-            setTableData(prev => ({
-                ...prev,
-                rows: formattedTasks
-            }));
-        } catch (error) {
-            console.error('Failed to fetch tasks:', error);
-            setToast({
-                show: true,
-                message: 'Failed to load tasks: ' + error.message
-            });
-        }
-    };
-
     useEffect(() => {
         fetchTasks();
-    }, []);
+    }, [fetchTasks]);
 
     return (
         <MDBContainer className="py-5">
@@ -144,40 +180,47 @@ const Tasks = () => {
                 </MDBBtn>
             </div>
 
-            <div className="row mb-4">
-                <div className="col-md-8">
-                    <MDBInput
-                        type="text"
-                        value={searchTerm}
-                        label="Search Tasks"
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                    />
-                </div>
-                <div className="col-md-4">
+            <div className="row">
+                <div className="col-md-4 mb-4">
                     <MDBInput
                         type="date"
                         value={selectedDate}
                         onChange={(e) => setSelectedDate(e.target.value)}
-                        label="Filter by Date"
+                        label="Start Date"
+                    />
+                </div>
+                <div className="col-md-4 mb-4">
+                    <MDBInput
+                        type="date"
+                        value={endDate}
+                        onChange={(e) => setEndDate(e.target.value)}
+                        label="End Date"
                     />
                 </div>
             </div>
 
             <MDBDatatable
+                fixedHeader
                 striped
                 hover
                 className="table-responsive"
-                data={tableData}
-                searching={true}
-                searchLabel="Search tasks"
+                data={asyncData}
+                selectable
+                multi
+                onSelectRow={handleRowSelect}
+                isLoading={loading}
+                search
+                searchLabel="Search Tasks"
                 entriesOptions={[5, 10, 25]}
                 entries={10}
+                noFoundMessage="No tasks found"
             />
 
             <Toast
                 show={toast.show}
                 message={toast.message}
-                onClose={() => setToast({ show: false, message: '' })}
+                type={toast.type}
+                onClose={() => setToast({ show: false, message: '', type: 'info' })}
             />
         </MDBContainer>
     );

@@ -79,6 +79,8 @@ export const ApiService = {
   deleteTask: (id) => api.delete(`/tasks/${id}`),
   getTask: (id) => api.get(`/tasks/${id}`),
   getTasks: (date) => api.get(`/tasks/date/${date}`),
+  getTasksByRange: (startDate, endDate) => 
+    api.get(`/api/tasks/range/${startDate}/${endDate}`),
   listTasks: (params) => api.get('/tasks', { params }),
   toggleTaskCompletion: (taskId) => api.patch(`/tasks/completed/${taskId}`),
   updateTask: (id, task) => api.patch(`/tasks/${id}`, task),
