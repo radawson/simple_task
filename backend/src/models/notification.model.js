@@ -43,6 +43,13 @@ class Notification extends BaseModel {
             paranoid: true
         });
     }
+    
+    static associate(models) {
+        this.belongsTo(models.User, {
+            foreignKey: 'recipientId',
+            as: 'recipient'
+        });
+    }
 }
 
 export default Notification;

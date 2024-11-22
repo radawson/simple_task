@@ -30,14 +30,12 @@ class Task extends BaseModel {
                 type: DataTypes.BOOLEAN,
                 defaultValue: false
             },
-            templateId: {
+            template_id: {
                 type: DataTypes.INTEGER,
-                allowNull: true,
-                field: 'template_id'
+                allowNull: true
             },
-            addedBy: {
-                type: DataTypes.STRING(30),
-                field: 'added_by'
+            added_by: {
+                type: DataTypes.STRING(30)
             }
         }, {
             sequelize,

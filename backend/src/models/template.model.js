@@ -18,9 +18,8 @@ class Template extends BaseModel {
                 type: DataTypes.TEXT,
                 allowNull: true
             },
-            addedBy: {
-                type: DataTypes.STRING(30),
-                field: 'added_by'
+            added_by: {
+                type: DataTypes.STRING(30)
             }
         }, {
             sequelize,

@@ -168,11 +168,19 @@ class Event extends BaseModel {
             targetKey: 'username'
         });
         this.belongsTo(models.Person, {
-            as: 'Organizer',  // Add alias for organizer
+            as: 'Organizer',  
             foreignKey: 'organizer',
             targetKey: 'id'
         });
-        this.belongsTo(models.Calendar);
+        this.belongsTo(models.Calendar, {
+            foreignKey: 'calendarId',
+            as: 'calendar'
+        });
+        this.belongsToMany(models.Person, {
+            through: 'EventParticipants',
+            foreignKey: 'eventId',
+            as: 'participants'
+        });
     }
 
     getParticipantNames() {

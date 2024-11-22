@@ -9,21 +9,19 @@ class Timecard extends BaseModel {
                 primaryKey: true,
                 autoIncrement: true
             },
-            timeIn: {
+            time_in: {
                 type: DataTypes.DATE,
                 allowNull: false,
-                field: 'time_in',
                 validate: {
                     isDate: true
                 }
             },
-            timeOut: {
+            time_out: {
                 type: DataTypes.DATE,
-                field: 'time_out',
                 validate: {
                     isDate: true,
                     isAfterTimeIn(value) {
-                        if (value && value <= this.timeIn) {
+                        if (value && value <= this.time_in) {
                             throw new Error('Time out must be after time in');
                         }
                     }
