@@ -183,6 +183,74 @@ class Seeder {
                     added_by: "admin",
                     templateName: "Daily Tasks"
                 },
+                {
+                    name: "Bring George to the bathroom in the morning",
+                    description: "Help George to the bathroom in the morning to clean him up for the day.\n" +
+                        " * Change his underwear and clean his body as needed.\n" +
+                        " * Change his clothed to fresh clothes for the day.\n" +
+                        " * Help him brush his teeth and use mouthwash.\n" +
+                        " * Clean the bathroom sink and floor when he is done.",
+                    priority: 1,
+                    template: true,
+                    added_by: "admin",
+                    templateName: "Daily Tasks"
+                },
+                {
+                    name: "Breakfast for Pat",
+                    description: "Wipe down the bed table with cleaning wipes.\n" +
+                        " * Collect dirty dishesand silverware from the bedroom.\n" +
+                        " * Make sure she gets her morning medicines and vitamins.\n" +
+                        " * Write down the time and check the boxes for her medicines.",
+                    priority: 1,
+                    template: true,
+                    added_by: "admin",
+                    templateName: "Daily Tasks"
+                },
+                {
+                    name: "Breakfast for George and Kathy",
+                    description: "Wake up George and Kathy with coffee and give them time to get out of bed.\n" +
+                        " * Wipe down the table with cleaning wipes.\n" +
+                        " * Collect dirty dishes, silverware and napkins from the bedroom.\n" +
+                        " * Make sure they get their morning medicines and vitamins.\n" +
+                        " * Write down the time and check the boxes for their medicines.",
+                    priority: 1,
+                    template: true,
+                    added_by: "admin",
+                    templateName: "Daily Tasks"
+                },
+                {
+                    name: "Dinner for Pat",
+                    description: "Wipe down the bed table with cleaning wipes.\n" +
+                        " * Collect dirty dishesand silverware from the bedroom.\n" +
+                        " * Make sure she gets her morning medicines and vitamins.\n" +
+                        " * Write down the time and check the boxes for her medicines.",
+                    priority: 3,
+                    template: true,
+                    added_by: "admin",
+                    templateName: "Daily Tasks"
+                },
+                {
+                    name: "Dinner for George and Kathy",
+                    description: "Wipe down the table with cleaning wipes.\n" +
+                        " * Collect dirty dishes, silverware and napkins from the bedroom.\n" +
+                        " * Make sure they get their morning medicines and vitamins.\n" +
+                        " * Write down the time and check the boxes for their medicines.",
+                    priority: 3,
+                    template: true,
+                    added_by: "admin",
+                    templateName: "Daily Tasks"
+                },
+                {
+                    name: "Bring George to the bathroom in the evening",
+                    description: "Help George to the bathroom in the evening before leaving for the day.\n" +
+                        " * Change his underwear and clean his body as needed.\n" +
+                        " * Change his clothes to fresh clothes if needed.\n" +
+                        " * Clean the bathroom sink and floor when he is done.",
+                    priority: 3,
+                    template: true,
+                    added_by: "admin",
+                    templateName: "Daily Tasks"
+                },
                 // Weekly Tasks
                 {
                     name: "Vacuum Entire House",
