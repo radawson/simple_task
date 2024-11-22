@@ -151,7 +151,7 @@ class Seeder {
                     description: "Wipe down kitchen counters, clean stove top, and clean microwave.",
                     priority: 1,
                     template: true,
-                    added_by: "admin",
+                    addedBy: "admin",
                     templateName: "Daily Tasks"
                 },
                 {
@@ -159,7 +159,7 @@ class Seeder {
                     description: "Vacuum first floor rugs in living room, dining room, foyer, and both bedrooms.",
                     priority: 1,
                     template: true,
-                    added_by: "admin",
+                    addedBy: "admin",
                     templateName: "Daily Tasks"
                 },
                 {
@@ -171,7 +171,7 @@ class Seeder {
                         " * downstairs powder room",
                     priority: 1,
                     template: true,
-                    added_by: "admin",
+                    addedBy: "admin",
                     templateName: "Daily Tasks"
                 },
                 {
@@ -181,7 +181,7 @@ class Seeder {
                         " * Wash dirty laundry on Sanitary cycle with bleach.",
                     priority: 1,
                     template: true,
-                    added_by: "admin",
+                    addedBy: "admin",
                     templateName: "Daily Tasks"
                 },
                 {
@@ -193,7 +193,7 @@ class Seeder {
                         " * Clean the bathroom sink and floor when he is done.",
                     priority: 1,
                     template: true,
-                    added_by: "admin",
+                    addedBy: "admin",
                     templateName: "Daily Tasks"
                 },
                 {
@@ -204,7 +204,7 @@ class Seeder {
                         " * Write down the time and check the boxes for her medicines.",
                     priority: 1,
                     template: true,
-                    added_by: "admin",
+                    addedBy: "admin",
                     templateName: "Daily Tasks"
                 },
                 {
@@ -216,7 +216,7 @@ class Seeder {
                         " * Write down the time and check the boxes for their medicines.",
                     priority: 1,
                     template: true,
-                    added_by: "admin",
+                    addedBy: "admin",
                     templateName: "Daily Tasks"
                 },
                 {
@@ -227,7 +227,7 @@ class Seeder {
                         " * Write down the time and check the boxes for her medicines.",
                     priority: 3,
                     template: true,
-                    added_by: "admin",
+                    addedBy: "admin",
                     templateName: "Daily Tasks"
                 },
                 {
@@ -238,7 +238,7 @@ class Seeder {
                         " * Write down the time and check the boxes for their medicines.",
                     priority: 3,
                     template: true,
-                    added_by: "admin",
+                    addedBy: "admin",
                     templateName: "Daily Tasks"
                 },
                 {
@@ -249,7 +249,7 @@ class Seeder {
                         " * Clean the bathroom sink and floor when he is done.",
                     priority: 3,
                     template: true,
-                    added_by: "admin",
+                    addedBy: "admin",
                     templateName: "Daily Tasks"
                 },
                 // Weekly Tasks
@@ -301,7 +301,7 @@ class Seeder {
                         " * downstairs unit",
                     priority: 1,
                     template: true,
-                    added_by: "admin",
+                    addedBy: "admin",
                     templateName: "Monthly Tasks"
                 },
                 // Morning Tasks
