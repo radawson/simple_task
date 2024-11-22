@@ -47,7 +47,7 @@ class Notification extends BaseModel {
     static associate(models) {
         this.belongsTo(models.User, {
             foreignKey: 'recipientId',
-            as: 'recipient'
+            as: 'recipientList'
         });
     }
 }

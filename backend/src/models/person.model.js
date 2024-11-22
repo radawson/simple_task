@@ -9,17 +9,20 @@ class Person extends BaseModel {
                 defaultValue: DataTypes.UUIDV4,
                 primaryKey: true,
             },
-            first_name: {
+            firstName: {
                 type: DataTypes.STRING(20),
-                allowNull: false
+                allowNull: false,
+                field: 'first_name' // Maps to column 'first_name'
             },
-            last_name: {
-                type: DataTypes.STRING(20)
+            lastName: {
+                type: DataTypes.STRING(20),
+                field: 'last_name' // Maps to column 'last_name'
             },
             email: DataTypes.STRING,
-            is_admin: {
+            isAdmin: {
                 type: DataTypes.BOOLEAN,
-                defaultValue: false
+                defaultValue: false,
+                field: 'is_admin'
             },
             birthdate: {
                 type: DataTypes.DATEONLY,

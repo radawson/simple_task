@@ -179,7 +179,7 @@ class Event extends BaseModel {
         this.belongsToMany(models.Person, {
             through: 'EventParticipants',
             foreignKey: 'eventId',
-            as: 'participants'
+            as: 'participantList'
         });
     }
 
