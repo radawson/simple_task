@@ -34,8 +34,10 @@ class Task extends BaseModel {
                 type: DataTypes.INTEGER,
                 allowNull: true
             },
-            added_by: {
-                type: DataTypes.STRING(30)
+            addedBy: {
+                type: DataTypes.STRING(30),
+                field: 'added_by',
+                allowNull: true
             }
         }, {
             sequelize,

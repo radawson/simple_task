@@ -101,8 +101,9 @@ class Event extends BaseModel {
                 type: DataTypes.STRING(500),
                 allowNull: true
             },
-            added_by: {
+            addedBy: {
                 type: DataTypes.STRING(30),
+                field: 'added_by',
                 allowNull: true
             },
             calendar_id: {
