@@ -81,7 +81,7 @@ class Event extends BaseModel {
                 defaultValue: 'CONFIRMED'
             },
             organizer: {
-                type: DataTypes.STRING(50),
+                type: DataTypes.UUID,
                 allowNull: true
             },
             transp: {
@@ -169,7 +169,7 @@ class Event extends BaseModel {
             targetKey: 'username'
         });
         this.belongsTo(models.Person, {
-            as: 'Organizer',  
+            as: 'organizerUser',  
             foreignKey: 'organizer',
             targetKey: 'id'
         });
