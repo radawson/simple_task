@@ -105,9 +105,7 @@ class Seeder {
                     name: [
                         'Daily Tasks',
                         'Weekly Tasks',
-                        'Monthly Tasks',
-                        'Morning Tasks',
-                        'Afternoon Tasks'
+                        'Monthly Tasks'
                     ]
                 }
             });
@@ -121,7 +119,10 @@ class Seeder {
                 // Daily Tasks
                 {
                     name: "Clean Cat Litter",
-                    description: "Clean the cat litter box and refill with 1 inch of fresh litter.",
+                    description: "Clean the cat litter box and refill with 1 inch of fresh litter.\n" +
+					" * Sweep area around the cat boxes. Litter can be dumped into the cat boxes.\n" +
+					" * Make sure there is fresh water in cat bowl.\n" +
+					" * Removed litter and cat feces go in brown paper bags and go up to outside trash.",
                     template: true,
                     priority: 1,
                     addedBy: "admin",
@@ -129,7 +130,7 @@ class Seeder {
                 },
                 {
                     name: "Pick Up Dishes",
-                    description: "Periodically check the house (especially bedrooms) for dirty dishes and bring them to the kitchen.",
+                    description: "Periodically check the house (especially the bedrooms) for dirty dishes and bring them to the kitchen.",
                     template: true,
                     priority: 1,
                     addedBy: "admin",
@@ -138,9 +139,10 @@ class Seeder {
                 {
                     name: "Take Out Trash",
                     description: "Remove trash from upstairs bathrooms and bedrooms, downstairs bathroom, kitchen, and powder room.\n" +
-                        "* replace trash bags in each garbage can\n" +
-                        "* replace box of garbage bags if empty\n" +
-                        "* take trash out to the porch and stack neatly",
+                        " * replace trash bags in each garbage can\n" +
+                        " * replace box of garbage bags if empty\n" +
+                        " * take trash out to the porch and stack neatly.\n" +
+						" * conbine small bags of trash into one when possible.",
                     template: true,
                     priority: 1,
                     addedBy: "admin",
@@ -148,7 +150,10 @@ class Seeder {
                 },
                 {
                     name: "Clean Kitchen",
-                    description: "Wipe down kitchen counters, clean stove top, and clean microwave.",
+                    description: "Wipe down kitchen counters, clean stove top, and clean microwave." +
+					" * Clean air fryer after use.\n" +
+					" * Clean kitchen floor as necessary.\n" +
+					" * Wipe out oven with water only, do not use soap or cleaners.",
                     priority: 1,
                     template: true,
                     addedBy: "admin",
@@ -156,7 +161,7 @@ class Seeder {
                 },
                 {
                     name: "Vacuum first floor carpets",
-                    description: "Vacuum first floor rugs in living room, dining room, foyer, and both bedrooms.",
+                    description: "Vacuum first floor rugs in living room, dining room, bathrooms, and bedrooms.",
                     priority: 1,
                     template: true,
                     addedBy: "admin",
@@ -165,6 +170,7 @@ class Seeder {
                 {
                     name: "Refill toilet paper",
                     description: "Make sure there are at least two (2) extra rolls in each bathroom.\n" +
+						"Extra toilet paper is located on basement shelves.\n" +
                         "Refill toilet paper in:\n" +
                         " * upstairs bathrooms\n" +
                         " * downstairs bathroom\n" +
@@ -188,8 +194,9 @@ class Seeder {
                     name: "Bring George to the bathroom in the morning",
                     description: "Help George to the bathroom in the morning to clean him up for the day.\n" +
                         " * Change his underwear and clean his body as needed.\n" +
-                        " * Change his clothed to fresh clothes for the day.\n" +
+                        " * Change his clothes to fresh clothes for the day.\n" +
                         " * Help him brush his teeth and use mouthwash.\n" +
+						" * Help him brush his hair.\n" +
                         " * Clean the bathroom sink and floor when he is done.",
                     priority: 1,
                     template: true,
@@ -199,9 +206,31 @@ class Seeder {
                 {
                     name: "Breakfast for Pat",
                     description: "Wipe down the bed table with cleaning wipes.\n" +
-                        " * Collect dirty dishesand silverware from the bedroom.\n" +
+                        " * Collect dirty dishes and silverware from the bedroom.\n" +
                         " * Make sure she gets her morning medicines and vitamins.\n" +
                         " * Write down the time and check the boxes for her medicines.",
+                    priority: 1,
+                    template: true,
+                    addedBy: "admin",
+                    templateName: "Daily Tasks"
+                },
+				{
+                    name: "Clean Pat's Bedroom",
+                    description: "Clean Pat's Bedroom Daily.\n" +
+                        " * Sweep bedroom floor, especially in front of bed.\n" +
+                        " * Change absorbent pads on bed and chair.\n" +
+                        " * Change air freshener as needed.",
+                    priority: 1,
+                    template: true,
+                    addedBy: "admin",
+                    templateName: "Daily Tasks"
+                },
+				{
+                    name: "Clean Pat's Bathroom",
+                    description: "Clean Bathroom Daily.\n" +
+                        " * Wipe down toilet seat daily and after toilet use.\n" +
+                        " * Swiffer bathroom floor daily, including under floor mats.\n" +
+                        " * Refill underwear/pads.",
                     priority: 1,
                     template: true,
                     addedBy: "admin",
@@ -222,9 +251,7 @@ class Seeder {
                 {
                     name: "Dinner for Pat",
                     description: "Wipe down the bed table with cleaning wipes.\n" +
-                        " * Collect dirty dishesand silverware from the bedroom.\n" +
-                        " * Make sure she gets her morning medicines and vitamins.\n" +
-                        " * Write down the time and check the boxes for her medicines.",
+                        " * Collect dirty dishes and silverware from the bedroom.",
                     priority: 3,
                     template: true,
                     addedBy: "admin",
@@ -233,9 +260,7 @@ class Seeder {
                 {
                     name: "Dinner for George and Kathy",
                     description: "Wipe down the table with cleaning wipes.\n" +
-                        " * Collect dirty dishes, silverware and napkins from the bedroom.\n" +
-                        " * Make sure they get their morning medicines and vitamins.\n" +
-                        " * Write down the time and check the boxes for their medicines.",
+                        " * Collect dirty dishes, silverware and napkins from the bedroom.\n",
                     priority: 3,
                     template: true,
                     addedBy: "admin",
@@ -246,6 +271,7 @@ class Seeder {
                     description: "Help George to the bathroom in the evening before leaving for the day.\n" +
                         " * Change his underwear and clean his body as needed.\n" +
                         " * Change his clothes to fresh clothes if needed.\n" +
+						" * Refill underwear/pad so there are at least 6 for the next day.\n" +
                         " * Clean the bathroom sink and floor when he is done.",
                     priority: 3,
                     template: true,
@@ -304,39 +330,29 @@ class Seeder {
                     addedBy: "admin",
                     templateName: "Monthly Tasks"
                 },
-                // Morning Tasks
-                {
-                    name: "Make Beds",
-                    description: "Make all beds in the house",
-                    template: true,
-                    priority: 1,
-                    addedBy: "admin",
-                    templateName: "Morning Tasks"
-                },
                 {
                     name: "Empty Dishwasher",
                     description: "Empty clean dishes from dishwasher",
                     template: true,
                     priority: 1,
                     addedBy: "admin",
-                    templateName: "Morning Tasks"
+                    templateName: "Daily Tasks"
                 },
-                // Afternoon Tasks
                 {
                     name: "Load Dishwasher",
                     description: "Load dirty dishes into dishwasher and run if full",
                     template: true,
-                    priority: 1,
+                    priority: 2,
                     addedBy: "admin",
-                    templateName: "Afternoon Tasks"
+                    templateName: "Daily Tasks"
                 },
                 {
                     name: "Wipe Counters",
                     description: "Clean and sanitize kitchen counters",
                     template: true,
-                    priority: 1,
+                    priority: 3,
                     addedBy: "admin",
-                    templateName: "Afternoon Tasks"
+                    templateName: "Daily Tasks"
                 }
             ];
 
