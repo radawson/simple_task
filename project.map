@@ -70,6 +70,7 @@ project/
 │   │   │   ├── mail.service.js
 │   │   │   └── socket.service.js
 │   │   └── utils/
+│   │       ├── asyncHandler.js
 │   │       ├── cert.util.js          
 │   │       ├── date.util.js
 │   │       ├── esm-helpers.util.js    

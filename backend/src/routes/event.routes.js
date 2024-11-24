@@ -2,6 +2,7 @@
 import express from 'express';
 import { validateEvent } from '../middleware/validation.middleware.js';
 import { authenticate } from '../middleware/auth.middleware.js';
+import asyncHandler from '../utils/asyncHandler.js';
 import EventController from '../controllers/event.controller.js';
 
 const createEventRoutes = (socketService) => {
@@ -10,7 +11,7 @@ const createEventRoutes = (socketService) => {
 
     // Public routes (GET only)
     router.get('/range/:start/:end', eventController.getByDateRange);
-    router.get('/date/:date', eventController.getByDate);
+    router.get('/date/:date', asyncHandler(eventController.getByDate));
     router.get('/:id', eventController.get);
     router.get('/', eventController.list);
 
