@@ -188,6 +188,9 @@ class EventController {
     getByDate = async (req, res) => {
         try {
             const { date } = req.params;
+            if (!date) {
+                return res.status(400).json({ error: 'Date parameter is required.' });
+              }
             logger.info('Retrieving events by date', { date });
     
             // Get events with organizer details
@@ -197,7 +200,7 @@ class EventController {
                 },
                 include: [{
                     model: Person,
-                    as: 'Organizer',  // Use the alias
+                    as: 'organizerUser',  // Use the alias
                     required: false,
                     attributes: ['id', 'firstName', 'lastName']
                 }],
