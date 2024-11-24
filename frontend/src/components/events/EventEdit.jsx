@@ -234,7 +234,6 @@ const EventEdit = () => {
                   })}
                   data={[
                     { text: 'Select Participant', value: '' },
-                    { text: 'Everyone', value: '0' },
                     ...persons.map(person => ({
                       text: `${person.firstName} ${person.lastName}`,
                       value: person.id

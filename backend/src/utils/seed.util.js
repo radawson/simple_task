@@ -35,6 +35,9 @@ class Seeder {
     static async seedPersons(stats) {
         const persons = [
             {
+                firstName: "Everyone"
+            },
+            {
                 firstName: "George",
                 lastName: "Dirschel",
                 birthdate: "1938-05-27"
