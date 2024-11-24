@@ -187,6 +187,9 @@ const Events = () => {
         </div>
     );
 
+    useEffect(() => {
+        fetchEvents();
+      }, [fetchEvents]);
 
     return (
         <MDBContainer className="py-5">

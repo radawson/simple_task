@@ -164,14 +164,20 @@ const Notes = () => {
             </div>
 
             <MDBDatatable
+                fixedHeader
                 striped
                 hover
                 className="table-responsive"
-                data={tableData}
-                searching={false} // We're handling search ourselves
-                searchLabel="Search notes"
+                data={asyncData}
+                selectable
+                multi
+                onSelectRow={handleRowSelect}
+                isLoading={loading}
+                search
+                searchLabel="Search Events"
                 entriesOptions={[5, 10, 25]}
                 entries={10}
+                noFoundMessage="No events found"
             />
 
             <Toast
