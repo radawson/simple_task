@@ -1,17 +1,18 @@
 import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { 
-  MDBInput, 
-  MDBBtn, 
-  MDBCard, 
-  MDBCardBody,
-  MDBIcon 
+import {
+  MDBIcon,
+  MDBInput,
+  MDBBtn,
+  MDBCard,
+  MDBCardBody
 } from 'mdb-react-ui-kit';
 
 export default function Login() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const navigate = useNavigate();
   const location = useLocation();
@@ -38,7 +39,7 @@ export default function Login() {
         <MDBCardBody className="p-5">
           <h2 className="text-center mb-5">Login</h2>
           {error && <div className="alert alert-danger">{error}</div>}
-          
+
           <form onSubmit={handleSubmit}>
             <MDBInput
               type="text"
@@ -49,13 +50,19 @@ export default function Login() {
               required
             />
             <MDBInput
-              type="password"
+              type={showPassword ? 'text' : 'password'}
               label="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="mb-4"
               required
-            />
+            >
+              <MDBIcon
+                onClick={() => setShowPassword(!showPassword)}
+                className="trailing"
+                icon={showPassword ? 'eye-slash' : 'eye'}
+              />
+            </MDBInput>
             <MDBBtn type="submit" block className="mb-4">
               Login
             </MDBBtn>
@@ -63,12 +70,12 @@ export default function Login() {
 
           <div className="text-center">
             <p className="text-muted mb-4">- OR -</p>
-            <MDBBtn 
-              color="danger" 
-              onClick={handleSSOLogin} 
+            <MDBBtn
+              color="danger"
+              onClick={handleSSOLogin}
               block
             >
-              <MDBIcon fab icon="windows" className="me-2" /> 
+              <MDBIcon fab icon="windows" className="me-2" />
               PTX SSO
             </MDBBtn>
           </div>
