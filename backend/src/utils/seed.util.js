@@ -55,18 +55,21 @@ class Seeder {
         ];
 
         for (const person of persons) {
+            const whereClause = { firstName: person.firstName };
+    
+            if (person.lastName !== undefined) {
+                whereClause.lastName = person.lastName;
+            }
+    
             const [result, created] = await Person.findOrCreate({
-                where: {
-                    firstName: person.firstName,
-                    lastName: person.lastName
-                },
-                defaults: person
+                where: whereClause,
+                defaults: person,
             });
-
+    
             if (created) {
-                stats.added++;
+                stats.added += 1;
             } else {
-                stats.existing++;
+                stats.existing += 1;
             }
         }
     }
