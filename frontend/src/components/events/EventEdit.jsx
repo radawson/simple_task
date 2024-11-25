@@ -30,10 +30,10 @@ const EventEdit = () => {
     categories: [],
     priority: 0,
     url: '',
-    organizer: '',
+    organizer: null,
     transp: 'OPAQUE',
     class: 'PUBLIC',
-    participants: ''
+    participants: []
   });
   const [loading, setLoading] = useState(!!id);
 
