@@ -7,12 +7,15 @@ import { ApiService } from '../../services/api';
 import { socketService } from '../../services/socket.service';
 import ErrorBoundary from '../ErrorBoundary';
 
-const TaskList = ({ 
-  tasks = [], 
-  onTaskUpdate = () => {},
-  selectedDate  
+const TaskList = ({
+  tasks = [],
+  onTaskUpdate = () => { },
+  selectedDate
 }) => {
   const [openItems, setOpenItems] = useState({})
+
+  // Sort tasks by priority
+  const sortedTasks = tasks.slice().sort((a, b) => a.priority - b.priority);
 
   const toggleAccordion = (taskId) => {
     setOpenItems(prev => ({
@@ -48,7 +51,7 @@ const TaskList = ({
     // Connect socket and subscribe
     socketService.connect();
     socketService.subscribeToDate(selectedDate);
-    
+
     // Set up interval
     const intervalId = setInterval(updateTasks, 30000);
 
@@ -70,7 +73,7 @@ const TaskList = ({
         <div className="card">
           <h3 className="m-2">Tasks</h3>
           <div className="accordion accordion-flush" id="task_accordion">
-            {Array.isArray(tasks) && tasks.map((task) => (
+          {Array.isArray(sortedTasks) && sortedTasks.map((task) => (
               <div key={task?.id} className="accordion-item">
                 <div
                   className="accordion-header d-flex justify-content-between align-items-center"

@@ -28,7 +28,7 @@ const Dashboard = () => {
 
         // Debugging
         // console.log('Tasks:', tasksRes.data);
-        console.log('Events:', eventsRes.data);
+        // console.log('Events:', eventsRes.data);
         // console.log('Notes:', notesRes.data);
 
         setTasks(tasksRes.data);
@@ -92,7 +92,7 @@ const Dashboard = () => {
     return () => {
       socketService.unsubscribeFromDate(currentDate);
     };
-  }, []);
+  }, [selectedDate]);
 
   const handleTaskUpdate = async (taskId) => {
     try {
@@ -110,14 +110,18 @@ const Dashboard = () => {
         <TaskList 
             tasks={tasks} 
             onTaskUpdate={handleTaskUpdate}
-            selectedDate={selectedDate} // Pass selectedDate prop
+            selectedDate={selectedDate} 
           />
         </div>
         <div className="col-12 mb-4">
-          <EventList events={events} />
+          <EventList events={events}
+          selectedDate={selectedDate} 
+           />
         </div>
         <div className="col-12 mb-4">
-          <NoteList notes={notes} />
+          <NoteList notes={notes}
+          selectedDate={selectedDate} 
+           />
         </div>
       </div>
     </div>
