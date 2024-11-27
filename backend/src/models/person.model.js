@@ -58,6 +58,9 @@ class User extends BaseModel {
                 type: DataTypes.STRING(20),
                 field: 'last_name'
             },
+            displayName: {
+                type: DataTypes.STRING(30),
+            },
             email: {
                 type: DataTypes.STRING,
                 allowNull: true,

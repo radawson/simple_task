@@ -35,7 +35,8 @@ class Seeder {
     static async seedPersons(stats) {
         const persons = [
             {
-                firstName: "Everyone"
+                firstName: "Everyone",
+                lastName: " ",
             },
             {
                 firstName: "George",
@@ -212,8 +213,45 @@ class Seeder {
                 {
                     name: "Breakfast for Pat",
                     description: "Wipe down the bed table with cleaning wipes.\n" +
-                        " * Collect dirty dishes and silverware from the bedroom.\n" +
-                        " * Make sure she gets her morning medicines and vitamins.\n" +
+                        " * Collect dirty dishes and silverware from the bedroom.",
+                    priority: 1,
+                    template: true,
+                    addedBy: "admin",
+                    templateName: "Daily Tasks"
+                },
+                {
+                    name: "Morning Medicine for Pat",
+                    description: "Give medicine from container.\n" +
+                        " * Check container to make sure there are no pills left inside.\n" +
+                        " * Bring a glass fo water specifically for swallowing pills.\n" +
+                        " * Help her to sit up while taking the pills to prevent choking\n" +
+                        " * Watch and assist to make sure all pills are taken.\n" +
+                        " * Write down the time and check the boxes for her medicines.",
+                    priority: 1,
+                    template: true,
+                    addedBy: "admin",
+                    templateName: "Daily Tasks"
+                },
+                {
+                    name: "Morning Medicine for Kathy",
+                    description: "Give medicine from container.\n" +
+                        " * Check container to make sure there are no pills left inside.\n" +
+                        " * Bring a glass fo water specifically for swallowing pills.\n" +
+                        " * Help her to sit up while taking the pills to prevent choking\n" +
+                        " * Watch and assist to make sure all pills are taken.\n" +
+                        " * Write down the time and check the boxes for her medicines.",
+                    priority: 1,
+                    template: true,
+                    addedBy: "admin",
+                    templateName: "Daily Tasks"
+                },
+                {
+                    name: "Morning Medicine for George",
+                    description: "Give medicine from container.\n" +
+                        " * Check container to make sure there are no pills left inside.\n" +
+                        " * Bring a glass fo water specifically for swallowing pills.\n" +
+                        " * Help him to sit up while taking the pills to prevent choking\n" +
+                        " * Watch and assist to make sure all pills are taken.\n" +
                         " * Write down the time and check the boxes for her medicines.",
                     priority: 1,
                     template: true,
@@ -246,10 +284,47 @@ class Seeder {
                     name: "Breakfast for George and Kathy",
                     description: "Wake up George and Kathy with coffee and give them time to get out of bed.\n" +
                         " * Wipe down the table with cleaning wipes.\n" +
-                        " * Collect dirty dishes, silverware and napkins from the bedroom.\n" +
-                        " * Make sure they get their morning medicines and vitamins.\n" +
-                        " * Write down the time and check the boxes for their medicines.",
+                        " * Collect dirty dishes, silverware and napkins from the bedroom.",
                     priority: 1,
+                    template: true,
+                    addedBy: "admin",
+                    templateName: "Daily Tasks"
+                },
+                {
+                    name: "Afternoon Medicine for George",
+                    description: "Give medicine from pill container.\n" +
+                        " * Check container to make sure there are no pills left inside.\n" +
+                        " * Bring a glass fo water specifically for swallowing pills.\n" +
+                        " * Help him to sit up while taking the pills to prevent choking\n" +
+                        " * Watch and assist to make sure all pills are taken.\n" +
+                        " * Write down the time and check the boxes for her medicines.",
+                    priority: 2,
+                    template: true,
+                    addedBy: "admin",
+                    templateName: "Daily Tasks"
+                },
+                {
+                    name: "Evening Medicine for Kathy",
+                    description: "Give medicine from pill container.\n" +
+                        " * Check container to make sure there are no pills left inside.\n" +
+                        " * Bring a glass fo water specifically for swallowing pills.\n" +
+                        " * Help her to sit up while taking the pills to prevent choking\n" +
+                        " * Watch and assist to make sure all pills are taken.\n" +
+                        " * Write down the time and check the boxes for her medicines.",
+                    priority: 3,
+                    template: true,
+                    addedBy: "admin",
+                    templateName: "Daily Tasks"
+                },
+                {
+                    name: "Evening Medicine for George",
+                    description: "Give medicine from pill container.\n" +
+                        " * Check container to make sure there are no pills left inside.\n" +
+                        " * Bring a glass fo water specifically for swallowing pills.\n" +
+                        " * Help him to sit up while taking the pills to prevent choking\n" +
+                        " * Watch and assist to make sure all pills are taken.\n" +
+                        " * Write down the time and check the boxes for her medicines.",
+                    priority: 3,
                     template: true,
                     addedBy: "admin",
                     templateName: "Daily Tasks"
@@ -420,6 +495,7 @@ class Seeder {
             {
                 firstName: "Mervat",
                 lastName: "Malak",
+                displayName: "Mimi",
                 username: "malakm",
                 password: "$argon2id$v=19$m=65536,t=3,p=4$F6AWOCY7rGVESHILDRGqsg$nlTYuNRg7CxK6oTFOZclQLiT/35zltUyLwJVpf3EcyE"
             },
