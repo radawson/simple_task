@@ -111,6 +111,7 @@ class Seeder {
                 where: {
                     name: [
                         'Daily Tasks',
+                        'Saturday Tasks',
                         'Weekly Tasks',
                         'Monthly Tasks'
                     ]
@@ -358,6 +359,43 @@ class Seeder {
                     template: true,
                     addedBy: "admin",
                     templateName: "Daily Tasks"
+                },
+                // Saturday Tasks
+                {
+                    name: "George Shower",
+                    description: "Help George to the shower and assist him with cleaning himself.\n" +
+                        " * Heat up the bathroom and make sure the water is warm.\n" +
+                        " * Help him to the shower and assist him with cleaning himself.\n" +
+                        " * Change his clothes to fresh clothes for the day.\n" +
+                        " * Help him with drying and dressing.",
+                    priority: 1,
+                    template: true,
+                    addedBy: "admin",
+                    templateName: "Saturday Tasks"
+                },
+                {
+                    name: "Kathy Shower",
+                    description: "Help Kathy to the shower and encourage her to clean herself.\n" +
+                        " * Heat up the bathroom and make sure the water is warm.\n" +
+                        " * Help her to the shower and assist her with cleaning herself if needed.\n" +
+                        " * Help her select fresh clothes for the day.\n" +
+                        " * Help her with drying and dressing if needed.",
+                    priority: 1,
+                    template: true,
+                    addedBy: "admin",
+                    templateName: "Saturday Tasks"
+                },
+                {
+                    name: "Pat Shower",
+                    description: "Help Pat to the shower and assist her with cleaning herself.\n" +
+                        " * Heat up the bathroom and make sure the water is warm.\n" +
+                        " * Help her to the shower and assist her with cleaning herself.\n" +
+                        " * Change her clothes to fresh clothes for the day.\n" +
+                        " * Help her with drying and dressing.",
+                    priority: 1,
+                    template: true,
+                    addedBy: "admin",
+                    templateName: "Saturday Tasks"
                 },
                 // Weekly Tasks
                 {
