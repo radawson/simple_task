@@ -190,9 +190,9 @@ class EventController {
             const { date } = req.params;
             if (!date) {
                 return res.status(400).json({ error: 'Date parameter is required.' });
-              }
+            }
             logger.info('Retrieving events by date', { date });
-    
+
             // Get events with organizer details
             const events = await Event.findAll({
                 where: {
@@ -210,12 +210,12 @@ class EventController {
                     ['priority', 'DESC']
                 ]
             });
-    
+
             // Collect all unique participant IDs
             const participantIds = [...new Set(
                 events.flatMap(event => event.participants || [])
             )];
-    
+
             // Fetch participant details if there are any
             let participantMap = new Map();
             if (participantIds.length > 0) {
@@ -225,12 +225,12 @@ class EventController {
                     },
                     attributes: ['id', 'firstName', 'lastName']
                 });
-    
+
                 participantMap = new Map(
                     participantDetails.map(p => [p.id, p])
                 );
             }
-    
+
             // Add participant details to each event
             const eventsWithParticipants = events.map(event => {
                 const eventData = event.toJSON();
@@ -239,12 +239,12 @@ class EventController {
                     .filter(Boolean);
                 return eventData;
             });
-    
+
             logger.debug('Events retrieved with participants', {
                 eventCount: events.length,
                 participantIds: participantIds
             });
-    
+
             return res.json(eventsWithParticipants);
         } catch (error) {
             logger.error('Failed to get events by date', {
@@ -252,9 +252,9 @@ class EventController {
                 stack: error.stack,
                 date: date
             });
-            return res.status(500).json({ 
+            return res.status(500).json({
                 message: 'Failed to retrieve events',
-                error: error.message 
+                error: error.message
             });
         }
     };
@@ -414,6 +414,13 @@ class EventController {
      */
     update = async (req, res) => {
         try {
+            logger.info('Verifying token payload:', req.user);
+
+            if (!req.user) {
+                logger.error('No user information available in request');
+                return res.status(401).json({ message: 'Unauthorized: User not authenticated' });
+            }
+
             logger.info('Attempting to update event', {
                 eventId: req.params.id,
                 updates: req.body
@@ -426,15 +433,26 @@ class EventController {
             }
 
             // Convert single participant to array if needed
-            const updateData = {
-                ...req.body,
+            const updatedData = {
+                summary: req.body.summary,
+                description: req.body.description || null,
+                date_start: new Date(req.body.dtstart).toISOString().split('T')[0],
+                date_end: req.body.dtend ? new Date(req.body.dtend).toISOString().split('T')[0] : null,
+                time_start: req.body.timeStart || null,
+                time_end: req.body.timeEnd || null,
+                location: req.body.location,
                 participants: Array.isArray(req.body.participants)
                     ? req.body.participants
-                    : req.body.participants ? [req.body.participants] : []
+                    : req.body.participants ? [req.body.participants] : [],
+                status: req.body.status,
+                classification: req.body.class || 'PUBLIC',
+                priority: req.body.priority || 0,
+                url: req.body.url || null,
+                organizer: req.body.organizer || null,
             };
 
             const oldDate = event.dtstart;
-            await event.update(updateData);
+            await event.update(updatedData);
 
             logger.info('Event updated successfully', { eventId: event.id });
 

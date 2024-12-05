@@ -58,7 +58,6 @@ const EventEdit = () => {
     }
   };
 
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -79,6 +78,8 @@ const EventEdit = () => {
         transp: calEvent.transp || 'OPAQUE',
         participants: Array.isArray(calEvent.participants) ? calEvent.participants : []
       };
+
+      console.log('Submitting event data:', eventData);
 
       if (id) {
         await ApiService.updateEvent(id, eventData);
