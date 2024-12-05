@@ -86,7 +86,7 @@ const Tasks = () => {
                 description: task.description || '',
                 date: task.date,
                 priority: task.priority,
-                status: task.completed ? 'Completed' : 'Pending',
+                status: task.completed ? 'Completed' : 'Incomplete',
                 actions: createActionButtons(task)
             }));
     
