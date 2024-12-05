@@ -13,55 +13,57 @@ const schemas = {
 
     event: Joi.object({
         summary: Joi.string()
-            .required()
-            .max(200),
+          .required()
+          .max(200),
         classification: Joi.string()
-            .allow('', null),
+          .allow('', null),
         description: Joi.string()
-            .allow('', null),
-        dtstart: Joi.date()
-            .required(),
-        dtend: Joi.date()
-            .min(Joi.ref('dtstart'))
-            .allow(null),
-        timeStart: Joi.string()
-            .pattern(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/)
-            .allow('', null),
-        timeEnd: Joi.string()
-            .pattern(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/)
-            .allow('', null),
+          .allow('', null),
+        date_start: Joi.date()
+          .required(),
+        date_end: Joi.date()
+          .min(Joi.ref('date_start'))
+          .allow(null),
+        time_start: Joi.string()
+          .pattern(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/)
+          .allow('', null),
+        time_end: Joi.string()
+          .pattern(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/)
+          .allow('', null),
         location: Joi.string()
-            .max(200)
-            .allow('', null),
-        participants: Joi.alternatives().try(
+          .max(200)
+          .allow('', null),
+        participants: Joi.alternatives()
+          .try(
             Joi.string().allow('', null),
             Joi.array().items(Joi.string())
-        ).default([]),
+          )
+          .default([]),
         status: Joi.string()
-            .valid('CONFIRMED', 'TENTATIVE', 'CANCELLED')
-            .default('CONFIRMED'),
+          .valid('CONFIRMED', 'TENTATIVE', 'CANCELLED')
+          .default('CONFIRMED'),
         organizer: Joi.string()
-            .max(50)
-            .allow('', null),
+          .max(50)
+          .allow('', null),
         transp: Joi.string()
-            .valid('OPAQUE', 'TRANSPARENT')
-            .default('OPAQUE'),
+          .valid('OPAQUE', 'TRANSPARENT')
+          .default('OPAQUE'),
         priority: Joi.number()
-            .integer()
-            .min(0)
-            .max(9)
-            .default(0),
+          .integer()
+          .min(0)
+          .max(9)
+          .default(0),
         url: Joi.string()
-            .max(500)
-            .uri()
-            .allow('', null),
+          .max(500)
+          .uri()
+          .allow('', null),
         calendarId: Joi.number()
-            .integer()
-            .allow(null)
-    }).options({
+          .integer()
+          .allow(null),
+      }).options({
         stripUnknown: true,
-        abortEarly: false
-    }),
+        abortEarly: false,
+      }),
 
     note: Joi.object({
         title: Joi.string()
