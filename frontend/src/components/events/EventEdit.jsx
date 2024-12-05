@@ -62,10 +62,28 @@ const EventEdit = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      // Map frontend fields to backend expected fields
+      const eventData = {
+        summary: calEvent.summary,
+        description: calEvent.description || null,
+        date_start: calEvent.dtstart,
+        date_end: calEvent.dtend || null,
+        time_start: calEvent.timeStart || null,
+        time_end: calEvent.timeEnd || null,
+        location: calEvent.location || null,
+        status: calEvent.status,
+        classification: calEvent.class || 'PUBLIC',
+        priority: calEvent.priority || 0,
+        url: calEvent.url || null,
+        organizer: calEvent.organizer || null,
+        transp: calEvent.transp || 'OPAQUE',
+        participants: Array.isArray(calEvent.participants) ? calEvent.participants : []
+      };
+
       if (id) {
-        await ApiService.updateEvent(id, calEvent);
+        await ApiService.updateEvent(id, eventData);
       } else {
-        await ApiService.createEvent(calEvent);
+        await ApiService.createEvent(eventData);
       }
       navigate('/events');
     } catch (error) {
@@ -76,13 +94,31 @@ const EventEdit = () => {
   useEffect(() => {
     const loadData = async () => {
       try {
-        // Load persons for participant selector
         const personsResponse = await ApiService.listPersons();
         setPersons(personsResponse.data);
 
         if (id) {
           const eventResponse = await ApiService.getEvent(id);
-          setCalEvent(eventResponse.data);
+          const eventData = eventResponse.data;
+
+          // Map backend fields to frontend state
+          setCalEvent({
+            summary: eventData.summary || '',
+            description: eventData.description || '',
+            dtstart: eventData.date_start || formatLocalDate(),
+            dtend: eventData.date_end || '',
+            timeStart: eventData.time_start || '',
+            timeEnd: eventData.time_end || '',
+            location: eventData.location || '',
+            status: eventData.status || 'CONFIRMED',
+            categories: eventData.categories || [],
+            priority: eventData.priority || 0,
+            url: eventData.url || '',
+            organizer: eventData.organizer || null,
+            transp: eventData.transp || 'OPAQUE',
+            class: eventData.classification || 'PUBLIC',
+            participants: eventData.participants || []
+          });
         }
       } catch (error) {
         console.error('Failed to load data:', error);
