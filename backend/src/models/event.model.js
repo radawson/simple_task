@@ -54,28 +54,28 @@ class Event extends BaseModel {
                 type: DataTypes.STRING(200),
                 allowNull: true
             },
-            participants: {
-                type: DataTypes.JSON,
-                allowNull: true,
-                defaultValue: [],
-                get() {
-                    const raw = this.getDataValue('participants');
-                    if (!raw) return [];
-                    try {
-                        return typeof raw === 'string' ? JSON.parse(raw) : raw;
-                    } catch (e) {
-                        return [];
-                    }
-                },
-                set(value) {
-                    try {
-                        const toStore = Array.isArray(value) ? value : [];
-                        this.setDataValue('participants', JSON.stringify(toStore));
-                    } catch (e) {
-                        this.setDataValue('participants', '[]');
-                    }
-                }
-            },
+            // participants: {
+            //     type: DataTypes.JSON,
+            //     allowNull: true,
+            //     defaultValue: [],
+            //     get() {
+            //         const raw = this.getDataValue('participants');
+            //         if (!raw) return [];
+            //         try {
+            //             return typeof raw === 'string' ? JSON.parse(raw) : raw;
+            //         } catch (e) {
+            //             return [];
+            //         }
+            //     },
+            //     set(value) {
+            //         try {
+            //             const toStore = Array.isArray(value) ? value : [];
+            //             this.setDataValue('participants', JSON.stringify(toStore));
+            //         } catch (e) {
+            //             this.setDataValue('participants', '[]');
+            //         }
+            //     }
+            // },
             status: {
                 type: DataTypes.ENUM('CONFIRMED', 'TENTATIVE', 'CANCELLED'),
                 defaultValue: 'CONFIRMED'
@@ -178,10 +178,11 @@ class Event extends BaseModel {
             as: 'calendar'
         });
         this.belongsToMany(models.Person, {
-            through: 'EventParticipants',
+            through: 'EventParticipants', 
             foreignKey: 'eventId',
-            as: 'participantList'
-        });
+            otherKey: 'personId',
+            as: 'participants',
+          });
     }
 
     getParticipantNames() {

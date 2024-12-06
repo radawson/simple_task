@@ -119,6 +119,12 @@ class User extends BaseModel {
     static associate(models) {
         this.hasMany(models.Timecard);
         this.hasMany(models.Event, { foreignKey: 'organizer', as: 'organizedEvents' });
+        this.belongsToMany(models.Event, {
+            through: 'EventParticipants',
+            foreignKey: 'personId',
+            otherKey: 'eventId',
+            as: 'events',
+          });
         this.belongsTo(models.User, { foreignKey: 'owner', as: 'ownedBy' });
     }
 }

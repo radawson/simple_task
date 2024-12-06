@@ -58,6 +58,14 @@ const EventEdit = () => {
     }
   };
 
+  // Handle change for participants
+const handleParticipantsChange = (value) => {
+  setCalEvent((prev) => ({
+    ...prev,
+    participants: Array.isArray(value) ? value : [value],
+  }));
+};
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -265,10 +273,7 @@ const EventEdit = () => {
                   label="Participants"
                   name="participants"
                   value={calEvent.participants}
-                  onChange={value => handleChange({
-                    name: 'participants',
-                    value: typeof value === 'object' ? value.value : value
-                  })}
+                  onChange={(value) => handleParticipantsChange(value)}
                   data={[
                     { text: 'Select Participant', value: '' },
                     ...persons.map(person => ({
