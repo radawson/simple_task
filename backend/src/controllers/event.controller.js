@@ -23,27 +23,62 @@ class EventController {
                 eventData: JSON.stringify(req.body)  // Log full request
             });
 
+            // Extract fields from the request body
+            const {
+                summary,
+                description = null,
+                date_start,
+                date_end = null,
+                time_start = null,
+                time_end = null,
+                location = null,
+                status,
+                classification = 'PUBLIC',
+                priority = 0,
+                url = null,
+                organizer = null,
+                transp = 'OPAQUE',
+                participants = []
+            } = req.body;
 
+            // Create DateTime objects
+            const startDateTime = time_start
+                ? new Date(`${date_start}T${time_start}`)
+                : new Date(date_start);
 
-            // Remove any timestamp fields from input
-            const { created_at, updated_at, ...eventInput } = req.body;
+            let endDateTime;
+            if (date_end) {
+                endDateTime = time_end
+                    ? new Date(`${date_end}T${time_end}`)
+                    : new Date(date_end);
+            } else {
+                endDateTime = null;
+            }
 
+            // Check if Date objects are valid
+            if (isNaN(startDateTime)) {
+                throw new Error(`Invalid start date/time: ${date_start} ${time_start}`);
+            }
+            if (endDateTime && isNaN(endDateTime)) {
+                throw new Error(`Invalid end date/time: ${date_end} ${time_end}`);
+            }
+
+            // Prepare event data
             const eventData = {
-                ...req.body,
-                summary: req.body.summary,
-                description: req.body.description,
-                date_start: new Date(req.body.dtstart).toISOString().split('T')[0] || new Date().toISOString().split('T')[0],
-                date_end: req.body.dtend ? new Date(req.body.dtend).toISOString().split('T')[0] : null,
-                time_start: req.body.timeStart?.substring(0, 5) || null,
-                time_end: req.body.timeEnd?.substring(0, 5) || null,
-                location: req.body.location,
-                participants: Array.isArray(req.body.participants)
-                    ? req.body.participants
-                    : req.body.participants ? [req.body.participants] : [],
-                status: req.body.status,
-                classification: req.body.class || 'PUBLIC',
-                priority: req.body.priority || 0,
-                url: req.body.url,
+                summary,
+                description,
+                date_start,
+                date_end,
+                time_start,
+                time_end,
+                location,
+                status,
+                classification,
+                priority,
+                url,
+                organizer,
+                transp,
+                participants,
                 added_by: req.user.username
             };
 
