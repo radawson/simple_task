@@ -37,8 +37,7 @@ class EventController {
                 priority = 0,
                 url = null,
                 organizer = null,
-                transp = 'OPAQUE',
-                participants = []
+                transp = 'OPAQUE'
             } = req.body;
 
             // Create DateTime objects
@@ -76,6 +75,9 @@ class EventController {
                 priority,
                 url,
                 organizer,
+                participants: Array.isArray(req.body.participants)
+                    ? req.body.participants
+                    : req.body.participants ? [req.body.participants] : [],
                 transp,
                 added_by: req.user.username,
             };
@@ -86,23 +88,6 @@ class EventController {
 
             // Create the event
             const event = await Event.create(eventData, { transaction });
-
-            // Associate participants if any
-            if (participants.length > 0) {
-                // Fetch participant instances
-                const participantInstances = await Person.findAll({
-                    where: {
-                        id: participants,
-                    },
-                    transaction,
-                });
-
-                // Associate participants with the event
-                await event.addParticipants(participantInstances, { transaction });
-            }
-
-            // Commit the transaction
-            await transaction.commit();
 
             logger.info('Event created successfully', { eventId: event.id });
             this.notifySubscribers(event, 'create');
