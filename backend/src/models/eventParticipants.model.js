@@ -1,6 +1,6 @@
 // src/models/eventParticipants.model.js
 
-import { Model } from 'sequelize';
+import { DataTypes, Model } from 'sequelize';
 
 class EventParticipants extends Model {
   static init(sequelize) {
