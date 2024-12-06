@@ -87,26 +87,27 @@ class EventController {
             });
 
             // Create the event
-            const event = await Event.create(eventData, { transaction });
+            const event = await Event.create(eventData);
+            // const event = await Event.create(eventData, { transaction });
 
             logger.info('Event created successfully', { eventId: event.id });
 
-            // Associate participants
-            if (participants.length > 0) {
-                // Fetch participant instances
-                const participantInstances = await Person.findAll({
-                    where: {
-                        id: participants,
-                    },
-                    transaction,
-                });
+            // // Associate participants
+            // if (participants.length > 0) {
+            //     // Fetch participant instances
+            //     const participantInstances = await Person.findAll({
+            //         where: {
+            //             id: participants,
+            //         },
+            //         transaction,
+            //     });
 
-                // Associate participants with the event
-                await event.addParticipants(participantInstances, { transaction });
-            }
+            //     // Associate participants with the event
+            //     await event.addParticipants(participantInstances, { transaction });
+            // }
 
-            // Commit the transaction
-            await transaction.commit();
+            // // Commit the transaction
+            // await transaction.commit();
 
             // Notify subscribers if applicable
             this.notifySubscribers(event, 'create');
