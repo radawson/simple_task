@@ -63,7 +63,6 @@ class EventController {
                 throw new Error(`Invalid end date/time: ${date_end} ${time_end}`);
             }
 
-            // Prepare event data
             const eventData = {
                 summary,
                 description,
@@ -78,15 +77,32 @@ class EventController {
                 url,
                 organizer,
                 transp,
-                participants,
-                added_by: req.user.username
+                added_by: req.user.username,
             };
 
             logger.info('Processed event data', {
                 processedData: JSON.stringify(eventData)  // Log processed data
             });
 
-            const event = await Event.create(eventData);
+            // Create the event
+            const event = await Event.create(eventData, { transaction });
+
+            // Associate participants if any
+            if (participants.length > 0) {
+                // Fetch participant instances
+                const participantInstances = await Person.findAll({
+                    where: {
+                        id: participants,
+                    },
+                    transaction,
+                });
+
+                // Associate participants with the event
+                await event.addParticipants(participantInstances, { transaction });
+            }
+
+            // Commit the transaction
+            await transaction.commit();
 
             logger.info('Event created successfully', { eventId: event.id });
             this.notifySubscribers(event, 'create');
