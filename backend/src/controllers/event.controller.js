@@ -87,7 +87,7 @@ class EventController {
             });
 
             // Create the event
-            const event = await Event.create(eventData, { transaction });
+            const event = await Event.create(eventData);
 
             logger.info('Event created successfully', { eventId: event.id });
             this.notifySubscribers(event, 'create');
