@@ -4,6 +4,7 @@ import { dirname } from 'path';
 import dotenv from 'dotenv';
 import config from './src/config/index.js';
 import Logger from './src/core/Logger.js';
+import Server from './src/core/Server.js';
 
 // ESM __dirname equivalent
 const __filename = fileURLToPath(import.meta.url);
@@ -49,9 +50,12 @@ process.on('unhandledRejection', (reason, promise) => {
 
 // Import and start application
 import bootstrap from './src/index.js';
-bootstrap().then(app => {
-  server = app;
-}).catch(error => {
+try {
+  const app = await bootstrap();
+  server = Server.getInstance(config);
+  await server.initialize();
+  await server.start();
+} catch (error) {
   logger.error(`Fatal error during startup: ${error.message}`);
   process.exit(1);
-});
+}
