@@ -27,22 +27,29 @@
     border: 1px solid #ddd !important;
   }
 
-  /* Remove any background colors and ensure text is black */
-  * {
-    background-color: white !important;
-    color: black !important;
-  }
-
-  /* Ensure all content is expanded/visible */
-  .collapse {
+  /* Force show all collapsed content */
+  .collapse,
+  .collapse:not(.show),
+  .accordion-collapse {
     display: block !important;
     height: auto !important;
+    visibility: visible !important;
+    opacity: 1 !important;
   }
 
-  /* Remove any unnecessary margins/padding */
-  .mb-4, .mb-3, .py-5 {
-    margin: 10px 0 !important;
-    padding: 0 !important;
+  /* Force show all task descriptions */
+  .task-description,
+  .description,
+  [data-bs-toggle="collapse"] {
+    display: block !important;
+    height: auto !important;
+    visibility: visible !important;
+  }
+
+  /* Remove collapse/expand indicators */
+  .accordion-button::after,
+  .collapse-indicator {
+    display: none !important;
   }
 
   /* Adjust spacing for printed content */
