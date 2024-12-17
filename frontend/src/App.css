@@ -42,3 +42,37 @@ ul.no-bullets {
   padding: 0; /* Remove padding */
   margin: 0; /* Remove margins */
 }
+
+/* Responsive text adjustments for MDB components */
+.mdb-card {
+  font-size: 1rem;
+}
+
+/* Make buttons more touchable on mobile */
+@media screen and (max-width: 768px) {
+  .btn {
+    padding: 0.625rem 1.25rem;
+    min-height: 44px; /* Apple's recommended minimum touch target size */
+  }
+  
+  .input-group, .form-control {
+    min-height: 44px;
+  }
+  
+  /* Increase spacing between elements on mobile */
+  .mb-4 {
+    margin-bottom: 1.5rem !important;
+  }
+}
+
+/* Adjust table text size on mobile */
+@media screen and (max-width: 480px) {
+  .table {
+    font-size: 0.875rem;
+  }
+  
+  .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+}

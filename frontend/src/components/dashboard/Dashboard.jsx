@@ -6,6 +6,7 @@ import { formatLocalDate } from '../../utils/dateUtils';
 import TaskList from './TaskList';
 import EventList from './EventList';
 import NoteList from './NoteList';
+import './Dashboard.css';
 
 const Dashboard = () => {
   const [tasks, setTasks] = useState([]);
@@ -94,6 +95,10 @@ const Dashboard = () => {
     };
   }, [selectedDate]);
 
+  const handlePrint = () => {
+    window.print();
+  };
+
   const handleTaskUpdate = async (taskId) => {
     try {
       const response = await ApiService.getTasks(selectedDate);
@@ -106,6 +111,14 @@ const Dashboard = () => {
   return (
     <div className="container py-5">
       <div className="row">
+      <div className="col-12 mb-3">
+          <button 
+            className="btn btn-secondary" 
+            onClick={handlePrint}
+          >
+            Print Dashboard
+          </button>
+        </div>
         <div className="col-12 mb-4">
         <TaskList 
             tasks={tasks} 
