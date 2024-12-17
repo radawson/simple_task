@@ -15,6 +15,7 @@ import {
   MDBSideNavItem,
   MDBSideNavLink
 } from 'mdb-react-ui-kit';
+import './Navbar.css';
 
 export default function Navbar() {
   const [showNav, setShowNav] = useState(false);
@@ -89,12 +90,13 @@ export default function Navbar() {
             aria-controls='navbarSupportedContent'
             aria-expanded='false'
             aria-label='Toggle navigation'
-            onClick={() => setShowNav(!showNav)}  // Changed to toggle showNav
+            onClick={() => setSideNavOpen(!sideNavOpen)}  // Changed to toggle sideNav
           >
             <MDBIcon icon='bars' fas />
           </MDBNavbarToggler>
 
-          <MDBCollapse navbar open={showNav}>
+          {/* Hide the collapsible nav on mobile */}
+          <MDBCollapse navbar open={showNav} className='d-lg-block d-none'>
             <MDBNavbarNav className='mr-auto mb-2 mb-lg-0'>
               {navItems.map((item, index) => (
                 <MDBNavbarItem key={index} className={item.className}>
@@ -108,8 +110,12 @@ export default function Navbar() {
 
       <MDBSideNav
         open={sideNavOpen}
-        closeOnEsc
+        setOpen={setSideNavOpen}
+        position='left'
+        closeOnEsc={true}
+        backdrop={true}
         className='pt-4'
+        getOpenState={(e) => setSideNavOpen(e)}
       >
         <div className='list-group list-group-flush'>
           {navItems.map((item, index) => (
