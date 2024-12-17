@@ -1,32 +1,38 @@
 @media print {
-  /* Hide the print button when printing */
-  .btn-secondary {
-    display: none;
+  /* Existing styles remain the same */
+
+  /* Hide navigation elements */
+  nav,
+  .navbar,
+  .sidebar,
+  #navbar,
+  .nav-wrapper {
+    display: none !important;
   }
 
-  /* Ensure the page uses full width */
-  .container {
-    max-width: 100% !important;
-    width: 100% !important;
+  /* Ensure main content takes full page */
+  main,
+  .main-content,
+  .dashboard-container {
+    margin: 0 !important;
     padding: 0 !important;
+    width: 100% !important;
+    left: 0 !important;
+  }
+
+  /* Remove any box-shadows or borders */
+  .card,
+  .list-group-item {
+    box-shadow: none !important;
+    border: 1px solid #ddd !important;
+  }
+
+  /* Adjust spacing for printed content */
+  .row {
     margin: 0 !important;
   }
 
-  /* Remove any background colors and ensure text is black */
-  * {
-    background-color: white !important;
-    color: black !important;
-  }
-
-  /* Ensure all content is expanded/visible */
-  .collapse {
-    display: block !important;
-    height: auto !important;
-  }
-
-  /* Remove any unnecessary margins/padding */
-  .mb-4, .mb-3, .py-5 {
-    margin: 10px 0 !important;
-    padding: 0 !important;
+  .col-12 {
+    padding: 5px !important;
   }
 } 
