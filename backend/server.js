@@ -51,10 +51,7 @@ process.on('unhandledRejection', (reason, promise) => {
 // Import and start application
 import bootstrap from './src/index.js';
 try {
-  const app = await bootstrap();
-  server = Server.getInstance(config);
-  await server.initialize();
-  await server.start();
+  await bootstrap();
 } catch (error) {
   logger.error(`Fatal error during startup: ${error.message}`);
   process.exit(1);

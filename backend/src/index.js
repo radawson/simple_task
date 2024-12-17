@@ -33,8 +33,6 @@ async function bootstrap() {
             cors: config.server.cors
         });
         await server.initialize();
-
-        logger.debug('Starting server...');
         await server.start();
 
         // Setup graceful shutdown
