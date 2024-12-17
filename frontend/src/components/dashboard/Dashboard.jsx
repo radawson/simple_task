@@ -17,7 +17,7 @@ const Dashboard = () => {
   useEffect(() => {
     const currentDate = formatLocalDate(); // Use local timezone
     console.log('Fetching data for date:', currentDate); // Debug log
-    
+
     const fetchInitialData = async () => {
       try {
         const [tasksRes, eventsRes, notesRes] = await Promise.all([
@@ -94,6 +94,17 @@ const Dashboard = () => {
     };
   }, [selectedDate]);
 
+  const handlePrint = () => {
+    // Add print-specific class to body
+    document.body.classList.add('printing');
+
+    // Print
+    window.print();
+
+    // Remove print-specific class after printing
+    document.body.classList.remove('printing');
+  };
+
   const handleTaskUpdate = async (taskId) => {
     try {
       const response = await ApiService.getTasks(selectedDate);
@@ -103,36 +114,33 @@ const Dashboard = () => {
     }
   };
 
-  const handlePrint = () => {
-    // Add print-specific class to body
-    document.body.classList.add('printing');
-    
-    // Print
-    window.print();
-    
-    // Remove print-specific class after printing
-    document.body.classList.remove('printing');
-  };
-
   return (
     <div className="container py-5">
       <div className="row">
+        <div className="col-12 mb-3">
+          <button
+            className="btn btn-secondary"
+            onClick={handlePrint}
+          >
+            Print Dashboard
+          </button>
+        </div>
         <div className="col-12 mb-4">
-        <TaskList 
-            tasks={tasks} 
+          <TaskList
+            tasks={tasks}
             onTaskUpdate={handleTaskUpdate}
-            selectedDate={selectedDate} 
+            selectedDate={selectedDate}
           />
         </div>
         <div className="col-12 mb-4">
           <EventList events={events}
-          selectedDate={selectedDate} 
-           />
+            selectedDate={selectedDate}
+          />
         </div>
         <div className="col-12 mb-4">
           <NoteList notes={notes}
-          selectedDate={selectedDate} 
-           />
+            selectedDate={selectedDate}
+          />
         </div>
       </div>
     </div>
