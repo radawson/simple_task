@@ -8,7 +8,21 @@ import Logger from './Logger.js';
 import { errorHandler, notFound } from '../middleware/error.middleware.js';
 
 class Server {
+    static instance = null;
+    
+    static getInstance(config) {
+        if (!Server.instance) {
+            Server.instance = new Server(config);
+        }
+        return Server.instance;
+    }
+
     constructor(config) {
+        // Prevent direct construction
+        if (Server.instance) {
+            throw new Error('Server instance already exists. Use Server.getInstance()');
+        }
+
         if (!config || !config.server) {
             throw new Error('Server configuration is required');
         }
