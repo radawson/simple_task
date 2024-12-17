@@ -94,17 +94,6 @@ const Dashboard = () => {
     };
   }, [selectedDate]);
 
-  const handlePrint = () => {
-    // Add print-specific class to body
-    document.body.classList.add('printing');
-
-    // Print
-    window.print();
-
-    // Remove print-specific class after printing
-    document.body.classList.remove('printing');
-  };
-
   const handleTaskUpdate = async (taskId) => {
     try {
       const response = await ApiService.getTasks(selectedDate);
@@ -114,18 +103,35 @@ const Dashboard = () => {
     }
   };
 
+  const handlePrint = () => {
+    // Find all collapsed elements and expand them
+    const collapsedElements = document.querySelectorAll('.collapse');
+    collapsedElements.forEach(element => {
+      element.classList.add('show');
+    });
+
+    // Add print class to body
+    document.body.classList.add('printing');
+
+    // Print
+    window.print();
+
+    // Cleanup: Remove print class and restore collapsed state
+    document.body.classList.remove('printing');
+    collapsedElements.forEach(element => {
+      if (!element.dataset.keepExpanded) {
+        element.classList.remove('show');
+      }
+    });
+  };
+
   return (
     <div className="container py-5">
       <div className="row">
-        <div className="col-12 mb-3">
-          <button
-            className="btn btn-secondary"
-            onClick={handlePrint}
-          >
+        <div className="col-12 mb-4">
+          <button onClick={handlePrint} className="btn btn-secondary mb-3">
             Print Dashboard
           </button>
-        </div>
-        <div className="col-12 mb-4">
           <TaskList
             tasks={tasks}
             onTaskUpdate={handleTaskUpdate}
