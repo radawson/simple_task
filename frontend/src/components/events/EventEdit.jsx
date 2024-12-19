@@ -84,7 +84,9 @@ const handleParticipantsChange = (value) => {
         url: calEvent.url || null,
         organizer: calEvent.organizer || null,
         transp: calEvent.transp || 'OPAQUE',
-        participants: Array.isArray(calEvent.participants) ? calEvent.participants : []
+        participants: calEvent.participants
+          .filter(p => p && p !== '') // Filter out empty values
+          .map(p => typeof p === 'object' ? p.value : p) // Extract just the ID if it's an object
       };
 
       console.log('Submitting event data:', eventData);
