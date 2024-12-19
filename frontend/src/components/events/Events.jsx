@@ -112,14 +112,14 @@ const Events = () => {
     const formatParticipants = (event) => {
         if (!event) return '';
 
-        // Use participant details if available
-        if (event.participantDetails?.length > 0) {
-            return event.participantDetails
+        // Use participants from the join table
+        if (event.participants?.length > 0) {
+            return event.participants
                 .map(p => `${p.firstName} ${p.lastName}`)
                 .join(', ');
         }
 
-        // Show organizer if available
+        // Show organizer if available and no participants
         const organizer = event.Organizer
             ? `${event.Organizer.firstName} ${event.Organizer.lastName}`
             : '';
@@ -189,7 +189,7 @@ const Events = () => {
 
     useEffect(() => {
         fetchEvents();
-      }, [fetchEvents]);
+    }, [fetchEvents]);
 
     return (
         <MDBContainer className="py-5">
