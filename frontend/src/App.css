@@ -1,0 +1,78 @@
+.App {
+  text-align: center;
+}
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+ul.no-bullets {
+  list-style-type: none; /* Remove bullets */
+  padding: 0; /* Remove padding */
+  margin: 0; /* Remove margins */
+}
+
+/* Responsive text adjustments for MDB components */
+.mdb-card {
+  font-size: 1rem;
+}
+
+/* Make buttons more touchable on mobile */
+@media screen and (max-width: 768px) {
+  .btn {
+    padding: 0.625rem 1.25rem;
+    min-height: 44px; /* Apple's recommended minimum touch target size */
+  }
+  
+  .input-group, .form-control {
+    min-height: 44px;
+  }
+  
+  /* Increase spacing between elements on mobile */
+  .mb-4 {
+    margin-bottom: 1.5rem !important;
+  }
+}
+
+/* Adjust table text size on mobile */
+@media screen and (max-width: 480px) {
+  .table {
+    font-size: 0.875rem;
+  }
+  
+  .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+}
