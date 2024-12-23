@@ -414,7 +414,18 @@ class EventController {
             const events = await Event.findAndCountAll({
                 limit: parseInt(limit),
                 offset: (page - 1) * parseInt(limit),
-                order: [['dateStart', 'ASC']]
+                order: [['dateStart', 'ASC']],
+                include: [
+                    {
+                        model: Person,
+                        as: 'organizerUser'
+                    },
+                    {
+                        model: Person,
+                        as: 'participants',
+                        through: { attributes: [] }
+                    }
+                ]
             });
 
             const response = {
