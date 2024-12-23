@@ -76,6 +76,7 @@ const Events = () => {
             } else {
                 response = await ApiService.getEventsByRange(selectedDate, endDate);
             }
+            console.log(response);
             const eventsArray = response?.data || [];
 
             const formattedEvents = eventsArray.map(event => ({
