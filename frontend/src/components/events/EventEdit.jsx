@@ -11,6 +11,7 @@ import {
   MDBContainer,
   MDBTimepicker
 } from 'mdb-react-ui-kit';
+import { useToast } from '../../context/ToastContext';
 import { ApiService } from '../../services/api';
 import { formatLocalDate } from '../../utils/dateUtils';
 
@@ -59,12 +60,17 @@ const EventEdit = () => {
   };
 
   // Handle change for participants
-const handleParticipantsChange = (value) => {
-  setCalEvent((prev) => ({
-    ...prev,
-    participants: Array.isArray(value) ? value : [value],
-  }));
-};
+  const handleParticipantsChange = (value) => {
+    // Ensure we're always working with an array
+    const participantValues = Array.isArray(value) 
+      ? value.map(v => typeof v === 'object' ? v.value : v)
+      : [value].map(v => typeof v === 'object' ? v.value : v);
+
+    setCalEvent(prev => ({
+      ...prev,
+      participants: participantValues
+    }));
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -93,12 +99,18 @@ const handleParticipantsChange = (value) => {
 
       if (id) {
         await ApiService.updateEvent(id, eventData);
+        showToast({ message: 'Event updated successfully', type: 'success' });
       } else {
         await ApiService.createEvent(eventData);
+        showToast({ message: 'Event created successfully', type: 'success' });
       }
       navigate('/events');
     } catch (error) {
       console.error('Failed to save event:', error);
+      showToast({ 
+        message: `Failed to ${id ? 'update' : 'create'} event: ${error.message}`, 
+        type: 'error' 
+      });
     }
   };
 
@@ -276,6 +288,7 @@ const handleParticipantsChange = (value) => {
                   name="participants"
                   value={calEvent.participants}
                   onChange={(value) => handleParticipantsChange(value)}
+                  multiple={true}
                   data={[
                     { text: 'Select Participant', value: '' },
                     ...persons.map(person => ({
