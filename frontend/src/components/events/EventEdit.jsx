@@ -18,6 +18,7 @@ import { formatLocalDate } from '../../utils/dateUtils';
 const EventEdit = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { showToast } = useToast();
   const [persons, setPersons] = useState([]);
   const [calEvent, setCalEvent] = useState({
     summary: '',
@@ -290,7 +291,6 @@ const EventEdit = () => {
                   onChange={(value) => handleParticipantsChange(value)}
                   multiple={true}
                   data={[
-                    { text: 'Select Participant', value: '' },
                     ...persons.map(person => ({
                       text: `${person.firstName} ${person.lastName}`,
                       value: person.id
