@@ -54,12 +54,12 @@ class Event extends BaseModel {
                 type: DataTypes.STRING(200),
                 allowNull: true
             },
-            participants: {
+            participantList: {
                 type: DataTypes.JSON,
                 allowNull: true,
                 defaultValue: [],
                 get() {
-                    const raw = this.getDataValue('participants');
+                    const raw = this.getDataValue('participantList');
                     if (!raw) return [];
                     try {
                         return typeof raw === 'string' ? JSON.parse(raw) : raw;
@@ -70,9 +70,9 @@ class Event extends BaseModel {
                 set(value) {
                     try {
                         const toStore = Array.isArray(value) ? value : [];
-                        this.setDataValue('participants', JSON.stringify(toStore));
+                        this.setDataValue('participantList', JSON.stringify(toStore));
                     } catch (e) {
-                        this.setDataValue('participants', '[]');
+                        this.setDataValue('participantList', '[]');
                     }
                 }
             },
@@ -184,32 +184,32 @@ class Event extends BaseModel {
     }
 
     getParticipantNames() {
-        if (typeof this.participants === 'string') {
-            return this.participants;
+        if (typeof this.participantList === 'string') {
+            return this.participantList;
         }
-        return this.participants.map(p => {
+        return this.participantList.map(p => {
             if (typeof p === 'string') return p;
             return `${p.firstName} ${p.lastName}`;
         }).join(', ');
     }
 
     addParticipant(participant) {
-        if (!Array.isArray(this.participants)) {
-            this.participants = [];
+        if (!Array.isArray(this.participantList)) {
+            this.participantList = [];
         }
-        this.participants.push(participant);
+        this.participantList.push(participant);
     }
 
     removeParticipant(participant) {
-        if (!Array.isArray(this.participants)) return;
+        if (!Array.isArray(this.participantList)) return;
 
         if (typeof participant === 'string') {
-            this.participants = this.participants.filter(p =>
+            this.participantList = this.participantList.filter(p =>
                 typeof p === 'string' ? p !== participant :
                     `${p.firstName} ${p.lastName}` !== participant
             );
         } else {
-            this.participants = this.participants.filter(p =>
+            this.participantList = this.participantList.filter(p =>
                 typeof p === 'string' ? true :
                     p.firstName !== participant.firstName ||
                     p.lastName !== participant.lastName
