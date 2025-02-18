@@ -10,18 +10,28 @@ import {
 } from 'mdb-react-ui-kit';
 
 export default function Login() {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+  const [formData, setFormData] = useState({
+    username: '',
+    password: ''
+  });
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const navigate = useNavigate();
   const location = useLocation();
   const { login, loginWithSSO } = useAuth();
 
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await login(username, password);
+      await login(formData.username, formData.password);
       const from = location.state?.from?.pathname || '/';
       navigate(from, { replace: true });
     } catch (err) {
@@ -40,29 +50,36 @@ export default function Login() {
           <h2 className="text-center mb-5">Login</h2>
           {error && <div className="alert alert-danger">{error}</div>}
 
-          <form onSubmit={handleSubmit}>
-            <MDBInput
-              type="text"
-              label="Username"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              className="mb-4"
-              required
-            />
-            <MDBInput
-              type={showPassword ? 'text' : 'password'}
-              label="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="mb-4"
-              required
-            >
-              <MDBIcon
-                onClick={() => setShowPassword(!showPassword)}
-                className="trailing"
-                icon={showPassword ? 'eye-slash' : 'eye'}
+          <form onSubmit={handleSubmit} autoComplete="off">
+            <div className="form-group mb-4">
+              <MDBInput
+                type="text"
+                name="username"
+                label="Username"
+                value={formData.username}
+                onChange={handleChange}
+                required
+                autoComplete="username"
               />
-            </MDBInput>
+            </div>
+            <div className="form-group mb-4">
+              <MDBInput
+                type={showPassword ? 'text' : 'password'}
+                name="password"
+                label="Password"
+                value={formData.password}
+                onChange={handleChange}
+                required
+                autoComplete="current-password"
+              >
+                <MDBIcon
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="trailing"
+                  icon={showPassword ? 'eye-slash' : 'eye'}
+                  style={{ cursor: 'pointer' }}
+                />
+              </MDBInput>
+            </div>
             <MDBBtn type="submit" block className="mb-4">
               Login
             </MDBBtn>

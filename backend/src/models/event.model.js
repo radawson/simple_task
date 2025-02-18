@@ -172,11 +172,11 @@ class Event extends BaseModel {
             foreignKey: 'organizer'
         });
         this.belongsTo(models.Calendar, {
-            foreignKey: 'calendarId',
+            foreignKey: 'calendar_id',
             as: 'calendar'
         });
         this.belongsToMany(models.Person, {
-            through: 'event_participants',
+            through: models.EventParticipants,
             foreignKey: 'event_id',
             otherKey: 'person_id',
             as: 'participants'

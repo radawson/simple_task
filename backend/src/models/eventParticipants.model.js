@@ -6,22 +6,35 @@ class EventParticipants extends Model {
   static init(sequelize) {
     return super.init(
       {
-        eventId: {
+        event_id: {
           type: DataTypes.INTEGER,
           primaryKey: true,
+          references: {
+            model: 'events',
+            key: 'id'
+          }
         },
-        personId: {
+        person_id: {
           type: DataTypes.UUID,
           primaryKey: true,
-        },
+          references: {
+            model: 'persons',
+            key: 'id'
+          }
+        }
       },
       {
         sequelize,
         modelName: 'EventParticipants',
         tableName: 'event_participants',
         timestamps: false,
+        underscored: true
       }
     );
+  }
+
+  static associate(models) {
+    // No direct associations needed as this is a junction table
   }
 }
 
