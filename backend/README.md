@@ -38,7 +38,7 @@ The communication between Server A and Server B will use a WireGuard tunnel for 
 The WireGuard tunnel will handle encrypted communications, allowing the servers to relay messages between clients securely.
 4. Backend Structure
 The backend will be built using a microservices architecture to separate concerns (authentication, chat, file handling).
-We’ll include endpoints for login, user management, message storage, and file management.
+We'll include endpoints for login, user management, message storage, and file management.
 
 ## Badges
 On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
@@ -69,7 +69,30 @@ You can also document commands to lint the code or run tests. These steps help t
 Show your appreciation to those who have contributed to the project.
 
 ## License
-For open source projects, say how it is licensed.
+MIT License
+
+Copyright (c) 2024 Richard Dawson
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+Any derivative works or modifications must include appropriate credit to the 
+original author, Richard Dawson, and a link to the original repository.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
 
 ## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+This is a low priority project that is basically for home use.
