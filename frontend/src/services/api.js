@@ -64,7 +64,7 @@ export const ApiService = {
   deleteNote: (id) => api.delete(`/notes/${id}`),
   getNote: (id) => api.get(`/notes/${id}`),
   getNotes: (date) => api.get(`/notes/date/${date}`),
-  listNotes: (params) => axios.get('/api/notes', { params }),
+  listNotes: (params) => axios.get('/notes', { params }),
   updateNote: (id, note) => api.patch(`/notes/${id}`, note),
 
   // Persons
@@ -80,7 +80,7 @@ export const ApiService = {
   getTask: (id) => api.get(`/tasks/${id}`),
   getTasks: (date) => api.get(`/tasks/date/${date}`),
   getTasksByRange: (startDate, endDate) => 
-    api.get(`/api/tasks/range/${startDate}/${endDate}`),
+    api.get(`/tasks/range/${startDate}/${endDate}`),
   listTasks: (params) => api.get('/tasks', { params }),
   toggleTaskCompletion: (taskId) => api.patch(`/tasks/completed/${taskId}`),
   updateTask: (id, task) => api.patch(`/tasks/${id}`, task),

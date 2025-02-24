@@ -1,12 +1,12 @@
 // src/services/auth.service.js
-import axios from 'axios';
+import { ApiService } from './api';
 import authConfig from '../config/auth.config';
 
 const API_URL = '/auth';
 
 export const AuthService = {
   async login(username, password) {
-    const response = await axios.post(`${API_URL}/login`, { username, password });
+    const response = await ApiService.login({ username, password });
     this.handleAuthResponse(response);
     return response.data;
   },
@@ -19,9 +19,7 @@ export const AuthService = {
   },
 
   async handleSSOCallback(code, state) {
-    const response = await axios.get(`${API_URL}/sso/callback`, {
-      params: { code, state }
-    });
+    const response = await ApiService.handleSSOCallback(code, state);
     this.handleAuthResponse(response);
     return response.data;
   },

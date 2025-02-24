@@ -28,7 +28,7 @@ const createRouter = (socketService) => {
     const userRoutes = createUserRoutes(socketService);
 
     // Public routes (dashboard accessible)
-    router.use('/auth', authRoutes);
+    router.use('/api/auth', authRoutes);
     router.use('/api/tasks', taskRoutes);      // Public GET routes
     router.use('/api/events', eventRoutes);    // Public GET routes
     router.use('/api/notes', noteRoutes);      // Public GET routes
